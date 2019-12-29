@@ -1,0 +1,17 @@
+﻿@media (min-width: 768px) {
+    .nav > li.hidden-desktop {
+        display: none;
+    }
+}
+
+.content-wrapper.no-footer {
+    min-height: calc(100vh - 50px);
+}
+
+.dropdown-menu .divider {
+    margin: 5px 0;
+}
+
+.dropdown-menu {
+    border-radius: 0;
+}
