@@ -15,6 +15,12 @@ namespace TSensor.Web.Controllers
         [Route("")]
         public IActionResult Index()
         {
+            return View();
+        }
+
+        [Route("dashboard")]
+        public IActionResult Old()
+        {
             var actualValues = repository.GetActualSensorValues();
 
             return View(actualValues);
