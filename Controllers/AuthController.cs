@@ -2,9 +2,9 @@
 
 namespace TSensor.Web.Controllers
 {
-    [Route("login")]
     public class AuthController : Controller
     {
+        [Route("login")]
         public IActionResult Login()
         {
             return View();
