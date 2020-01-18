@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
 using System;
+using System.Linq;
 using System.Security.Claims;
 
 namespace TSensor.Web.Models.Services.Security
@@ -8,10 +10,12 @@ namespace TSensor.Web.Models.Services.Security
     public class AuthService
     {
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContext;
 
-        public AuthService(IConfiguration configuration)
+        public AuthService(IConfiguration configuration, IHttpContextAccessor httpContext)
         {
             _configuration = configuration;
+            _httpContext = httpContext;
         }
 
         public string EncryptPassword(string password)
@@ -24,6 +28,10 @@ namespace TSensor.Web.Models.Services.Security
                     iterationCount: 4096,
                     numBytesRequested: 32));
         }
+
+        public Guid CurrentUserGuid =>
+            Guid.Parse(_httpContext.HttpContext.User.Claims.FirstOrDefault(p => p.Type == "Guid")?.Value);
+
 
         public static ClaimsPrincipal CreateUserPrincipal(Guid userGuid, string name, string role)
         {
