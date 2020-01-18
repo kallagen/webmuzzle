@@ -25,7 +25,7 @@ namespace TSensor.Web.Controllers
         {
             var actualValues = repository.GetActualSensorValues();
 
-            return View("Old", actualValues);
+            return View(actualValues);
         }
     }
 }
