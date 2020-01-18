@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using System.IO;
 using TSensor.Web.Models.Broadcast;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Services.Log;
 using TSensor.Web.Models.Services.Security;
 
 namespace TSensor.Web
@@ -45,6 +46,7 @@ namespace TSensor.Web
 
             services.AddScoped<UpdateAuthenticationEvents>();
             services.AddSingleton<AuthService>();
+            services.AddSingleton<FileLogService>();
 
             var connectionString = Configuration.GetConnectionString("oltp");
             services.AddScoped<IRepository, Repository>(p => new Repository(connectionString));

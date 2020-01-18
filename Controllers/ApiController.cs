@@ -2,17 +2,20 @@
 using System;
 using System.Globalization;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Services.Log;
 
 namespace TSensor.Web.Controllers
 {
     [Route("api")]
     public class ApiController : Controller
     {
-        private readonly IRepository repository;
+        private readonly IRepository _repository;
+        private readonly FileLogService _logService;
 
-        public ApiController(IRepository repository)
+        public ApiController(IRepository repository, FileLogService logService)
         {
-            this.repository = repository;
+            _repository = repository;
+            _logService = logService;
         }
 
         [NonAction]
@@ -27,6 +30,8 @@ namespace TSensor.Web.Controllers
         {
             try
             {
+                _logService.Write("rawinput", $"{g} {d} {v}");
+
                 if (string.IsNullOrWhiteSpace(v))
                 {
                     return Error("missing sensor value");
@@ -44,7 +49,7 @@ namespace TSensor.Web.Controllers
                     return Error("missing device guid");
                 }
 
-                if (repository.PushValue(
+                if (_repository.PushValue(
                     Request.HttpContext.Connection.RemoteIpAddress.ToString(),
                     v, eventDateUTC, g))
                 {
