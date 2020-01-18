@@ -25,7 +25,7 @@ namespace TSensor.Web.Models.Repository
         {
             using IDbConnection db = new SqlConnection(connectionString);
 
-            return db.QueryFirst<T>(sql, param);
+            return db.QueryFirstOrDefault<T>(sql, param);
         }
     }
 }
