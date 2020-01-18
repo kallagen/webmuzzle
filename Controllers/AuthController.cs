@@ -1,11 +1,10 @@
-﻿using TSensor.Web.Models.Repository;
-using TSensor.Web.Models.Services.Security;
-using TSensor.Web.ViewModels.Auth;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Services.Security;
+using TSensor.Web.ViewModels.Auth;
 
 namespace TSensor.Web.Controllers
 {

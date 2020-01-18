@@ -8,7 +8,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <title>УЧЕТ СУ5Д</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="~/lib/adminlte/dist/css/AdminLTE.min.css" />
@@ -21,24 +21,40 @@
         <div class="login-box">
             <div class="login-logo">УЧЕТ <b>СУ5Д</b></div>
             <div class="login-box-body">
-                <p class="login-box-msg">Укажите данные для входа в систему</p>
-                <form action="../../index2.html" method="post">
-                    <div class="form-group has-feedback">
-                        @Html.TextBoxFor(m => m.Login, new { @class = "form-control", placeholder = "Р›РѕРіРёРЅ" })
-                        <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                @if (Model?.IsError == true)
+                {
+                    <p class="login-box-msg text-red">@Model.ErrorMessage</p>
+                }
+                else
+                {
+                    <p class="login-box-msg">Укажите данные для входа в систему</p>
+                }
+                <div class="form-group has-feedback">
+                    @Html.TextBoxFor(m => m.Login, new { @class = "form-control", placeholder = "Логин" })
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Пароль" })
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                </div>
+                <div class="text-center">
+                    <div class="row">
+                        <button type="submit" class="btn btn-primary btn-flat">Войти</button>
                     </div>
-                    <div class="form-group has-feedback">
-                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "РџР°СЂРѕР»СЊ" })
-                        <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-                    </div>
-                    <div class="text-center">
-                        <div class="row">
-                            <button type="submit" class="btn btn-primary btn-flat">Войти</button>
-                        </div>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     }
+    <script>
+        document.querySelector('#auth-form').addEventListener('submit', function (e) {
+            if (!document.querySelector('#Login').value ||
+                !document.querySelector('#Password').value) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        document.querySelector('#@(Model?.IsError == true ? "Password" : "Login")').focus();
+    </script>
 </body>
 </html> 

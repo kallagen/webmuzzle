@@ -29,14 +29,12 @@ namespace TSensor.Web
                 {
                     opts.LoginPath = new PathString("/login");
                     opts.AccessDeniedPath = new PathString("/youshallnotpass");
-                    //opts.EventsType = typeof(UpdateAuthenticationEvents);
+                    opts.EventsType = typeof(UpdateAuthenticationEvents);
                 });
 
-            services.AddControllersWithViews().AddRazorRuntimeCompilation();
-            //services.AddControllersWithViews();
+            services.AddMemoryCache();
 
-            services.AddSignalR();
-
+            services.AddScoped<UpdateAuthenticationEvents>();
             services.AddSingleton<AuthService>();
 
             var connectionString = Configuration.GetConnectionString("oltp");
@@ -45,6 +43,10 @@ namespace TSensor.Web
             services.AddSingleton<IBroadcastRepository, BroadcastRepository>(p => new BroadcastRepository(connectionString));
 
             services.AddHostedService<BroadcastService>();
+
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
+            //services.AddControllersWithViews();
+            services.AddSignalR();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
