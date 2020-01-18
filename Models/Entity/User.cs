@@ -2,7 +2,7 @@
 
 namespace TSensor.Web.Models.Entity
 {
-    public class User
+    public class User : IRemovableEntity
     {
         public Guid UserGuid { get; set; }
         public string Login { get; set; }
