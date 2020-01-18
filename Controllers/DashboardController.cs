@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TSensor.Web.Models.Repository;
 
 namespace TSensor.Web.Controllers
 {
+    [Authorize]
     public class DashboardController : Controller
     {
         private readonly IBroadcastRepository repository;
@@ -13,17 +15,17 @@ namespace TSensor.Web.Controllers
         }
 
         [Route("")]
-        public IActionResult Index()
+        public IActionResult Default()
         {
-            return View();
+            return RedirectToAction("Index", "Dashboard");
         }
 
         [Route("dashboard")]
-        public IActionResult Old()
+        public IActionResult Index()
         {
             var actualValues = repository.GetActualSensorValues();
 
-            return View(actualValues);
+            return View("Old", actualValues);
         }
     }
 }
