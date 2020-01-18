@@ -36,7 +36,7 @@ namespace TSensor.Web
             {
                 opts.AddPolicy("Admin", policy =>
                 {
-                    policy.RequireRole("Admin");
+                    policy.RequireRole("admin");
                 });
             });
 
