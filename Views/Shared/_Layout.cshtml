@@ -1,13 +1,78 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@{
+    var hasTitle = !string.IsNullOrWhiteSpace(ViewBag.Title as string);
+    var hasAdditionalTitle = !string.IsNullOrEmpty(ViewBag.AdditionalTitle as string);
+}
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TSensor - @ViewData["Title"]</title>
-    <script src="/npm/jquery/dist/jquery.min.js"></script>
+    <title>УЧЕТ СУ5Д @if (hasTitle) {<text> - @ViewBag.Title</text>}</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/lib/adminlte/dist/css/AdminLTE.min.css" />
+    <link rel="stylesheet" href="~/lib/adminlte/dist/css/skins/skin-blue-light.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <link rel="stylesheet" href="~/css/custom.css" />
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="~/lib/fastclick/lib/fastclick.js"></script>
+    <script src="~/lib/adminlte/dist/js/adminlte.min.js"></script>
+    <script src="~/js/main.js"></script>
 </head>
-<body>
-    @RenderBody()
-    @RenderSection("Scripts", required: false)
+<body class="hold-transition skin-blue-light layout-top-nav">
+    <div class="wrapper">
+
+        <header class="main-header">
+            <nav class="navbar navbar-static-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <span class="navbar-brand">УЧЕТ <b>СУ5Д</b></span>
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="true">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                    </div>
+
+                    <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li>@Html.ActionLink("Измерения по системе", "Index", "Dashboard")</li>
+                            <li><a>Объекты</a></li>
+                            <li class="dropdown">
+                                <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">Настройки <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Объекты</a></li>
+                                    <li class="divider"></li>
+                                    <li>@Html.ActionLink("Пользователи", "Search", "User")</li>
+                                </ul>
+                            </li>
+                            <li class="hidden-desktop"><a href="#">Выйти</a></li>
+                        </ul>
+                    </div>
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown user">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">admin</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Выйти</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div class="content-wrapper no-footer">
+            <div class="container">
+                <section class="content-header"><h1>@ViewBag.Title</h1>
+                </section>
+                <section class="content">
+                    @RenderBody()
+                </section>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
