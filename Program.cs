@@ -5,6 +5,8 @@ namespace TSensor.Web
 {
     public class Program
     {
+        public const string GLOBAL_ERROR_MESSAGE = "Произошла ошибка";
+
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();

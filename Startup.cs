@@ -1,15 +1,15 @@
-using TSensor.Web.Models.Services.Security;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using System.IO;
 using TSensor.Web.Models.Broadcast;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Services.Security;
 
 namespace TSensor.Web
 {
@@ -32,7 +32,16 @@ namespace TSensor.Web
                     opts.EventsType = typeof(UpdateAuthenticationEvents);
                 });
 
+            services.AddAuthorization(opts =>
+            {
+                opts.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireRole("Admin");
+                });
+            });
+
             services.AddMemoryCache();
+            services.AddHttpContextAccessor();
 
             services.AddScoped<UpdateAuthenticationEvents>();
             services.AddSingleton<AuthService>();
@@ -46,7 +55,7 @@ namespace TSensor.Web
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             //services.AddControllersWithViews();
-            services.AddSignalR();
+            services.AddSignalR();            
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
