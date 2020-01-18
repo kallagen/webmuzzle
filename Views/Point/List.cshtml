@@ -4,11 +4,14 @@
 }
 
 <div class="row">
-    <div class="col-md-3">
-        @Html.ActionLink("Создать новый объект", "Create", "Point", null, new { @class = "btn bg-blue btn-block margin-bottom" })
+    <div class="row">
+        <div class="col-md-3">
+            @Html.ActionLink("Создать новый объект", "Create", "Point", null, new { @class = "btn bg-blue btn-block margin-bottom" })
+        </div>
     </div>
-    <div class="col-md-9">
-        @if (!Model.HasData)
+    <div class="row">
+        <div class="col-md-12">
+            @if (!Model.HasData)
         {
             <h4>ничего не найдено</h4>
         }
@@ -25,15 +28,16 @@
                         <tbody>
                             @foreach (var item in Model.Data)
                             {
-                                <tr>
-                                    <td>@Html.ActionLink(item.Name, "Edit", "Point", new { pointGuid = item.PointGuid }, null)</td>
-                                </tr>
+                            <tr>
+                                <td>@Html.ActionLink(item.Name, "Edit", "Point", new { pointGuid = item.PointGuid }, null)</td>
+                            </tr>
                             }
                         </tbody>
                     </table>
                 </div>
             </div>
         }
+        </div>
     </div>
 </div>
 @Html.ViewModelWindow()
