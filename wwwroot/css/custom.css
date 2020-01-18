@@ -1,10 +1,4 @@
-﻿@media (min-width: 768px) {
-    .nav > li.hidden-desktop {
-        display: none;
-    }
-}
-
-.content-wrapper.no-footer {
+﻿.content-wrapper.no-footer {
     min-height: calc(100vh - 50px);
 }
 
@@ -46,4 +40,12 @@
 span.form-control {
     border: 0;
     padding: 7px 0 0 2px;
+}
+
+.nav > li > .menu-element {
+    position: relative;
+    display: block;
+    padding: 15px;
+    color: #fff;
+    line-height: 20px;
 }
