@@ -1,0 +1,52 @@
+﻿@model UserCreateViewModel
+@{
+    ViewBag.Title = "Создание нового пользователя";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="box">
+            @using (Html.BeginForm("Create", "User", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
+            {
+                <div class="box-body">
+                    <div class="form-group @Html.ValidState("Login")">
+                        <label for="Login" class="col-sm-3 control-label">Логин</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Login, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Login, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("Name")">
+                        <label for="Name" class="col-sm-3 control-label">Имя</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("Password")">
+                        <label for="Password" class="col-sm-3 control-label">Пароль</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Password, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Password, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("Role")">
+                        <label for="Role" class="col-sm-3 control-label">Группа</label>
+                        <div class="col-sm-9">
+                            @Html.DropDownListFor(model => model.Role, new SelectList(AuthService.Roles, "Key", "Value"), string.Empty, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Role, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    @Html.ActionLink("назад к списку пользователей", "Search", "User", null, new { @class = "footer-link" })
+                    <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('#Login').focus();
+</script>
+@Html.ViewModelWindow()

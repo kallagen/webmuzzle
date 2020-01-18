@@ -1,0 +1,85 @@
+﻿@model UserSearchViewModel
+@{
+    ViewBag.Title = "Пользователи";
+    if (Model?.HasData == true)
+    {
+        ViewBag.AdditionalTitle = $"найдено {Model.RecordCount} пользователей";
+    }
+}
+
+<div class="row">
+    <div class="col-md-3">
+        @Html.ActionLink("Создать нового пользователя", "Create", "User", null, new { @class = "btn bg-blue btn-block margin-bottom" })
+        @using (Html.BeginForm("Search", "User", FormMethod.Post, new { autocomplete = "off" }))
+        {
+            <div class="box box-solid">
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="FilterSearch">Поиск</label>
+                        @Html.TextBoxFor(m => m.FilterSearch, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label for="FilterRole">Группа</label>
+                        @Html.DropDownListFor(m => m.FilterRole, new SelectList(AuthService.Roles, "Key", "Value", Model.FilterRole), string.Empty, new { @class = "form-control" })
+                    </div>
+                    <div class="checkbox">
+                        <label>@Html.CheckBoxFor(m => m.ShowRemoved)Показывать удаленных</label>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-default">Искать</button>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="col-md-9">
+        @if (!Model.HasData)
+        {
+            <h4>ничего не найдено</h4>
+        }
+        else
+        {
+            <div class="box box-solid">
+                <div class="box-body table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                @if (Model.HasRemovedRecord)
+                                {
+                                    <th></th>
+                                }
+                                <th class="text-center">Логин</th>
+                                <th class="text-center">Имя</th>
+                                <th class="text-center">Группа</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Data)
+                            {
+                                <tr @if (item.IsRemoved) { <text> class="text-muted" </text> }>
+                                    @if (Model.HasRemovedRecord)
+                                    {
+                                        <td>
+                                            @if (item.IsRemoved)
+                                            {
+                                                <span class="badge">удален</span>
+                                            }
+                                        </td>
+                                    }
+                                    <td>@Html.ActionLink(item.Login, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                    <td>@Html.ActionLink(item.Name ?? string.Empty, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                    <td>@Model.GetRoleName(item.Role)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    document.querySelector('#FilterSearch').focus();
+</script>
+@Html.ViewModelWindow()

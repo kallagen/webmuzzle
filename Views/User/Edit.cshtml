@@ -1,0 +1,75 @@
+﻿@model UserEditViewModel
+@{
+    ViewBag.Title = $"Редактирование пользователя " +
+        (string.IsNullOrWhiteSpace(Model.Name) ? string.Empty : $" \"{Model.Name}\"");
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="box">
+            @using (Html.BeginForm("Edit", "User", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
+            {
+                @Html.HiddenFor(model => model.UserGuid)
+                @Html.HiddenFor(model => model.SetNewPassword)
+                <div class="box-body">
+                    <div class="form-group @Html.ValidState("Login")">
+                        <label for="Login" class="col-sm-3 control-label">Логин</label>
+                        <div class="col-sm-9"><span class="form-control">@Model.Login</span></div>
+                    </div>
+                    <div class="form-group @Html.ValidState("Name")">
+                        <label for="Name" class="col-sm-3 control-label">Имя</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("Role")">
+                        <label for="Role" class="col-sm-3 control-label">Группа</label>
+                        <div class="col-sm-9">
+                            @Html.DropDownListFor(model => model.Role, new SelectList(AuthService.Roles, "Key", "Value"), string.Empty, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Role, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <div class="checkbox">
+                                <label>@Html.CheckBoxFor(m => m.IsRemoved)пользователь удален</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-group" id="new-password-accordion">
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label"></div><div class="col-sm-9">
+                                <a data-toggle="collapse" href="#new-password-collapse" class="collapsed" aria-expanded="@Model.SetNewPassword">установить новый пароль</a>
+                            </div>
+                        </div>
+                        <div id="new-password-collapse" class="panel-collapse collapse @if(Model.SetNewPassword){<text>in</text>}" aria-expanded="@Model.SetNewPassword">
+                            <div class="form-group @Html.ValidState("NewPassword")">
+                                <label for="Password" class="col-sm-3 control-label">Новый пароль</label>
+                                <div class="col-sm-9">
+                                    @Html.TextBoxFor(m => m.NewPassword, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.NewPassword, null, new { @class = "help-block" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    @Html.ActionLink("назад к списку пользователей", "Search", "User", null, new { @class = "footer-link" })
+                    <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('#Name').focus();
+
+    var setNewPasswordInput = $('#SetNewPassword');
+    $('#new-password-accordion').on('hide.bs.collapse', function () {
+        setNewPasswordInput.val(false);
+    }).on('show.bs.collapse', function () {
+        setNewPasswordInput.val(true);
+    });
+</script>
+@Html.ViewModelWindow()
