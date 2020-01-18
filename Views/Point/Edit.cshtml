@@ -1,0 +1,32 @@
+﻿@model PointCreateEditViewModel
+@{
+    ViewBag.Title = $"Редактирование объекта \"{Model.Name}\"";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="box">
+            @using (Html.BeginForm("Edit", "Point", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
+            {
+                @Html.HiddenFor(model => model.PointGuid)
+                <div class="box-body">
+                    <div class="form-group @Html.ValidState("Name")">
+                        <label for="Name" class="col-sm-3 control-label">Имя</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    @Html.ActionLink("назад к списку объектов", "List", "Point", null, new { @class = "footer-link" })
+                    <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('#Name').focus();
+</script>
+@Html.ViewModelWindow()

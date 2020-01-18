@@ -49,9 +49,10 @@ namespace TSensor.Web
             services.AddSingleton<FileLogService>();
 
             var connectionString = Configuration.GetConnectionString("oltp");
+            services.AddSingleton<IBroadcastRepository, BroadcastRepository>(p => new BroadcastRepository(connectionString));
             services.AddScoped<IRepository, Repository>(p => new Repository(connectionString));
             services.AddScoped<IUserRepository, UserRepository>(p => new UserRepository(connectionString));
-            services.AddSingleton<IBroadcastRepository, BroadcastRepository>(p => new BroadcastRepository(connectionString));
+            services.AddScoped<IPointRepository, PointRepository>(p => new PointRepository(connectionString));
 
             services.AddHostedService<BroadcastService>();
 
