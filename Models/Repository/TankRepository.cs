@@ -93,9 +93,14 @@ namespace TSensor.Web.Models.Repository
                 }) == 1;
         }
 
-        public bool Remove(Guid tankGuid)
+        public bool Remove(Guid tankGuid, Guid pointGuid)
         {
-            throw new NotImplementedException();
+            return QueryFirst<int?>(@"
+                DELETE [Tank] 
+                WHERE TankGuid = @tankGuid AND PointGuid = @pointGuid
+                    
+                SELECT @@ROWCOUNT",
+                new { tankGuid, pointGuid }) == 1;
         }
     }
 }
