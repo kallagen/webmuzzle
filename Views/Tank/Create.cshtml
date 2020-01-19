@@ -3,6 +3,11 @@
     ViewBag.Title = $"Добавление нового топливного бака к объекту \"{Model.PointName}\"";
 }
 
+@section AdditionalHeader
+{
+    @Html.ActionLink("назад к объекту", "Edit", "Point", new { pointGuid = Model.PointGuid }, new { @class = "footer-link pull-right additional-header-link" })
+}
+
 <div class="row">
     <div class="col-md-12">
         <div class="box">
@@ -67,7 +72,6 @@
                     </div>
                 </div>
                 <div class="box-footer">
-                    @Html.ActionLink("назад к объекту", "Edit", "Point", new { pointGuid = Model.PointGuid }, new { @class = "footer-link" })
                     <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
                 </div>
             }
