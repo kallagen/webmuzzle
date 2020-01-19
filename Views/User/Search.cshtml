@@ -1,15 +1,14 @@
 ﻿@model UserSearchViewModel
 @{
     ViewBag.Title = "Пользователи";
-    if (Model?.HasData == true)
-    {
-        ViewBag.AdditionalTitle = $"найдено {Model.RecordCount} пользователей";
-    }
 }
 
+@section AdditionalHeader
+{
+    @Html.ActionLink("Создать нового пользователя", "Create", "User", null, new { @class = "btn bg-blue btn-block" })
+}
 <div class="row">
     <div class="col-md-3">
-        @Html.ActionLink("Создать нового пользователя", "Create", "User", null, new { @class = "btn bg-blue btn-block margin-bottom" })
         @using (Html.BeginForm("Search", "User", FormMethod.Post, new { autocomplete = "off" }))
         {
             <div class="box box-solid">

@@ -58,3 +58,7 @@ span.form-control {
 .table>thead>tr>th.table-center-header {
     vertical-align: middle;
 }
+
+.additional-header-link {
+    margin-top: 4px;
+}

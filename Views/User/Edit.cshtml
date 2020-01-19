@@ -4,6 +4,11 @@
         (string.IsNullOrWhiteSpace(Model.Name) ? string.Empty : $" \"{Model.Name}\"");
 }
 
+@section AdditionalHeader
+{
+    @Html.ActionLink("назад к списку пользователей", "Search", "User", null, new { @class = "footer-link pull-right additional-header-link" })
+}
+
 <div class="row">
     <div class="col-md-12">
         <div class="box">
@@ -55,7 +60,6 @@
                     </div>
                 </div>
                 <div class="box-footer">
-                    @Html.ActionLink("назад к списку пользователей", "Search", "User", null, new { @class = "footer-link" })
                     <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
                 </div>
             }
