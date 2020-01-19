@@ -48,7 +48,12 @@ namespace TSensor.Web.Models.Repository
 
         public bool Remove(Guid pointGuid)
         {
-            throw new NotImplementedException();
+            return QueryFirst<int?>(@"
+                DELETE [Point] 
+                WHERE PointGuid = @pointGuid
+                    
+                SELECT @@ROWCOUNT",
+                new { pointGuid }) == 1;
         }
     }
 }
