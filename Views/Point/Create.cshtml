@@ -10,7 +10,7 @@
             {
                 <div class="box-body">
                     <div class="form-group @Html.ValidState("Name")">
-                        <label for="Name" class="col-sm-3 control-label">Имя</label>
+                        <label for="Name" class="col-sm-3 control-label">Название</label>
                         <div class="col-sm-9">
                             @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
                             @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
