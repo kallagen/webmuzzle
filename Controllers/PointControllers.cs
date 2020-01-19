@@ -149,5 +149,31 @@ namespace TSensor.Web.Controllers
             viewModel.Data = _tankRepository.GetTankListByPoint(viewModel.PointGuid);
             return View(viewModel);
         }
+
+        [Route("point/remove")]
+        [HttpPost]
+        public ActionResult Remove(string pointGuid)
+        {
+            if (!Guid.TryParse(pointGuid, out var _pointGuid))
+            {
+                ViewBag.Title = "Объект не найден";
+                ViewBag.BackTitle = "назад к списку объектов";
+                ViewBag.BackUrl = Url.ActionLink("List", "Point");
+
+                return View("NotFound");
+            }
+            else
+            {
+                if (_pointRepository.Remove(_pointGuid))
+                {
+                    TempData["Point.List.SuccessMessage"] = "Объект удален";
+                }
+                else
+                {
+                    TempData["Point.List.ErrorMessage"] = "При удалении объекта произошла ошибка";
+                }
+                return RedirectToAction("List", "Point");
+            }
+        }
     }
 }

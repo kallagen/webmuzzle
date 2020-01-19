@@ -24,6 +24,7 @@
                     </div>
                 </div>
                 <div class="box-footer">
+                    <a id="remove-point-button" href="javascript:void(0)" class="btn bg-red">Удалить</a>
                     <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
                 </div>
             }
@@ -85,7 +86,16 @@
         }
     </div>
 </div>
+@using (Html.BeginForm("Remove", "Point", FormMethod.Post, new { id = "remove-point-form", @class = "hidden" }))
+{
+    @Html.HiddenFor(m => m.PointGuid)
+}
 <script>
     document.querySelector('#Name').focus();
+    $('#remove-point-button').click(function () {
+        new ConfirmModal('Удалить объект вместе со всеми топливными баками?', function () {
+            $('#remove-point-form').submit();
+        }).show();
+    });
 </script>
 @Html.ViewModelWindow()
