@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Globalization;
+using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Services.Log;
 
@@ -63,9 +64,12 @@ namespace TSensor.Web.Controllers
                     return Error("missing device guid", value, date, guid);
                 }
 
+                var sensorValue = SensorValue.Parse(value);
+                sensorValue.DeviceGuid = guid;
+
                 if (_repository.PushValue(
                     Request.HttpContext.Connection.RemoteIpAddress.ToString(),
-                    value, eventDateUTC, guid))
+                    sensorValue, eventDateUTC, guid))
                 {
                     return Json(new { success = true });
                 }
