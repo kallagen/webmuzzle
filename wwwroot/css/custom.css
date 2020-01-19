@@ -62,3 +62,7 @@ span.form-control {
 .additional-header-link {
     margin-top: 4px;
 }
+
+.default-button {
+    min-width: 80px;
+}
