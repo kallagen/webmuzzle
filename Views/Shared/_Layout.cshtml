@@ -1,6 +1,5 @@
 ﻿@{
     var hasTitle = !string.IsNullOrWhiteSpace(ViewBag.Title as string);
-    var hasAdditionalTitle = !string.IsNullOrEmpty(ViewBag.AdditionalTitle as string);
 }
 <!DOCTYPE html>
 <html>
@@ -8,8 +7,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>УЧЕТ СУ5Д @if (hasTitle)
-    {<text> - @ViewBag.Title</text>}</title>
+    <title>
+        УЧЕТ СУ5Д @if (hasTitle)
+        {<text> - @ViewBag.Title</text>}
+    </title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="~/lib/adminlte/dist/css/AdminLTE.min.css" />
@@ -70,7 +71,10 @@
         <div class="content-wrapper no-footer">
             <div class="container">
                 <section class="content-header">
-                    <h1>@ViewBag.Title</h1>
+                    <div class="row">
+                        <div class="col-md-9"><h3 class="no-margin">@ViewBag.Title</h3></div>
+                        <div class="col-md-3">@RenderSection("AdditionalHeader", false)</div>
+                    </div>
                 </section>
                 <section class="content">
                     @RenderBody()
