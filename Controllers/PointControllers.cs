@@ -11,11 +11,13 @@ namespace TSensor.Web.Controllers
     [Authorize(Policy = "Admin")]
     public class PointController : Controller
     {
-        private readonly IPointRepository _repository;
+        private readonly IPointRepository _pointRepository;
+        private readonly ITankRepository _tankRepository;
 
-        public PointController(IPointRepository repository)
+        public PointController(IPointRepository pointRepository, ITankRepository tankRepository)
         {
-            _repository = repository;
+            _pointRepository = pointRepository;
+            _tankRepository = tankRepository;
         }
 
         [Route("point/list")]
@@ -23,7 +25,7 @@ namespace TSensor.Web.Controllers
         {
             var viewModel = new SearchViewModel<Point>
             {
-                Data = _repository.List()
+                Data = _pointRepository.List()
             };
 
             var successMessage = TempData["Point.List.SuccessMessage"] as string;
@@ -56,7 +58,7 @@ namespace TSensor.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var pointGuid = _repository.Create(viewModel.Name);
+                var pointGuid = _pointRepository.Create(viewModel.Name);
                 if (pointGuid == null)
                 {
                     viewModel.ErrorMessage = Program.GLOBAL_ERROR_MESSAGE;
@@ -79,14 +81,26 @@ namespace TSensor.Web.Controllers
         {
             if (Guid.TryParse(pointGuid, out var _pointGuid))
             {
-                var point = _repository.GetPointByGuid(_pointGuid);
+                var point = _pointRepository.GetPointByGuid(_pointGuid);
                 if (point != null)
                 {
                     var viewModel = new PointCreateEditViewModel
                     {
                         PointGuid = point.PointGuid,
-                        Name = point.Name
+                        Name = point.Name,
+                        Data = _tankRepository.GetTankListByPoint(point.PointGuid)
                     };
+
+                    var successMessage = TempData["Point.Edit.SuccessMessage"] as string;
+                    if (!string.IsNullOrEmpty(successMessage))
+                    {
+                        viewModel.SuccessMessage = successMessage;
+                    }
+                    var errorMessage = TempData["Point.Edit.ErrorMessage"] as string;
+                    if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        viewModel.ErrorMessage = errorMessage;
+                    }
 
                     return View(viewModel);
                 }
@@ -112,7 +126,7 @@ namespace TSensor.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var editResult = _repository.Edit(viewModel.PointGuid, viewModel.Name);
+                var editResult = _pointRepository.Edit(viewModel.PointGuid, viewModel.Name);
                 if (editResult)
                 {
                     var pointUrl = Url.Action("Edit", "Point", new { pointUrl = viewModel.PointGuid });
@@ -127,6 +141,7 @@ namespace TSensor.Web.Controllers
                 }
             }
 
+            viewModel.Data = _tankRepository.GetTankListByPoint(viewModel.PointGuid);
             return View(viewModel);
         }
     }

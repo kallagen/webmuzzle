@@ -49,3 +49,12 @@ span.form-control {
     color: #fff;
     line-height: 20px;
 }
+
+.inline-header-button {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.table>thead>tr>th.table-center-header {
+    vertical-align: middle;
+}
