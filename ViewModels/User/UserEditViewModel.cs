@@ -15,7 +15,7 @@ namespace TSensor.Web.ViewModels.User
         [StringLength(32, ErrorMessage = "Слишком длинный пароль")]
         public string NewPassword { get; set; }
         public string Role { get; set; }
-        public bool IsRemoved { get; set; }
+        public bool IsInactive { get; set; }
 
         public void Validate(ModelStateDictionary modelState)
         {

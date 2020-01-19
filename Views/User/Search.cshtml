@@ -21,9 +21,6 @@
                         <label for="FilterRole">Группа</label>
                         @Html.DropDownListFor(m => m.FilterRole, new SelectList(AuthService.Roles, "Key", "Value", Model.FilterRole), string.Empty, new { @class = "form-control" })
                     </div>
-                    <div class="checkbox">
-                        <label>@Html.CheckBoxFor(m => m.ShowRemoved)Показывать удаленных</label>
-                    </div>
                 </div>
                 <div class="box-footer">
                     <button type="submit" class="btn btn-default">Искать</button>
@@ -43,7 +40,7 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                @if (Model.HasRemovedRecord)
+                                @if (Model.HasInactiveRecord)
                                 {
                                     <th></th>
                                 }
@@ -55,13 +52,13 @@
                         <tbody>
                             @foreach (var item in Model.Data)
                             {
-                                <tr @if (item.IsRemoved) { <text> class="text-muted" </text> }>
-                                    @if (Model.HasRemovedRecord)
+                                <tr @if (item.IsInactive) { <text> class="text-muted" </text> }>
+                                    @if (Model.HasInactiveRecord)
                                     {
                                         <td>
-                                            @if (item.IsRemoved)
+                                            @if (item.IsInactive)
                                             {
-                                                <span class="badge">удален</span>
+                                                <span class="badge">неактивен</span>
                                             }
                                         </td>
                                     }

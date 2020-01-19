@@ -23,18 +23,16 @@ namespace TSensor.Web.Controllers
         }
 
         [Route("user/search")]
-        public IActionResult Search(string s, string r, byte sr = 0)
+        public IActionResult Search(string s, string r)
         {
             var search = s;
             var role = r;
-            var showRemoved = sr != 0;
 
             var viewModel = new UserSearchViewModel
             {
                 FilterSearch = search,
                 FilterRole = role,
-                ShowRemoved = showRemoved,
-                Data = _repository.Search(search, role, showRemoved)
+                Data = _repository.Search(search, role)
             };
 
             var successMessage = TempData["User.Search.SuccessMessage"] as string;
@@ -54,8 +52,7 @@ namespace TSensor.Web.Controllers
                 new
                 {
                     s = viewModel?.FilterSearch,
-                    r = viewModel?.FilterRole,
-                    sr = viewModel?.ShowRemoved == true ? (byte?)1 : null
+                    r = viewModel?.FilterRole
                 });
         }
 
@@ -122,7 +119,7 @@ namespace TSensor.Web.Controllers
                         Login = user.Login,
                         Name = user.Name,
                         Role = user.Role,
-                        IsRemoved = user.IsRemoved
+                        IsInactive = user.IsInactive
                     };
 
                     return View(viewModel);
@@ -157,7 +154,7 @@ namespace TSensor.Web.Controllers
             if (ModelState.IsValid)
             {
                 var editResult = _repository.Edit(viewModel.UserGuid, viewModel.Name,
-                    viewModel.Role, viewModel.IsRemoved);
+                    viewModel.Role, viewModel.IsInactive);
 
                 var changePasswordResult = true;
                 if (viewModel.SetNewPassword)
@@ -168,7 +165,7 @@ namespace TSensor.Web.Controllers
 
                 if (editResult && changePasswordResult)
                 {
-                    if (!((viewModel.IsRemoved || viewModel.SetNewPassword) &&
+                    if (!((viewModel.IsInactive || viewModel.SetNewPassword) &&
                         _authService.CurrentUserGuid == viewModel.UserGuid))
                     {
                         var userUrl = Url.Action("Edit", "User", new { userGuid = viewModel.UserGuid });
@@ -197,7 +194,7 @@ namespace TSensor.Web.Controllers
         {
             _memoryCache.Set($"UserLastUpdate{viewModel.UserGuid}", DateTime.Now);
 
-            if (viewModel.SetNewPassword || viewModel.IsRemoved)
+            if (viewModel.SetNewPassword || viewModel.IsInactive)
             {
                 _memoryCache.Set($"UserReject{viewModel.UserGuid}", true);
             }
