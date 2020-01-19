@@ -1,0 +1,80 @@
+﻿@model TankCreateEditViewModel
+@{
+    ViewBag.Title = $"Добавление нового топливного бака к объекту \"{Model.PointName}\"";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            @using (Html.BeginForm("Create", "Tank", new { pointGuid = Model.PointGuid }, FormMethod.Post, false, new { @class = "form-horizontal", autocomplete = "off" }))
+            {
+                <div class="box-body">
+                    <div class="form-group @Html.ValidState("Name")">
+                        <label for="Name" class="col-sm-3 control-label">Название</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("MainDeviceGuid")">
+                        <label for="Name" class="col-sm-3 control-label">Код устройства основного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.MainDeviceGuid, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.MainDeviceGuid, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("MainIZKId")">
+                        <label for="Name" class="col-sm-3 control-label">Код ИЗК основного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.MainIZKId, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.MainIZKId, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("MainSensorId")">
+                        <label for="Name" class="col-sm-3 control-label">Код основного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.MainSensorId, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.MainSensorId, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <div class="checkbox">
+                                <label>@Html.CheckBoxFor(m => m.DualMode)Использовать дополнительный датчик</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("SecondDeviceGuid")">
+                        <label for="Name" class="col-sm-3 control-label">Код устройства дополнительного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.SecondDeviceGuid, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.SecondDeviceGuid, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("SecondIZKId")">
+                        <label for="Name" class="col-sm-3 control-label">Код ИЗК дополнительного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.SecondIZKId, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.SecondIZKId, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("SecondSensorId")">
+                        <label for="Name" class="col-sm-3 control-label">Код дополнительного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.SecondSensorId, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.SecondSensorId, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    @Html.ActionLink("назад к объекту", "Edit", "Point", new { pointGuid = Model.PointGuid }, new { @class = "footer-link" })
+                    <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('#Name').focus();
+</script>
+@Html.ViewModelWindow()

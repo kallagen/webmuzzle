@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TSensor.Web.ViewModels.Point
 {
-    public class PointCreateEditViewModel : ViewModelBase
+    public class PointCreateEditViewModel : SearchViewModel<Models.Entity.Tank>
     {
         public Guid PointGuid { get; set; }
         [Required(ErrorMessage = "Укажите название")]
