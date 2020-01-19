@@ -111,9 +111,9 @@ namespace TSensor.Web.Models.Repository
 					@crc)
 
 				DELETE FROM ActualSensorValue 
-				WHERE 
-					(@findTankGuid IS NOT NULL AND TankGuid = @findTankGuid AND IsSecond = @findIsSecond) OR
-					(@findTankGuid IS NULL AND DeviceGuid = @DeviceGuid AND izkNumber = @izkNumber AND sensorSerial = @sensorSerial)
+				WHERE
+					(TankGuid = @findTankGuid AND IsSecond = @findIsSecond) OR
+					(DeviceGuid = @DeviceGuid AND izkNumber = @izkNumber AND sensorSerial = @sensorSerial)
 
 				INSERT ActualSensorValue(
 					TankGuid, IsSecond, [Raw], DeviceGuid,
