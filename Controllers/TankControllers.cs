@@ -208,7 +208,11 @@ namespace TSensor.Web.Controllers
             if (!Guid.TryParse(pointGuid, out var _pointGuid) ||
                 !Guid.TryParse(tankGuid, out var _tankGuid))
             {
-                return RedirectToAction("List", "Point");
+                ViewBag.Title = "Объект не найден";
+                ViewBag.BackTitle = "назад к списку объектов";
+                ViewBag.BackUrl = Url.ActionLink("List", "Point");
+
+                return View("NotFound");
             }
             else
             {
