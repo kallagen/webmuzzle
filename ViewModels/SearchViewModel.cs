@@ -9,7 +9,5 @@ namespace TSensor.Web.ViewModels
 
         public bool HasData =>
             Data?.Any() == true;
-        public int RecordCount =>
-            Data.Count();
     }
 }
