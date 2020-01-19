@@ -60,12 +60,17 @@
                     </div>
                 </div>
                 <div class="box-footer">
+                    <a id="remove-user-button" href="javascript:void(0)" class="btn bg-red">Удалить</a>
                     <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
                 </div>
             }
         </div>
     </div>
 </div>
+@using (Html.BeginForm("Remove", "User", FormMethod.Post, new { id = "remove-user-form", @class = "hidden" }))
+{
+    @Html.HiddenFor(m => m.UserGuid)
+}
 <script>
     document.querySelector('#Name').focus();
 
@@ -74,6 +79,12 @@
         setNewPasswordInput.val(false);
     }).on('show.bs.collapse', function () {
         setNewPasswordInput.val(true);
+    });
+
+    $('#remove-user-button').click(function () {
+        new ConfirmModal('Удалить пользователя?', function () {
+            $('#remove-user-form').submit();
+        }).show();
     });
 </script>
 @Html.ViewModelWindow()

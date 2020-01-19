@@ -40,6 +40,11 @@ namespace TSensor.Web.Controllers
             {
                 viewModel.SuccessMessage = successMessage;
             }
+            var errorMessage = TempData["User.Search.ErrorMessage"] as string;
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                viewModel.ErrorMessage = errorMessage;
+            }
 
             return View(viewModel);
         }
@@ -201,6 +206,32 @@ namespace TSensor.Web.Controllers
 
             _memoryCache.Set($"UserName{viewModel.UserGuid}", viewModel.Name);
             _memoryCache.Set($"UserRole{viewModel.UserGuid}", viewModel.Role);
+        }
+
+        [Route("user/remove")]
+        [HttpPost]
+        public ActionResult Remove(string userGuid)
+        {
+            if (!Guid.TryParse(userGuid, out var _userGuid))
+            {
+                ViewBag.Title = "Пользователь не найден";
+                ViewBag.BackTitle = "назад к списку пользователей";
+                ViewBag.BackUrl = Url.ActionLink("Search", "User");
+
+                return View("NotFound");
+            }
+            else
+            {
+                if (_repository.Remove(_userGuid))
+                {
+                    TempData["User.Search.SuccessMessage"] = "Пользователь удален";
+                }
+                else
+                {
+                    TempData["User.Search.ErrorMessage"] = "При удалении пользователя произошла ошибка";
+                }
+                return RedirectToAction("Search", "User");
+            }
         }
     }
 }
