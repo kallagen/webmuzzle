@@ -80,5 +80,15 @@ namespace TSensor.Web.Models.Repository
                 SELECT @@ROWCOUNT",
                 new { userGuid, password }) == 1;
         }
+
+        public bool Remove(Guid userGuid)
+        {
+            return QueryFirst<int?>(@"
+                DELETE [User] 
+                WHERE UserGuid = @userGuid
+                    
+                SELECT @@ROWCOUNT",
+                new { userGuid }) == 1;
+        }
     }
 }

@@ -13,5 +13,6 @@ namespace TSensor.Web.Models.Repository
         public User GetUserByGuid(Guid userGuid);
         public bool Edit(Guid userGuid, string name, string role, bool isInactive);
         public bool ChangePassword(Guid userGuid, string password);
+        public bool Remove(Guid userGuid);
     }
 }
