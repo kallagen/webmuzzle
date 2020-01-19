@@ -141,6 +141,8 @@ namespace TSensor.Web.Controllers
                 SecondIZKId = tank.SecondIZKId,
                 SecondSensorId = tank.SecondSensorId
             };
+
+
             return View(viewModel);
         }
 
@@ -197,6 +199,30 @@ namespace TSensor.Web.Controllers
 
             viewModel.PointName = point.Name;
             return View(viewModel);
+        }
+
+        [Route("tank/remove")]
+        [HttpPost]
+        public ActionResult Remove(string tankGuid, string pointGuid)
+        {
+            if (!Guid.TryParse(pointGuid, out var _pointGuid) ||
+                !Guid.TryParse(tankGuid, out var _tankGuid))
+            {
+                return RedirectToAction("List", "Point");
+            }
+            else
+            {
+                if (_tankRepository.Remove(_tankGuid, _pointGuid))
+                {
+                    TempData["Point.Edit.SuccessMessage"] = "Топливный бак удален";
+                    return RedirectToAction("Edit", "Point", new { pointGuid = _pointGuid });
+                }
+                else
+                {
+                    TempData["Point.List.ErrorMessage"] = "При удалении топливного бака произошла ошибка";
+                    return RedirectToAction("List", "Point");
+                }
+            }
         }
     }
 }

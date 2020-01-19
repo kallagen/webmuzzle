@@ -33,6 +33,11 @@ namespace TSensor.Web.Controllers
             {
                 viewModel.SuccessMessage = successMessage;
             }
+            var errorMessage = TempData["Point.List.ErrorMessage"] as string;
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                viewModel.ErrorMessage = errorMessage;
+            }
 
             return View(viewModel);
         }

@@ -73,15 +73,24 @@
                     </div>
                 </div>
                 <div class="box-footer">
-                    <a href="javascript:void()" class="btn bg-red">Удалить</a>
+                    <a id="remove-tank-button" href="javascript:void(0)" class="btn bg-red">Удалить</a>
                     <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
                 </div>
             }
         </div>
     </div>
 </div>
-@using 
+@using (Html.BeginForm("Remove", "Tank", FormMethod.Post, new { id = "remove-tank-form", @class = "hidden" }))
+{
+    @Html.HiddenFor(m => m.TankGuid)
+    @Html.HiddenFor(m => m.PointGuid)
+}
 <script>
     document.querySelector('#Name').focus();
+    $('#remove-tank-button').click(function () {
+        new ConfirmModal('Удалить топливный бак?', function () {
+            $('#remove-tank-form').submit();
+        }).show();
+    });
 </script>
 @Html.ViewModelWindow()
