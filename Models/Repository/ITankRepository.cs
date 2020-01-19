@@ -11,7 +11,7 @@ namespace TSensor.Web.Models.Repository
         public Guid? Create(Guid pointGuid, string name, bool dualMode,
             string mainDeviceGuid, string mainIZKId, string mainSensorId,
             string secondDeviceGuid, string secondIZKId, string secondSensorId);
-        public bool Edit(Guid tankGuid, string name, bool dualMode,
+        public bool Edit(Guid tankGuid, Guid pointGuid, string name, bool dualMode,
             string mainDeviceGuid, string mainIZKId, string mainSensorId,
             string secondDeviceGuid, string secondIZKId, string secondSensorId);
         public bool Remove(Guid tankGuid);

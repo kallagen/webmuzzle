@@ -61,7 +61,7 @@ namespace TSensor.Web.Models.Repository
                 });
         }
 
-        public bool Edit(Guid tankGuid, string name, bool dualMode,
+        public bool Edit(Guid tankGuid, Guid pointGuid, string name, bool dualMode,
             string mainDeviceGuid, string mainIZKId, string mainSensorId,
             string secondDeviceGuid, string secondIZKId, string secondSensorId)
         {
@@ -74,13 +74,14 @@ namespace TSensor.Web.Models.Repository
                     MainSensorId = @mainSensorId,
                     SecondDeviceGuid = @secondDeviceGuid, 
                     SecondIZKId = @secondIZKId, 
-                    SecondSensorId = @secondSensorId)
-                WHERE TankGuid = @tankGuid
+                    SecondSensorId = @secondSensorId
+                WHERE TankGuid = @tankGuid AND PointGuid = @pointGuid
 
                 SELECT @@ROWCOUNT",
                 new
                 {
                     tankGuid,
+                    pointGuid,
                     name,
                     dualMode,
                     mainDeviceGuid,
