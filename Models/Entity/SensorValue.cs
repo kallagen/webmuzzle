@@ -6,6 +6,7 @@ namespace TSensor.Web.Models.Entity
     public class SensorValue
     {
         public Guid? TankGuid { get; set; }
+        public bool IsSecond { get; set; }
         public string DeviceGuid { get; set; }
 
         public string Raw { get; set; }

@@ -69,7 +69,7 @@ namespace TSensor.Web.Controllers
 
                 if (_repository.PushValue(
                     Request.HttpContext.Connection.RemoteIpAddress.ToString(),
-                    sensorValue, eventDateUTC, guid))
+                    sensorValue, eventDateUTC))
                 {
                     return Json(new { success = true });
                 }
