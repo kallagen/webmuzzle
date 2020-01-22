@@ -1,4 +1,7 @@
-﻿.content-wrapper.no-footer {
+﻿*, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'Gilroy';
+}
+.content-wrapper.no-footer {
     min-height: calc(100vh - 50px);
 }
 
@@ -10,9 +13,9 @@
     border-radius: 0;
 }
 
-.logo-lg {
+/*.logo-lg {
     font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
-}
+}*/
 
 .badge {
     font-weight: normal;
@@ -65,4 +68,8 @@ span.form-control {
 
 .default-button {
     min-width: 80px;
+}
+
+.info-box-text {
+    text-transform: none;
 }

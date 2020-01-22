@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="~/lib/adminlte/dist/css/AdminLTE.min.css" />
     <link rel="stylesheet" href="~/lib/adminlte/dist/css/skins/skin-blue-light.min.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <link rel="stylesheet" href="~/css/fonts/stylesheet.css" />
     <link rel="stylesheet" href="~/css/custom.css" />
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -41,7 +41,7 @@
                     <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
                         <ul class="nav navbar-nav">
                             <li>@Html.ActionLink("Измерения по системе", "Index", "Dashboard")</li>
-                            <li><a>Объекты</a></li>
+                            <li>@Html.ActionLink("Объекты", "PointsCurrentState", "Point")</li>
                             @if (User.IsInRole("admin"))
                             {
                                 <li class="dropdown">
