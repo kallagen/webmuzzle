@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TSensor.Web.Models.Entity;
 
 namespace TSensor.Web.Models.Repository
@@ -7,7 +8,7 @@ namespace TSensor.Web.Models.Repository
     {
         public BroadcastRepository(string connectionString) : base(connectionString) { }
 
-        public IEnumerable<ActualSensorValue> GetAllSensorActualState()
+        public IEnumerable<ActualSensorValue> GetSensorActualState(Guid? pointGuid = null)
         {
             return Query<ActualSensorValue>(@"
 				SELECT 
@@ -54,7 +55,9 @@ namespace TSensor.Web.Models.Repository
 					LEFT JOIN Tank t ON p.PointGuid = t.PointGuid
 					FULL JOIN ActualSensorValue m ON t.TankGuid = m.TankGuid AND m.IsSecond = 0
 					LEFT JOIN ActualSensorValue s ON t.TankGuid = s.TankGuid AND t.DualMode = 1 AND s.IsSecond = 1
-				WHERE t.TankGuid IS NOT NULL OR m.IsSecond = 0");
+				WHERE 
+					(@pointGuid IS NULL AND (t.TankGuid IS NOT NULL OR m.IsSecond = 0)) OR
+					(@pointGuid IS NOT NULL AND p.PointGuid = @pointGuid)", new { pointGuid });
         }
     }
 }
