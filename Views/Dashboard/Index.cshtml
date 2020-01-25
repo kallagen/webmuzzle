@@ -14,7 +14,8 @@
                 new
                 {
                     guid = t.SensorGuid,
-                    updateDate = t.MainSensorLastDate
+                    updateDate = t.MainSensorLastDate,
+                    isSecond = -1
                 }
             };
         }
@@ -27,12 +28,14 @@
                     new
                     {
                         guid = t.MainSensorGuid,
-                        updateDate = t.MainSensorLastDate
+                        updateDate = t.MainSensorLastDate,
+                        isSecond = 0
                     },
                     new
                     {
                         guid = t.SecondSensorGuid,
-                        updateDate = t.SecondSensorLastDate
+                        updateDate = t.SecondSensorLastDate,
+                        isSecond = 1
                     }
                 };
             }
@@ -43,28 +46,24 @@
                     new
                     {
                         guid = t.MainSensorGuid,
-                        updateDate = t.MainSensorLastDate
+                        updateDate = t.MainSensorLastDate,
+                        isSecond = -1
                     }
                 };
             }
         }
-    })).Where(p => p.guid != null);
+    })).Where(p => p.guid != null).ToDictionary(p => p.guid, p => p);
 }
 
-@if (hasError)
-{
-    <div class="callout callout-danger">
-        <h4>Внимание!</h4>
-        <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
-    </div>
-}
-@if (hasWarning)
-{
-    <div class="callout callout-warning">
-        <h4>Внимание!</h4>
-        <p>Данные с некоторых датчиков не поступают больше часа. Проверьте правильность настроек и исправность системы.</p>
-    </div>
-}
+<div class="callout callout-danger @if(!hasError){<text>hidden</text>}">
+    <h4>Внимание!</h4>
+    <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
+</div>
+<div class="callout callout-warning @if(!hasWarning){<text>hidden</text>}">
+    <h4>Внимание!</h4>
+    <p>Данные с некоторых датчиков не поступают больше часа. Проверьте правильность настроек и исправность системы.</p>
+</div>
+
 @foreach (var point in Model)
 {
     var pointHeader = point.First();
@@ -81,32 +80,67 @@
 
 <script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
 <script>
-    const sensor = @Html.Raw(JsonSerializer.Serialize(listenSensors));
+    const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
     const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
 
-    /*
-    connection.on('sensorupdate', function (data, date) {
-        data.forEach(function (item) {
-            if (actualValues[item.sensorGuid] == item.sensorValueId) {
-                container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').next().find('td:first').html(date);
-            } else {
-                actualValues[item.sensorGuid] = item.sensorValueId;
+    connection.on('sensorupdate', function (data, date)
+    {
+        for (sensorGuid in listenSensors) {
+            if (data && data[sensorGuid] && data[sensorGuid].insertDate != listenSensors[sensorGuid].updateDate) {
+                console.log(listenSensors[sensorGuid].updateDate);
+                var val = data[sensorGuid];
+                var container = $('.t-cell[data-sensorguid="' + sensorGuid + '"],.t-cell[data-secondsensorguid="' + sensorGuid + '"]');
 
-                var html = '<tr data-sensorguid="' + item.sensorGuid + '"><td>' +
-                    date + '</td><td>' +
-                    item.date + '</td><td>' +
-                    item.eventDate + '</td><td>' +
-                    item.value + '</td></tr>';
+                container.find('span[data-sensorguid="' + sensorGuid + '"]').html(val.insertDateStr);
+                container.find('span[data-sensorguid="' + sensorGuid + '"]').css('color', 'red');
 
-                container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').after(html);
+                /*проверка цветов и убирание алертов*/
+                if (listenSensors[sensorGuid].isSecond == 0 || listenSensors[sensorGuid].isSecond == -1) {
+                    container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
+                    container.find('.t-liquidEnvironmentLevel').css('color', 'red');
 
-                var rowCount = container.find('tr[data-sensorguid="' + item.sensorGuid + '"]').length;
-                if (rowCount == 5) {
-                    container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:last').remove();
+                    container.find('.t-environmentVolume').html(val.environmentVolume);
+                    container.find('.t-environmentVolume').css('color', 'red');
+
+                    container.find('.t-liquidDensity').html(val.liquidDensity);
+                    container.find('.t-liquidDensity').css('color', 'red');
+
+                    container.find('.t-avgT').html(val.avgT);
+                    container.find('.t-avgT').css('color', 'red');
+
+                    container.find('.t-environmentLevel').html(val.environmentLevel);
+                    container.find('.t-environmentLevel').css('color', 'red');
                 }
+
+                if (listenSensors[sensorGuid].isSecond == 1 || listenSensors[sensorGuid].isSecond == -1) {
+                    container.find('.t-t1').html(val.t1.toFixed(1).replace('.', ','));
+                    container.find('.t-t1').css('color', 'red');
+
+                    container.find('.t-t2').html(val.t2.toFixed(1).replace('.', ','));
+                    container.find('.t-t2').css('color', 'red');
+
+                    container.find('.t-t3').html(val.t3.toFixed(1).replace('.', ','));
+                    container.find('.t-t3').css('color', 'red');
+
+                    container.find('.t-t4').html(val.t4.toFixed(1).replace('.', ','));
+                    container.find('.t-t4').css('color', 'red');
+
+                    container.find('.t-t5').html(val.t5.toFixed(1).replace('.', ','));
+                    container.find('.t-t5').css('color', 'red');
+
+                    container.find('.t-t6').html(val.t6.toFixed(1).replace('.', ','));
+                    container.find('.t-t6').css('color', 'red');
+
+                    container.find('.t-avgT').html(val.avgT.toFixed(1).replace('.', ','));
+                    container.find('.t-avgT').css('color', 'red');
+                }
+
+                
+
+                listenSensors[sensorGuid].updateDate = data[sensorGuid].insertDate;
             }
-        });
+        }
     });
 
-    connection.start();*/
+    connection.start();
 </script>
