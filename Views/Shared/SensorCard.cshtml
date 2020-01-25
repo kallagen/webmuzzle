@@ -1,0 +1,31 @@
+﻿@model TSensor.Web.Models.Entity.ActualSensorValue
+@{
+    var cellClass = Model.IsError ? "t-error" : (Model.IsWarning ? "t-warning" : "t-normal");
+}
+<div class="t-cell @cellClass">
+    <h5>@Model.TankName</h5>
+    <h6>@Model.MainSensorLastDate</h6>
+    <div>
+        <div class="bl1">
+            <span>@Model.t1 °C</span>
+            <span>@Model.t2 °C</span>
+            <span>@Model.t3 °C</span>
+            <span>@Model.t4 °C</span>
+            <span>@Model.t5 °C</span>
+            <span>@Model.t6 °C</span>
+        </div>
+        <div class="bl2">
+            <div>
+                <div style="height: @Model.PercentLevel%"></div>
+            </div>
+        </div>
+        <div class="bl3">
+            <span>M @Model.liquidEnvironmentLevel т</span>
+            <span>V @Model.environmentVolume м²</span>
+            <span>P @Model.liquidDensity кг/м³</span>
+            <span>T @Model.AvgT °C</span>
+            <span>S1 @Model.environmentLevel</span>
+        </div>
+        <div class="bl-error"></div>
+    </div>
+</div>

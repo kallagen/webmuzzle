@@ -4,6 +4,51 @@
 
     var hasError = Model.Any(p => p.Any(t => t.IsError));
     var hasWarning = Model.Any(p => p.Any(t => t.IsWarning));
+
+    var listenSensors = Model.SelectMany(p => p.SelectMany(t =>
+    {
+        if (!t.TankGuid.HasValue)
+        {
+            return new[]
+            {
+                new
+                {
+                    guid = t.SensorGuid,
+                    updateDate = t.MainSensorLastDate
+                }
+            };
+        }
+        else
+        {
+            if (t.DualMode == true)
+            {
+                return new[]
+                {
+                    new
+                    {
+                        guid = t.MainSensorGuid,
+                        updateDate = t.MainSensorLastDate
+                    },
+                    new
+                    {
+                        guid = t.SecondSensorGuid,
+                        updateDate = t.SecondSensorLastDate
+                    }
+                };
+            }
+            else
+            {
+                return new[]
+                {
+                    new
+                    {
+                        guid = t.MainSensorGuid,
+                        updateDate = t.MainSensorLastDate
+                    }
+                };
+            }
+        }
+    })).Where(p => p.guid != null);
 }
 
 @if (hasError)
@@ -29,69 +74,39 @@
     <div class="row">
         @foreach (var tank in point.OrderBy(t => t.TankName))
         {
-            var cellClass = tank.IsError ? "t-error" : (tank.IsWarning ? "t-warning" : "t-normal");
-            <div class="t-cell @cellClass">
-                <h5>@tank.TankName</h5>
-                <h6>@tank.MainSensorLastDate</h6>
-                <div>
-                    <div class="bl1">
-                        <span>@tank.t1 °C</span>
-                        <span>@tank.t2 °C</span>
-                        <span>@tank.t3 °C</span>
-                        <span>@tank.t4 °C</span>
-                        <span>@tank.t5 °C</span>
-                        <span>@tank.t6 °C</span>
-                    </div>
-                    <div class="bl2">
-                        <div>
-                            <div style="height: @tank.PercentLevel%"></div>
-                        </div>
-                    </div>
-                    <div class="bl3">
-                        <span>M @tank.liquidEnvironmentLevel т</span>
-                        <span>V @tank.environmentVolume м²</span>
-                        <span>P @tank.liquidDensity кг/м³</span>
-                        <span>T @tank.AvgT °C</span>
-                        <span>S1 @tank.environmentLevel</span>
-                    </div>
-                    <div class="bl-error"></div>
-                </div>
-            </div>
+            @Html.Partial("SensorCard", tank)
         }
     </div>
 }
 
-@*
-    <script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
-    <script>
-        var actualValues = @Html.Raw(@actualValues);
-        const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
+<script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script>
+    const sensor = @Html.Raw(JsonSerializer.Serialize(listenSensors));
+    const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
 
-        const container = $('.container tbody');
+    /*
+    connection.on('sensorupdate', function (data, date) {
+        data.forEach(function (item) {
+            if (actualValues[item.sensorGuid] == item.sensorValueId) {
+                container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').next().find('td:first').html(date);
+            } else {
+                actualValues[item.sensorGuid] = item.sensorValueId;
 
-        connection.on('sensorupdate', function (data, date) {
-            data.forEach(function (item) {
-                if (actualValues[item.sensorGuid] == item.sensorValueId) {
-                    container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').next().find('td:first').html(date);
-                } else {
-                    actualValues[item.sensorGuid] = item.sensorValueId;
+                var html = '<tr data-sensorguid="' + item.sensorGuid + '"><td>' +
+                    date + '</td><td>' +
+                    item.date + '</td><td>' +
+                    item.eventDate + '</td><td>' +
+                    item.value + '</td></tr>';
 
-                    var html = '<tr data-sensorguid="' + item.sensorGuid + '"><td>' +
-                        date + '</td><td>' +
-                        item.date + '</td><td>' +
-                        item.eventDate + '</td><td>' +
-                        item.value + '</td></tr>';
+                container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').after(html);
 
-                    container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').after(html);
-
-                    var rowCount = container.find('tr[data-sensorguid="' + item.sensorGuid + '"]').length;
-                    if (rowCount == 5) {
-                        container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:last').remove();
-                    }
+                var rowCount = container.find('tr[data-sensorguid="' + item.sensorGuid + '"]').length;
+                if (rowCount == 5) {
+                    container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:last').remove();
                 }
-            });
+            }
         });
+    });
 
-        connection.start();
-    </script>
-*@
+    connection.start();*/
+</script>
