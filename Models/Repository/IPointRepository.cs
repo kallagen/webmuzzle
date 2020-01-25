@@ -11,5 +11,6 @@ namespace TSensor.Web.Models.Repository
         public Guid? Create(string name);
         public bool Edit(Guid pointGuid, string name);
         public bool Remove(Guid pointGuid);
+        public IEnumerable<PointTankInfo> GetAllPointInfo();
     }
 }

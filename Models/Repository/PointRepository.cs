@@ -55,5 +55,18 @@ namespace TSensor.Web.Models.Repository
                 SELECT @@ROWCOUNT",
                 new { pointGuid }) == 1;
         }
+
+        public IEnumerable<PointTankInfo> GetAllPointInfo()
+        {
+            return Query<PointTankInfo>(@"
+                SELECT
+                    p.PointGuid, p.Name AS PointName,
+					t.TankGuid, t.Name AS TankName, t.DualMode AS DualMode,
+					m.InsertDate AS MainSensorLastDate, s.InsertDate AS SecondSensorLastDate
+                FROM Point p
+                    LEFT JOIN Tank t ON p.PointGuid = t.PointGuid
+                    LEFT JOIN ActualSensorValue m ON t.TankGuid = m.TankGuid AND m.IsSecond = 0
+                    LEFT JOIN ActualSensorValue s ON t.TankGuid = s.TankGuid AND t.DualMode = 1 AND s.IsSecond = 1");
+        }
     }
 }
