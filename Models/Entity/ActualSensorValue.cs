@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 
 namespace TSensor.Web.Models.Entity
 {
@@ -8,7 +9,14 @@ namespace TSensor.Web.Models.Entity
         public string DeviceGuid { get; set; }
         public string Raw { get; set; }
 
+        public string SensorGuid =>
+            GetSensorGuid(DeviceGuid, izkNumber, sensorSerial);
+
         #region sensor values 
+
+        public DateTime? InsertDate { get; set; }
+        public string InsertDateStr =>
+            InsertDate?.ToString("dd.MM.yyyy HH:mm:ss");
 
         public int izkNumber { get; set; }
         public int banderolType { get; set; }
