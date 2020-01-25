@@ -92,47 +92,24 @@
                 var container = $('.t-cell[data-sensorguid="' + sensorGuid + '"],.t-cell[data-secondsensorguid="' + sensorGuid + '"]');
 
                 container.find('span[data-sensorguid="' + sensorGuid + '"]').html(val.insertDateStr);
-                container.find('span[data-sensorguid="' + sensorGuid + '"]').css('color', 'red');
 
                 /*проверка цветов и убирание алертов*/
                 if (listenSensors[sensorGuid].isSecond == 0 || listenSensors[sensorGuid].isSecond == -1) {
                     container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
-                    container.find('.t-liquidEnvironmentLevel').css('color', 'red');
-
                     container.find('.t-environmentVolume').html(val.environmentVolume);
-                    container.find('.t-environmentVolume').css('color', 'red');
-
                     container.find('.t-liquidDensity').html(val.liquidDensity);
-                    container.find('.t-liquidDensity').css('color', 'red');
-
                     container.find('.t-avgT').html(val.avgT);
-                    container.find('.t-avgT').css('color', 'red');
-
                     container.find('.t-environmentLevel').html(val.environmentLevel);
-                    container.find('.t-environmentLevel').css('color', 'red');
                 }
 
                 if (listenSensors[sensorGuid].isSecond == 1 || listenSensors[sensorGuid].isSecond == -1) {
                     container.find('.t-t1').html(val.t1.toFixed(1).replace('.', ','));
-                    container.find('.t-t1').css('color', 'red');
-
                     container.find('.t-t2').html(val.t2.toFixed(1).replace('.', ','));
-                    container.find('.t-t2').css('color', 'red');
-
                     container.find('.t-t3').html(val.t3.toFixed(1).replace('.', ','));
-                    container.find('.t-t3').css('color', 'red');
-
                     container.find('.t-t4').html(val.t4.toFixed(1).replace('.', ','));
-                    container.find('.t-t4').css('color', 'red');
-
                     container.find('.t-t5').html(val.t5.toFixed(1).replace('.', ','));
-                    container.find('.t-t5').css('color', 'red');
-
                     container.find('.t-t6').html(val.t6.toFixed(1).replace('.', ','));
-                    container.find('.t-t6').css('color', 'red');
-
                     container.find('.t-avgT').html(val.avgT.toFixed(1).replace('.', ','));
-                    container.find('.t-avgT').css('color', 'red');
                 }
 
                 
