@@ -38,10 +38,10 @@ namespace TSensor.Web.Models.Entity
             DualMode == true && !SecondSensorLastDate.HasValue;
 
         public bool IsWarningMain =>
-            MainSensorLastDate < DateTime.Now.AddHours(-1);
+            MainSensorLastDate < DateTime.Now.AddMinutes(-10);
 
         public bool IsWarningSecond =>
-            DualMode == true && SecondSensorLastDate < DateTime.Now.AddHours(-1);
+            DualMode == true && SecondSensorLastDate < DateTime.Now.AddMinutes(-10);
 
         public bool IsWarning =>
             IsWarningMain || IsWarningSecond;
