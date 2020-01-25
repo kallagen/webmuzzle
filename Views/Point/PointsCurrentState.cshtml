@@ -1,0 +1,208 @@
+@model IEnumerable<TSensor.Web.Models.Entity.SensorValue>
+@{
+    ViewData["Title"] = "Значения датчиков на объектах";
+    var points = Model.GroupBy(p => p.PointGuid);
+}
+
+<style>
+    .t-cell {
+        float: left;
+        width: 300px;
+        padding: 0 15px;
+    }
+
+        .t-cell h5 {
+            text-align: center;
+            margin-bottom: 0px;
+        }
+
+        .t-cell h6 {
+            text-align: center;
+            margin-top: 4px;
+            margin-bottom: 6px;
+        }
+
+    .t-error h5 {
+        margin-top: 20px;
+        margin-bottom: 13px;
+    }
+
+    .t-cell h5::after {
+        content: "\f111";
+        font: normal normal normal 11px/1 FontAwesome;
+        padding-left: 8px;
+        line-height: 15px;
+        color: #3C8DBC;
+    }
+
+    .t-error h5::after {
+        color: #DD4B39;
+    }
+
+    .t-warning h5::after {
+        color: #F49200;
+    }
+
+    .t-cell span {
+        display: block;
+        width: 100%;
+        font-size: 14px;
+        line-height: 20px;
+        overflow: hidden;
+    }
+
+    .t-cell > div {
+        height: 120px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        border-radius: 2px;
+        margin-bottom: 15px;
+    }
+
+    .bl-error {
+        width: 100%;
+        height: 100%;
+        padding: 30px 15px;
+        background: #DD4B39;
+        color: #fff;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .t-normal .bl-error, .t-warning .bl-error {
+        display: none;
+    }
+
+    .bl1 {
+        float: left;
+        width: 70px;
+        padding-right: 10px;
+        text-align: right;
+    }
+
+    .bl2 {
+        float: left;
+        width: 100px;
+    }
+
+        .bl2 > div {
+            position: relative;
+            background: #A2E9F9;
+            height: 120px;
+        }
+
+            .bl2 > div > div {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                background: #3C8DBC;
+                width: 100%;
+            }
+
+    .t-warning .bl2 > div {
+        background: #F7D199;
+    }
+
+        .t-warning .bl2 > div > div {
+            background: #F49200;
+        }
+
+    .bl3 {
+        float: left;
+        vertical-align: top;
+        padding-left: 10px;
+        padding-top: 10px;
+        width: 100px;
+    }
+
+    .t-error .bl1, .t-error .bl2, .t-error .bl3 {
+        display: none;
+    }
+
+    .bl-error::before {
+        display: block;
+        content: "Данные с датчика не поступают";
+    }
+
+    .bl-error::after {
+        content: "Вероятно, датчик неправильно внесен в систему";
+        display: block;
+    }
+</style>
+@foreach (var point in points)
+{
+    var pointName = point.First().PointName;
+
+    <h3>@pointName</h3>
+    <div class="row">
+        @if (point.Any(p => p.TankGuid.HasValue))
+        {
+            foreach (var tank in point)
+            {
+                var cellClass = tank.HasData ? "t-normal" : "t-error";
+                <div class="t-cell @cellClass">
+                    <h5>@tank.TankName</h5>
+                    <h6>@tank.MainSensorLastDate</h6>
+                    <div>
+                        <div class="bl1">
+                            <span>@tank.t1 °C</span>
+                            <span>@tank.t2 °C</span>
+                            <span>@tank.t3 °C</span>
+                            <span>@tank.t4 °C</span>
+                            <span>@tank.t5 °C</span>
+                            <span>@tank.t6 °C</span>
+                        </div>
+                        <div class="bl2">
+                            <div>
+                                <div style="height: @tank.PercentLevel%"></div>
+                            </div>
+                        </div>
+                        <div class="bl3">
+                            <span>M @tank.liquidEnvironmentLevel т</span>
+                            <span>V @tank.environmentVolume м²</span>
+                            <span>P @tank.liquidDensity кг/м³</span>
+                            <span>T @tank.AvgT °C</span>
+                            <span>S1 @tank.environmentLevel</span>
+                        </div>
+                        <div class="bl-error"></div>
+                    </div>
+                </div>
+                @if (tank.HasData)
+                {
+                    <div class="t-cell t-warning">
+                        <h5>@tank.TankName</h5>
+                        <h6>@tank.MainSensorLastDate</h6>
+                        <div>
+                            <div class="bl1">
+                                <span>@tank.t1 °C</span>
+                                <span>@tank.t2 °C</span>
+                                <span>@tank.t3 °C</span>
+                                <span>@tank.t4 °C</span>
+                                <span>@tank.t5 °C</span>
+                                <span>@tank.t6 °C</span>
+                            </div>
+                            <div class="bl2">
+                                <div>
+                                    <div style="height: @tank.PercentLevel%"></div>
+                                </div>
+                            </div>
+                            <div class="bl3">
+                                <span>M @tank.liquidEnvironmentLevel т</span>
+                                <span>V @tank.environmentVolume м²</span>
+                                <span>P @tank.liquidDensity кг/м³</span>
+                                <span>T @tank.AvgT °C</span>
+                                <span>S1 @tank.environmentLevel</span>
+                            </div>
+                            <div class="bl-error"></div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            <div class="col-md-12">На объекте нет топливных баков</div>
+        }
+    </div>
+}
