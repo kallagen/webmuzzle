@@ -8,11 +8,11 @@ namespace TSensor.Web.Controllers
     [Authorize]
     public class DashboardController : Controller
     {
-        private readonly IBroadcastRepository _broadcastRepository;
+        private readonly IPointRepository _pointRepository;
 
-        public DashboardController(IBroadcastRepository broadcastRepository)
+        public DashboardController(IPointRepository pointRepository)
         {
-            _broadcastRepository = broadcastRepository;
+            _pointRepository = pointRepository;
         }
 
         [Route("")]
@@ -24,7 +24,7 @@ namespace TSensor.Web.Controllers
         [Route("dashboard")]
         public IActionResult Index()
         {
-            var allSensorActualValues = _broadcastRepository.GetSensorActualState()
+            var allSensorActualValues = _pointRepository.GetSensorActualState()
                 .GroupBy(p => p.PointGuid).OrderBy(p =>
                 {
                     if (p.Any(t => !t.PointGuid.HasValue))

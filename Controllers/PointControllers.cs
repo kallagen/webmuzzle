@@ -13,14 +13,11 @@ namespace TSensor.Web.Controllers
     {
         private readonly IPointRepository _pointRepository;
         private readonly ITankRepository _tankRepository;
-        private readonly IBroadcastRepository _broadcastRepository;
 
-        public PointController(IPointRepository pointRepository, ITankRepository tankRepository,
-            IBroadcastRepository broadcastRepository)
+        public PointController(IPointRepository pointRepository, ITankRepository tankRepository)
         {
             _pointRepository = pointRepository;
             _tankRepository = tankRepository;
-            _broadcastRepository = broadcastRepository;
         }
 
         [Authorize(Policy = "Admin")]
@@ -219,7 +216,7 @@ namespace TSensor.Web.Controllers
         {
             if (Guid.TryParse(pointGuid, out var _pointGuid))
             {
-                var pointActualState = _broadcastRepository.GetSensorActualState(_pointGuid);
+                var pointActualState = _pointRepository.GetSensorActualState(_pointGuid);
                 if (pointActualState.Any())
                 {
                     return View(pointActualState);

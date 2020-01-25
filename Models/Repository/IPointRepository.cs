@@ -12,5 +12,6 @@ namespace TSensor.Web.Models.Repository
         public bool Edit(Guid pointGuid, string name);
         public bool Remove(Guid pointGuid);
         public IEnumerable<PointTankInfo> GetAllPointInfo();
+        public IEnumerable<ActualSensorValue> GetSensorActualState(Guid? pointGuid = null);
     }
 }
