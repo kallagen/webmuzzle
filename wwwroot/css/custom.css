@@ -102,12 +102,11 @@ span.form-control {
     margin-bottom: 13px;
 }
 
-.t-cell h5::after {
-    content: "\f111";
-    font: normal normal normal 11px/1 FontAwesome;
+.t-cell i {
     padding-left: 8px;
     line-height: 15px;
     color: #3C8DBC;
+    font-size: 11px;
 }
 
 .t-error h5::after {
@@ -118,7 +117,7 @@ span.form-control {
     color: #F49200;
 }
 
-.t-cell span {
+.t-cell .bl1 > span, .t-cell .bl3 > span {
     display: block;
     width: 100%;
     font-size: 14px;
@@ -143,10 +142,11 @@ span.form-control {
     color: #fff;
     text-align: center;
     vertical-align: middle;
+    display: none;
 }
 
-.t-normal .bl-error, .t-warning .bl-error {
-    display: none;
+.t-error .bl-error {
+    display: block;
 }
 
 .bl1 {
@@ -204,4 +204,5 @@ span.form-control {
     content: "Вероятно, датчик неправильно внесен в систему";
     display: block;
 }
+
 /*end sensor card*/
