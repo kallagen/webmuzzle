@@ -55,11 +55,11 @@
     })).Where(p => p.guid != null).ToDictionary(p => p.guid, p => p);
 }
 
-<div class="callout callout-danger @if(!hasError){<text>hidden</text>}">
+<div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">
     <h4>Внимание!</h4>
     <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
 </div>
-<div class="callout callout-warning @if(!hasWarning){<text>hidden</text>}">
+<div class="t-warning-message callout callout-warning @if(!hasWarning){<text>hidden</text>}">
     <h4>Внимание!</h4>
     <p>Данные с некоторых датчиков не поступают больше часа. Проверьте правильность настроек и исправность системы.</p>
 </div>
@@ -83,17 +83,41 @@
     const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
     const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
 
+    var errorBlock = $('.t-error-message');
+    var warningBlock = $('.t-warning-message');
+
     connection.on('sensorupdate', function (data, date)
     {
         for (sensorGuid in listenSensors) {
             if (data && data[sensorGuid] && data[sensorGuid].insertDate != listenSensors[sensorGuid].updateDate) {
-                console.log(listenSensors[sensorGuid].updateDate);
+
                 var val = data[sensorGuid];
                 var container = $('.t-cell[data-sensorguid="' + sensorGuid + '"],.t-cell[data-secondsensorguid="' + sensorGuid + '"]');
 
+                var point = container.find('i[data-sensorguid="' + sensorGuid + '"]');
+                if (point.hasClass('text-red')) {
+                    point.removeClass('text-red');
+                }
+                if (point.hasClass('text-yellow')) {
+                    point.removeClass('text-yellow');
+                }
+
+                if (container.hasClass('t-error') && !container.find('.text-red').length) {
+                    container.removeClass('t-error');
+                }
+                if (container.hasClass('t-warning') && !container.find('.text-yellow').length) {
+                    container.removeClass('t-warning');
+                }
+
+                if (!errorBlock.hasClass('hidden') && !$('.text-red').length) {
+                    errorBlock.addClass('hidden');
+                }
+                if (!warningBlock.hasClass('hidden') && !$('.text-yellow').length) {
+                    warningBlock.addClass('hidden');
+                }
+
                 container.find('span[data-sensorguid="' + sensorGuid + '"]').html(val.insertDateStr);
 
-                /*проверка цветов и убирание алертов*/
                 if (listenSensors[sensorGuid].isSecond == 0 || listenSensors[sensorGuid].isSecond == -1) {
                     container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
                     container.find('.t-environmentVolume').html(val.environmentVolume);
@@ -110,9 +134,7 @@
                     container.find('.t-t5').html(val.t5.toFixed(1).replace('.', ','));
                     container.find('.t-t6').html(val.t6.toFixed(1).replace('.', ','));
                     container.find('.t-avgT').html(val.avgT.toFixed(1).replace('.', ','));
-                }
-
-                
+                }                
 
                 listenSensors[sensorGuid].updateDate = data[sensorGuid].insertDate;
             }
