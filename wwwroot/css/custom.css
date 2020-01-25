@@ -75,6 +75,10 @@ span.form-control {
     text-transform: none;
 }
 
+.no-header tr:first-child td {
+    border: 0;
+}
+
 /*sensor card*/
 .t-cell {
     float: left;
