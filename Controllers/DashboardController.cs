@@ -7,11 +7,11 @@ namespace TSensor.Web.Controllers
     [Authorize]
     public class DashboardController : Controller
     {
-        private readonly IBroadcastRepository _repository;
+        private readonly IBroadcastRepository _broadcastRepository;
 
-        public DashboardController(IBroadcastRepository repository)
+        public DashboardController(IBroadcastRepository broadcastRepository)
         {
-            _repository = repository;
+            _broadcastRepository = broadcastRepository;
         }
 
         [Route("")]
@@ -23,9 +23,9 @@ namespace TSensor.Web.Controllers
         [Route("dashboard")]
         public IActionResult Index()
         {
-            var actualValues = _repository.GetActualSensorValues();
+            var allSensorActualValues = _broadcastRepository.GetAllSensorActualState();
 
-            return View(actualValues);
+            return View(allSensorActualValues);
         }
     }
 }

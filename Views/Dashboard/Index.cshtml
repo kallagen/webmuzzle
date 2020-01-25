@@ -1,89 +1,125 @@
-﻿@model IEnumerable<TSensor.Web.Models.Entity.ActualSensorValue>
+﻿@model IEnumerable<ActualSensorValue>
 @{
-    ViewData["Title"] = "Актуальные значения датчиков";
-    var actualValues = System.Text.Json.JsonSerializer.Serialize(
-        Model.ToDictionary(p => p.SensorGuid, p => p.SensorValueId));
+    ViewData["Title"] = "Измерения по системе";
+    var points = Model.GroupBy(p => p.PointGuid).OrderBy(p =>
+    {
+        if (p.Any(t => !t.PointGuid.HasValue))
+        {
+            return 0;
+        }
+
+        var hasError = p.Any(t => !t.HasData);
+        var hasWarning = p.Any(t => t.HasWarning);
+
+        if (hasError && hasWarning)
+        {
+            return 1;
+        }
+        else if (hasError)
+        {
+            return 2;
+        }
+        else if (hasWarning)
+        {
+            return 3;
+        }
+        else
+        {
+            return 4;
+        }
+    }).ThenBy(p => p.First().PointName);
+
+
+    var hasError = Model.Any(p => !p.HasData);
+    var hasWarning = Model.Any(p => p.HasWarning);
 }
 
-<style>
-    table {
-        border-collapse: collapse;
-        font-size: 10px;
-    }
+@if (hasError)
+{
+    <div class="callout callout-danger">
+        <h4>Внимание!</h4>
+        <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
+    </div>
+}
+@if (hasWarning)
+{
+    <div class="callout callout-warning">
+        <h4>Внимание!</h4>
+        <p>Данные с некоторых датчиков не поступают больше часа. Проверьте правильность настроек и исправность системы.</p>
+    </div>
+}
+@foreach (var point in points)
+{
+    var pointHeader = point.First();
+    var pointName = pointHeader.PointGuid.HasValue ? pointHeader.PointName : "Датчики без привязки к объекту и топливному баку";
 
-    th {
-        font-weight: normal;
-        background: #4B94BF;
-        color: white;
-        text-align: center;
-        font-size: 12px;
-    }
+    <h3>@pointName</h3>
+    <div class="row">
+        @foreach (var tank in point)
+        {
+            var cellClass = tank.HasData ? (tank.HasWarning ? "t-warning" : "t-normal") : "t-error";
+            <div class="t-cell @cellClass">
+                <h5>@tank.TankName</h5>
+                <h6>@tank.MainSensorLastDate</h6>
+                <div>
+                    <div class="bl1">
+                        <span>@tank.t1 °C</span>
+                        <span>@tank.t2 °C</span>
+                        <span>@tank.t3 °C</span>
+                        <span>@tank.t4 °C</span>
+                        <span>@tank.t5 °C</span>
+                        <span>@tank.t6 °C</span>
+                    </div>
+                    <div class="bl2">
+                        <div>
+                            <div style="height: @tank.PercentLevel%"></div>
+                        </div>
+                    </div>
+                    <div class="bl3">
+                        <span>M @tank.liquidEnvironmentLevel т</span>
+                        <span>V @tank.environmentVolume м²</span>
+                        <span>P @tank.liquidDensity кг/м³</span>
+                        <span>T @tank.AvgT °C</span>
+                        <span>S1 @tank.environmentLevel</span>
+                    </div>
+                    <div class="bl-error"></div>
+                </div>
+            </div>
+        }
+    </div>
+}
 
-    th, td {
-        padding: 4px 12px;
-    }
+@*
+    <script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        var actualValues = @Html.Raw(@actualValues);
+        const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
 
-    .sensor-header {
-        background: #D2D6DE;
-        text-align: center;
-        line-height: 22px;
-    }
-</style>
+        const container = $('.container tbody');
 
-<div class="row">
-    <table class="container">
-        <thead>
-            <tr>
-                <th>дата получения<br />данных с сервера</th>
-                <th>дата получения<br />данных с устройства</th>
-                <th>дата получения<br />данных с датчика</th>
-                <th>значение</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var value in Model)
-            {
-                <tr data-sensorguid="@value.SensorGuid"><td class="sensor-header" colspan="4">Датчик @value.SensorGuid</td></tr>
-                <tr data-sensorguid="@value.SensorGuid">
-                    <td>@DateTime.Now.ToString()</td>
-                    <td>@value.InsertDate.ToString()</td>
-                    <td>@value.EventDate.ToString()</td>
-                    <td>@value.Value</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+        connection.on('sensorupdate', function (data, date) {
+            data.forEach(function (item) {
+                if (actualValues[item.sensorGuid] == item.sensorValueId) {
+                    container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').next().find('td:first').html(date);
+                } else {
+                    actualValues[item.sensorGuid] = item.sensorValueId;
 
-<script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
-<script>
-    var actualValues = @Html.Raw(@actualValues);
-    const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
+                    var html = '<tr data-sensorguid="' + item.sensorGuid + '"><td>' +
+                        date + '</td><td>' +
+                        item.date + '</td><td>' +
+                        item.eventDate + '</td><td>' +
+                        item.value + '</td></tr>';
 
-    const container = $('.container tbody');
+                    container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').after(html);
 
-    connection.on('sensorupdate', function (data, date) {
-        data.forEach(function (item) {
-            if (actualValues[item.sensorGuid] == item.sensorValueId) {
-                container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').next().find('td:first').html(date);
-            } else {
-                actualValues[item.sensorGuid] = item.sensorValueId;
-
-                var html = '<tr data-sensorguid="' + item.sensorGuid + '"><td>' +
-                    date + '</td><td>' +
-                    item.date + '</td><td>' +
-                    item.eventDate + '</td><td>' +
-                    item.value + '</td></tr>';
-
-                container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').after(html);
-
-                var rowCount = container.find('tr[data-sensorguid="' + item.sensorGuid + '"]').length;
-                if (rowCount == 5) {
-                    container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:last').remove();
+                    var rowCount = container.find('tr[data-sensorguid="' + item.sensorGuid + '"]').length;
+                    if (rowCount == 5) {
+                        container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:last').remove();
+                    }
                 }
-            }
+            });
         });
-    });
 
-    connection.start();
-</script>
+        connection.start();
+    </script>
+*@
