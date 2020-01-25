@@ -203,7 +203,7 @@ namespace TSensor.Web.Controllers
 
         [Route("tank/remove")]
         [HttpPost]
-        public ActionResult Remove(string tankGuid, string pointGuid)
+        public IActionResult Remove(string tankGuid, string pointGuid)
         {
             if (!Guid.TryParse(pointGuid, out var _pointGuid) ||
                 !Guid.TryParse(tankGuid, out var _tankGuid))

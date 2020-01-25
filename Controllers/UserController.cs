@@ -210,7 +210,7 @@ namespace TSensor.Web.Controllers
 
         [Route("user/remove")]
         [HttpPost]
-        public ActionResult Remove(string userGuid)
+        public IActionResult Remove(string userGuid)
         {
             if (!Guid.TryParse(userGuid, out var _userGuid))
             {
