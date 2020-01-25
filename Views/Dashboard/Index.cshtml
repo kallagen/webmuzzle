@@ -1,37 +1,9 @@
-﻿@model IEnumerable<ActualSensorValue>
+﻿@model IEnumerable<IGrouping<Guid?, ActualSensorValue>>
 @{
-    ViewData["Title"] = "Измерения по системе";
-    var points = Model.GroupBy(p => p.PointGuid).OrderBy(p =>
-    {
-        if (p.Any(t => !t.PointGuid.HasValue))
-        {
-            return 0;
-        }
+    ViewBag.Title = "Измерения по системе";
 
-        var hasError = p.Any(t => !t.HasData);
-        var hasWarning = p.Any(t => t.HasWarning);
-
-        if (hasError && hasWarning)
-        {
-            return 1;
-        }
-        else if (hasError)
-        {
-            return 2;
-        }
-        else if (hasWarning)
-        {
-            return 3;
-        }
-        else
-        {
-            return 4;
-        }
-    }).ThenBy(p => p.First().PointName);
-
-
-    var hasError = Model.Any(p => !p.HasData);
-    var hasWarning = Model.Any(p => p.HasWarning);
+    var hasError = Model.Any(p => p.Any(t => t.IsError));
+    var hasWarning = Model.Any(p => p.Any(t => t.IsWarning));
 }
 
 @if (hasError)
@@ -48,16 +20,16 @@
         <p>Данные с некоторых датчиков не поступают больше часа. Проверьте правильность настроек и исправность системы.</p>
     </div>
 }
-@foreach (var point in points)
+@foreach (var point in Model)
 {
     var pointHeader = point.First();
     var pointName = pointHeader.PointGuid.HasValue ? pointHeader.PointName : "Датчики без привязки к объекту и топливному баку";
 
     <h3>@pointName</h3>
     <div class="row">
-        @foreach (var tank in point)
+        @foreach (var tank in point.OrderBy(t => t.TankName))
         {
-            var cellClass = tank.HasData ? (tank.HasWarning ? "t-warning" : "t-normal") : "t-error";
+            var cellClass = tank.IsError ? "t-error" : (tank.IsWarning ? "t-warning" : "t-normal");
             <div class="t-cell @cellClass">
                 <h5>@tank.TankName</h5>
                 <h6>@tank.MainSensorLastDate</h6>
