@@ -7,32 +7,14 @@ namespace TSensor.Web.Models.Repository
     {
         public BroadcastRepository(string connectionString) : base(connectionString) { }
 
-        public IEnumerable<ActualSensorValue> GetActualSensorValues()
+        public IEnumerable<ActualSensorValue> GetAllSensorActualState()
         {
             return Query<ActualSensorValue>(@"
-                SELECT 
-    	                s.SensorGuid,
-    	                q.SensorValueId, q.InsertDate,
-                        DATEADD(HOUR, DATEDIFF(HOUR, GETUTCDATE(), GETDATE()), q.EventDateUTC) AS EventDate, 
-                        SUBSTRING(q.Value, 2, 127) AS Value
-                FROM
-    	                (SELECT DISTINCT SensorGuid AS SensorGuid FROM SensorValueRaw) s
-    	                OUTER APPLY
-    	                (
-    	                	    SELECT TOP 1 *
-    	                	    FROM SensorValueRaw svr 
-    	                	    WHERE svr.SensorGuid = s.SensorGuid
-    	                	    ORDER BY EventDateUTC DESC
-    	                ) q");
-        }
-
-        public IEnumerable<SensorValue> GetPointsCurrentState()
-        {
-            return Query<SensorValue>(@"
 				SELECT 
-					p.PointGuid, t.TankGuid,
-					p.Name AS PointName, t.Name AS TankName,
+					p.PointGuid, p.Name AS PointName,
+					t.TankGuid, t.Name AS TankName, t.DualMode AS DualMode,
 					m.InsertDate AS MainSensorLastDate, s.InsertDate AS SecondSensorLastDate,
+
 					m.izkNumber,
 					m.banderolType,
 					m.sensorSerial,
@@ -70,8 +52,9 @@ namespace TSensor.Web.Models.Repository
 					m.crc
 				FROM Point p
 					LEFT JOIN Tank t ON p.PointGuid = t.PointGuid
-					LEFT JOIN ActualSensorValue m ON t.TankGuid = m.TankGuid AND m.IsSecond = 0
-					LEFT JOIN ActualSensorValue s ON t.TankGuid = s.TankGuid AND t.DualMode = 1 AND s.IsSecond = 1");
+					FULL JOIN ActualSensorValue m ON t.TankGuid = m.TankGuid AND m.IsSecond = 0
+					LEFT JOIN ActualSensorValue s ON t.TankGuid = s.TankGuid AND t.DualMode = 1 AND s.IsSecond = 1
+				WHERE t.TankGuid IS NOT NULL OR m.IsSecond = 0");
         }
     }
 }
