@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.ViewModels;
@@ -8,18 +9,21 @@ using TSensor.Web.ViewModels.Point;
 
 namespace TSensor.Web.Controllers
 {
-    [Authorize(Policy = "Admin")]
     public class PointController : Controller
     {
         private readonly IPointRepository _pointRepository;
         private readonly ITankRepository _tankRepository;
+        private readonly IBroadcastRepository _broadcastRepository;
 
-        public PointController(IPointRepository pointRepository, ITankRepository tankRepository)
+        public PointController(IPointRepository pointRepository, ITankRepository tankRepository,
+            IBroadcastRepository broadcastRepository)
         {
             _pointRepository = pointRepository;
             _tankRepository = tankRepository;
+            _broadcastRepository = broadcastRepository;
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("point/list")]
         public IActionResult List()
         {
@@ -42,6 +46,7 @@ namespace TSensor.Web.Controllers
             return View(viewModel);
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("point/new")]
         public IActionResult Create()
         {
@@ -50,6 +55,7 @@ namespace TSensor.Web.Controllers
             return View(viewModel);
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("point/new")]
         [HttpPost]
         public IActionResult Create(PointCreateEditViewModel viewModel)
@@ -81,6 +87,7 @@ namespace TSensor.Web.Controllers
             return View(viewModel);
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("point/{pointGuid}")]
         public IActionResult Edit(string pointGuid)
         {
@@ -118,6 +125,7 @@ namespace TSensor.Web.Controllers
             return View("NotFound");
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("point/{pointGuid}")]
         [HttpPost]
         public IActionResult Edit(PointCreateEditViewModel viewModel)
@@ -150,9 +158,10 @@ namespace TSensor.Web.Controllers
             return View(viewModel);
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("point/remove")]
         [HttpPost]
-        public ActionResult Remove(string pointGuid)
+        public IActionResult Remove(string pointGuid)
         {
             if (!Guid.TryParse(pointGuid, out var _pointGuid))
             {
@@ -174,6 +183,54 @@ namespace TSensor.Web.Controllers
                 }
                 return RedirectToAction("List", "Point");
             }
+        }
+
+        [Route("point/all")]
+        public IActionResult All()
+        {
+            var data = _pointRepository.GetAllPointInfo().GroupBy(p => p.PointGuid)
+                .OrderBy(p =>
+                {
+                    var hasError = p.Any(t => t.IsError);
+                    var hasWarning = p.Any(t => t.IsWarning);
+
+                    if (hasError & hasWarning)
+                    {
+                        return 0;
+                    }
+                    else if (hasError)
+                    {
+                        return 1;
+                    }
+                    else if (hasWarning)
+                    {
+                        return 2;
+                    }
+                    else
+                    {
+                        return 3;
+                    }
+                }).ThenBy(p => p.First().PointName);
+            return View(data);
+        }
+
+        [Route("point/{pointGuid}/state")]
+        public IActionResult State(string pointGuid)
+        {
+            if (Guid.TryParse(pointGuid, out var _pointGuid))
+            {
+                var pointActualState = _broadcastRepository.GetSensorActualState(_pointGuid);
+                if (pointActualState.Any())
+                {
+                    return View(pointActualState);
+                }
+            }
+
+            ViewBag.Title = "Объект не найден";
+            ViewBag.BackTitle = "назад к списку объектов";
+            ViewBag.BackUrl = Url.ActionLink("All", "Point");
+
+            return View("NotFound");
         }
     }
 }
