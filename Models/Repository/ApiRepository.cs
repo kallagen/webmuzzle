@@ -3,11 +3,11 @@ using TSensor.Web.Models.Entity;
 
 namespace TSensor.Web.Models.Repository
 {
-    public class Repository : RepositoryBase, IRepository
+    public class ApiRepository : RepositoryBase, IApiRepository
     {
-        public Repository(string connectionString) : base(connectionString) { }
+        public ApiRepository(string connectionString) : base(connectionString) { }
 
-        public bool PushValue(string ip, SensorValue value, DateTime eventDateUTC)
+        public bool PushValue(string ip, ActualSensorValue value, DateTime eventDateUTC)
         {
             var sensorGuid = value.Raw.Substring(1, 2) + value.Raw.Substring(5, 2);
 

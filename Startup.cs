@@ -50,7 +50,7 @@ namespace TSensor.Web
 
             var connectionString = Configuration.GetConnectionString("oltp");
             services.AddSingleton<IBroadcastRepository, BroadcastRepository>(p => new BroadcastRepository(connectionString));
-            services.AddScoped<IRepository, Repository>(p => new Repository(connectionString));
+            services.AddScoped<IApiRepository, ApiRepository>(p => new ApiRepository(connectionString));
             services.AddScoped<IUserRepository, UserRepository>(p => new UserRepository(connectionString));
             services.AddScoped<IPointRepository, PointRepository>(p => new PointRepository(connectionString));
             services.AddScoped<ITankRepository, TankRepository>(p => new TankRepository(connectionString));

@@ -10,12 +10,12 @@ namespace TSensor.Web.Controllers
     [Route("api")]
     public class ApiController : Controller
     {
-        private readonly IRepository _repository;
+        private readonly IApiRepository _apiRepository;
         private readonly FileLogService _logService;
 
-        public ApiController(IRepository repository, FileLogService logService)
+        public ApiController(IApiRepository apiRepository, FileLogService logService)
         {
-            _repository = repository;
+            _apiRepository = apiRepository;
             _logService = logService;
         }
 
@@ -64,10 +64,10 @@ namespace TSensor.Web.Controllers
                     return Error("missing device guid", value, date, guid);
                 }
 
-                var sensorValue = SensorValue.Parse(value);
+                var sensorValue = ActualSensorValue.Parse(value);
                 sensorValue.DeviceGuid = guid;
 
-                if (_repository.PushValue(
+                if (_apiRepository.PushValue(
                     Request.HttpContext.Connection.RemoteIpAddress.ToString(),
                     sensorValue, eventDateUTC))
                 {
