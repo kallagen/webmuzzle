@@ -30,17 +30,11 @@ namespace TSensor.Web.Models.Broadcast
         {
             timer = new Timer(state =>
             {
-                var actualValues = _repository.GetActualSensorValues().Select(p => new
-                {
-                    sensorGuid = p.SensorGuid,
-                    sensorValueId = p.SensorValueId,
-                    date = p.InsertDate.ToString(),
-                    eventDate = p.EventDate.ToString(),
-                    value = p.Value
-                });
+                var actualValues = _repository.GetActualSensorValues().ToDictionary(p => p.SensorGuid, p => p);
 
                 _hubContext.Clients.All.SendAsync("sensorupdate", actualValues,
                     DateTime.Now.ToString());
+
             }, null, TimeSpan.Zero, TimeSpan.FromSeconds(delay));
 
             return Task.CompletedTask;
