@@ -11,7 +11,7 @@
     <h5>
         @Model.TankName<i class="fa fa-circle @mainClass" data-sensorguid="@guid"></i>@if (Model.DualMode == true){<i class="fa fa-circle @secondClass" data-sensorguid="@Model.SecondSensorGuid"></i>}
     </h5>
-    <h6><span data-sensorguid="@guid">@Model.MainSensorLastDate</span>@if (Model.DualMode == true) {<span data-sensorguid="@Model.SecondSensorGuid">@Model.SecondSensorLastDate</span> }</h6>
+    <h6><span data-sensorguid="@guid">@Model.MainSensorLastDate</span>@if (Model.DualMode == true) {<span style="padding-left: 16px;" data-sensorguid="@Model.SecondSensorGuid">@Model.SecondSensorLastDate</span> }</h6>
     <div>
         <div class="bl1">
             <span><span class="t-t1">@Model.t1</span> °C</span>
