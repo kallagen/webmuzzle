@@ -23,7 +23,7 @@ namespace TSensor.Web.Models.Broadcast
             _repository = repository;
             _hubContext = hubContext;
 
-            delay = configuration.GetValue("dataRequestDelay", 1);
+            delay = configuration.GetValue("dataRequestDelaySeconds", 3);
         }
 
         public Task StartAsync(CancellationToken stoppingToken)
