@@ -1,20 +1,9 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace TSensor.Web.Models.Entity
 {
-    public class ActualSensorValue
+    public class ActualSensorValue : PointTankInfo
     {
-        public Guid? PointGuid { get; set; }
-        public string PointName { get; set; }
-
-        public Guid? TankGuid { get; set; }
-        public string TankName { get; set; }
-        public bool DualMode { get; set; }
-
-        public DateTime? MainSensorLastDate { get; set; }
-        public DateTime? SecondSensorLastDate { get; set; }
-
         public bool IsSecond { get; set; }
         public string DeviceGuid { get; set; }
         public string Raw { get; set; }
@@ -63,18 +52,6 @@ namespace TSensor.Web.Models.Entity
 
         public int PercentLevel =>
             (int)decimal.Round(levelInPercent, 0);
-
-        public bool HasData =>
-            MainSensorLastDate.HasValue || SecondSensorLastDate.HasValue;
-
-        public bool HasWarning
-        {
-            get
-            {
-                var hourAgo = DateTime.Now.AddHours(-1);
-                return MainSensorLastDate < hourAgo || (DualMode && SecondSensorLastDate < hourAgo);
-            }
-        }
 
         public static ActualSensorValue Parse(string raw)
         {
