@@ -30,7 +30,7 @@
 @if (Model.Any(p => p.TankGuid.HasValue))
 {
     <div class="row">
-        @foreach (var tank in Model.Where(p => p.TankGuid.HasValue))
+        @foreach (var tank in Model.Where(p => p.TankGuid.HasValue).OrderBy(p => p.TankName))
         {
             var cellClass = tank.IsError ? "t-error" : (tank.IsWarning ? "t-warning" : "t-normal");
             <div class="t-cell @cellClass">
