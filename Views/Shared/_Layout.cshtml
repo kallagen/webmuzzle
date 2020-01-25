@@ -41,7 +41,7 @@
                     <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
                         <ul class="nav navbar-nav">
                             <li>@Html.ActionLink("Измерения по системе", "Index", "Dashboard")</li>
-                            <li>@Html.ActionLink("Объекты", "PointsCurrentState", "Point")</li>
+                            <li>@Html.ActionLink("Объекты", "All", "Point")</li>
                             @if (User.IsInRole("admin"))
                             {
                                 <li class="dropdown">
