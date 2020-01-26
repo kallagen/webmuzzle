@@ -5,6 +5,43 @@
 
     var hasError = Model.Any(p => p.IsError);
     var hasWarning = Model.Any(p => p.IsWarning);
+
+    var listenSensors = Model.SelectMany(t =>
+    {
+        if (t.TankGuid.HasValue && t.DualMode == true)
+        {
+            return new[]
+            {
+                new
+                {
+                    guid = t.MainSensorGuid,
+                    updateDate = t.MainSensorLastDate,
+                    warningDate = t.MainSensorWarningDateTicks,
+                    isSecond = 0
+                },
+                new
+                {
+                    guid = t.SecondSensorGuid,
+                    updateDate = t.SecondSensorLastDate,
+                    warningDate = t.SecondSensorWarningDateTicks,
+                    isSecond = 1
+                }
+                            };
+        }
+        else
+        {
+            return new[]
+            {
+                new
+                {
+                    guid = t.MainSensorGuid,
+                    updateDate = t.MainSensorLastDate,
+                    warningDate = t.MainSensorWarningDateTicks,
+                    isSecond = -1
+                }
+                            };
+        }
+    }).Where(p => p.guid != null).ToDictionary(p => p.guid, p => p);
 }
 
 @section AdditionalHeader
@@ -12,20 +49,14 @@
     @Html.ActionLink("назад к всем объектам", "All", "Point", null, new { @class = "footer-link pull-right additional-header-link" })
 }
 
-@if (hasError)
-{
-    <div class="callout callout-danger">
-        <h4>Внимание!</h4>
-        <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
-    </div>
-}
-@if (hasWarning)
-{
-    <div class="callout callout-warning">
-        <h4>Внимание!</h4>
-        <p>Данные с некоторых датчиков не поступают больше часа. Проверьте правильность настроек и исправность системы.</p>
-    </div>
-}
+<div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">
+    <h4>Внимание!</h4>
+    <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
+</div>
+<div class="t-warning-message callout callout-warning @if(!hasWarning){<text>hidden</text>}">
+    <h4>Внимание!</h4>
+    <p>Данные с некоторых датчиков не поступают больше часа. Проверьте правильность настроек и исправность системы.</p>
+</div>
 
 @if (Model.Any(p => p.TankGuid.HasValue))
 {
@@ -35,43 +66,21 @@
             @Html.Partial("SensorCard", tank)
         }
     </div>
+    <script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
+        const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
+
+        var errorBlock = $('.t-error-message');
+        var warningBlock = $('.t-warning-message');
+
+        connection.on('sensorupdate', sensorUpdate);
+
+        connection.start();
+    </script>
+
 }
 else
 {
     <span>Не найдено ни одного топливного бака</span>
 }
-
-@*
-    <script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
-    <script>
-        var actualValues = @Html.Raw(@actualValues);
-        const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
-
-        const container = $('.container tbody');
-
-        connection.on('sensorupdate', function (data, date) {
-            data.forEach(function (item) {
-                if (actualValues[item.sensorGuid] == item.sensorValueId) {
-                    container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').next().find('td:first').html(date);
-                } else {
-                    actualValues[item.sensorGuid] = item.sensorValueId;
-
-                    var html = '<tr data-sensorguid="' + item.sensorGuid + '"><td>' +
-                        date + '</td><td>' +
-                        item.date + '</td><td>' +
-                        item.eventDate + '</td><td>' +
-                        item.value + '</td></tr>';
-
-                    container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:first').after(html);
-
-                    var rowCount = container.find('tr[data-sensorguid="' + item.sensorGuid + '"]').length;
-                    if (rowCount == 5) {
-                        container.find('tr[data-sensorguid="' + item.sensorGuid + '"]:last').remove();
-                    }
-                }
-            });
-        });
-
-        connection.start();
-    </script>
-*@
