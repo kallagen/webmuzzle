@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Services.Log;
+using TSensor.Web.Models.Services;
 
 namespace TSensor.Web.Models.Broadcast
 {
@@ -37,8 +38,7 @@ namespace TSensor.Web.Models.Broadcast
                 {
                     var actualValues = _repository.GetActualSensorValues().ToDictionary(p => p.SensorGuid, p => p);
 
-                    _hubContext.Clients.All.SendAsync("sensorupdate", actualValues,
-                        DateTime.Now.ToString());
+                    _hubContext.Clients.All.SendAsync("sensorupdate", actualValues, DateTime.Now.TicksJs());
                 }
                 catch (Exception exception)
                 {

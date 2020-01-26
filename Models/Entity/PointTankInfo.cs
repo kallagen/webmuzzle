@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using TSensor.Web.Models.Services;
 
 namespace TSensor.Web.Models.Entity
 {
@@ -12,6 +13,16 @@ namespace TSensor.Web.Models.Entity
         public bool? DualMode { get; set; }
         public DateTime? MainSensorLastDate { get; set; }
         public DateTime? SecondSensorLastDate { get; set; }
+
+        public long? GetWarningDate(DateTime? date)
+        {
+            return date.HasValue ? (long?)date.Value.AddMinutes(10).TicksJs() : null;
+        }
+        public long? MainSensorWarningDateTicks =>
+            GetWarningDate(MainSensorLastDate);
+        public long? SecondSensorWarningDateTicks =>
+            GetWarningDate(SecondSensorLastDate);
+
         public string MainDeviceGuid { get; set; }
         public string MainIZKId { get; set; }
         public string MainSensorId { get; set; }
