@@ -7,50 +7,38 @@
 
     var listenSensors = Model.SelectMany(p => p.SelectMany(t =>
     {
-        if (!t.TankGuid.HasValue)
+        if (t.TankGuid.HasValue && t.DualMode == true)
         {
             return new[]
             {
                 new
                 {
-                    guid = t.SensorGuid,
+                    guid = t.MainSensorGuid,
                     updateDate = t.MainSensorLastDate,
-                    isSecond = -1
+                    warningDate = t.MainSensorWarningDateTicks,
+                    isSecond = 0
+                },
+                new
+                {
+                    guid = t.SecondSensorGuid,
+                    updateDate = t.SecondSensorLastDate,
+                    warningDate = t.SecondSensorWarningDateTicks,
+                    isSecond = 1
                 }
-            };
+                    };
         }
         else
         {
-            if (t.DualMode == true)
+            return new[]
             {
-                return new[]
+                new
                 {
-                    new
-                    {
-                        guid = t.MainSensorGuid,
-                        updateDate = t.MainSensorLastDate,
-                        isSecond = 0
-                    },
-                    new
-                    {
-                        guid = t.SecondSensorGuid,
-                        updateDate = t.SecondSensorLastDate,
-                        isSecond = 1
-                    }
-                };
-            }
-            else
-            {
-                return new[]
-                {
-                    new
-                    {
-                        guid = t.MainSensorGuid,
-                        updateDate = t.MainSensorLastDate,
-                        isSecond = -1
-                    }
-                };
-            }
+                    guid = t.TankGuid.HasValue ? t.MainSensorGuid : t.SensorGuid,
+                    updateDate = t.MainSensorLastDate,
+                    warningDate = t.MainSensorWarningDateTicks,
+                    isSecond = -1
+                }
+                    };
         }
     })).Where(p => p.guid != null).ToDictionary(p => p.guid, p => p);
 }
@@ -89,12 +77,13 @@
     connection.on('sensorupdate', function (data, date)
     {
         for (sensorGuid in listenSensors) {
+            var container = $('.t-cell[data-sensorguid="' + sensorGuid + '"],.t-cell[data-secondsensorguid="' + sensorGuid + '"]');
+            var point = $('i[data-sensorguid="' + sensorGuid + '"]');
+
             if (data && data[sensorGuid] && data[sensorGuid].insertDate != listenSensors[sensorGuid].updateDate) {
 
                 var val = data[sensorGuid];
-                var container = $('.t-cell[data-sensorguid="' + sensorGuid + '"],.t-cell[data-secondsensorguid="' + sensorGuid + '"]');
 
-                var point = container.find('i[data-sensorguid="' + sensorGuid + '"]');
                 if (point.hasClass('text-red')) {
                     point.removeClass('text-red');
                 }
@@ -107,13 +96,6 @@
                 }
                 if (container.hasClass('t-warning') && !container.find('.text-yellow').length) {
                     container.removeClass('t-warning');
-                }
-
-                if (!errorBlock.hasClass('hidden') && !$('.text-red').length) {
-                    errorBlock.addClass('hidden');
-                }
-                if (!warningBlock.hasClass('hidden') && !$('.text-yellow').length) {
-                    warningBlock.addClass('hidden');
                 }
 
                 container.find('span[data-sensorguid="' + sensorGuid + '"]').html(val.insertDateStr);
@@ -134,9 +116,39 @@
                     container.find('.t-t5').html(val.t5.toFixed(1).replace('.', ','));
                     container.find('.t-t6').html(val.t6.toFixed(1).replace('.', ','));
                     container.find('.t-avgT').html(val.avgT.toFixed(1).replace('.', ','));
-                }                
+                }
 
                 listenSensors[sensorGuid].updateDate = data[sensorGuid].insertDate;
+                listenSensors[sensorGuid].warningDate = date + 600000;
+            }
+
+            if (!point.hasClass('text-yellow') && date > listenSensors[sensorGuid].warningDate) {
+                point.addClass('text-yellow');
+
+                if (!container.hasClass('t-error') && !container.hasClass('t-warning')) {
+                    container.addClass('t-warning');
+                }
+            }
+
+            if ($('.text-red').length) {
+                if (errorBlock.hasClass('hidden')) {
+                    errorBlock.removeClass('hidden');
+                }
+            } else {
+                if (!errorBlock.hasClass('hidden')) {
+                    errorBlock.addClass('hidden');
+                }
+            }
+
+            if ($('.text-yellow').length) {
+                if (warningBlock.hasClass('hidden')) {
+                    warningBlock.removeClass('hidden');
+                }
+            }
+            else {
+                if (!warningBlock.hasClass('hidden')) {
+                    warningBlock.addClass('hidden');
+                }
             }
         }
     });
