@@ -25,7 +25,7 @@
                     warningDate = t.SecondSensorWarningDateTicks,
                     isSecond = 1
                 }
-                    };
+            };
         }
         else
         {
@@ -38,7 +38,7 @@
                     warningDate = t.MainSensorWarningDateTicks,
                     isSecond = -1
                 }
-                    };
+            };
         }
     })).Where(p => p.guid != null).ToDictionary(p => p.guid, p => p);
 }
@@ -74,84 +74,7 @@
     var errorBlock = $('.t-error-message');
     var warningBlock = $('.t-warning-message');
 
-    connection.on('sensorupdate', function (data, date)
-    {
-        for (sensorGuid in listenSensors) {
-            var container = $('.t-cell[data-sensorguid="' + sensorGuid + '"],.t-cell[data-secondsensorguid="' + sensorGuid + '"]');
-            var point = $('i[data-sensorguid="' + sensorGuid + '"]');
-
-            if (data && data[sensorGuid] && data[sensorGuid].insertDate != listenSensors[sensorGuid].updateDate) {
-
-                var val = data[sensorGuid];
-
-                if (point.hasClass('text-red')) {
-                    point.removeClass('text-red');
-                }
-                if (point.hasClass('text-yellow')) {
-                    point.removeClass('text-yellow');
-                }
-
-                if (container.hasClass('t-error') && !container.find('.text-red').length) {
-                    container.removeClass('t-error');
-                }
-                if (container.hasClass('t-warning') && !container.find('.text-yellow').length) {
-                    container.removeClass('t-warning');
-                }
-
-                container.find('span[data-sensorguid="' + sensorGuid + '"]').html(val.insertDateStr);
-
-                if (listenSensors[sensorGuid].isSecond == 0 || listenSensors[sensorGuid].isSecond == -1) {
-                    container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
-                    container.find('.t-environmentVolume').html(val.environmentVolume);
-                    container.find('.t-liquidDensity').html(val.liquidDensity);
-                    container.find('.t-avgT').html(val.avgT);
-                    container.find('.t-environmentLevel').html(val.environmentLevel);
-                }
-
-                if (listenSensors[sensorGuid].isSecond == 1 || listenSensors[sensorGuid].isSecond == -1) {
-                    container.find('.t-t1').html(val.t1.toFixed(1).replace('.', ','));
-                    container.find('.t-t2').html(val.t2.toFixed(1).replace('.', ','));
-                    container.find('.t-t3').html(val.t3.toFixed(1).replace('.', ','));
-                    container.find('.t-t4').html(val.t4.toFixed(1).replace('.', ','));
-                    container.find('.t-t5').html(val.t5.toFixed(1).replace('.', ','));
-                    container.find('.t-t6').html(val.t6.toFixed(1).replace('.', ','));
-                    container.find('.t-avgT').html(val.avgT.toFixed(1).replace('.', ','));
-                }
-
-                listenSensors[sensorGuid].updateDate = data[sensorGuid].insertDate;
-                listenSensors[sensorGuid].warningDate = date + 600000;
-            }
-
-            if (!point.hasClass('text-yellow') && date > listenSensors[sensorGuid].warningDate) {
-                point.addClass('text-yellow');
-
-                if (!container.hasClass('t-error') && !container.hasClass('t-warning')) {
-                    container.addClass('t-warning');
-                }
-            }
-
-            if ($('.text-red').length) {
-                if (errorBlock.hasClass('hidden')) {
-                    errorBlock.removeClass('hidden');
-                }
-            } else {
-                if (!errorBlock.hasClass('hidden')) {
-                    errorBlock.addClass('hidden');
-                }
-            }
-
-            if ($('.text-yellow').length) {
-                if (warningBlock.hasClass('hidden')) {
-                    warningBlock.removeClass('hidden');
-                }
-            }
-            else {
-                if (!warningBlock.hasClass('hidden')) {
-                    warningBlock.addClass('hidden');
-                }
-            }
-        }
-    });
+    connection.on('sensorupdate', sensorUpdate);
 
     connection.start();
 </script>
