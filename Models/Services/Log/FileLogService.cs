@@ -10,6 +10,7 @@ namespace TSensor.Web.Models.Services.Log
     {
         private static ReaderWriterLock InputErrorLocker = new ReaderWriterLock();
         private static ReaderWriterLock RawInputLocker = new ReaderWriterLock();
+        private static ReaderWriterLock ExceptionLocker = new ReaderWriterLock();
 
         private readonly string LogFilePath;
 
@@ -27,6 +28,9 @@ namespace TSensor.Web.Models.Services.Log
                     break;
                 case "rawinput":
                     Write(header, message, RawInputLocker);
+                    break;
+                case "exception":
+                    Write(header, message, ExceptionLocker);
                     break;
                 default: break;
             }
