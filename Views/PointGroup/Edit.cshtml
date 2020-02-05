@@ -1,0 +1,103 @@
+﻿@model PointGroupCreateEditViewModel
+@{
+    ViewBag.Title = $"Редактирование группы объектов \"{Model.Name}\"";
+}
+
+@section AdditionalHeader
+{
+    @Html.ActionLink("назад к списку групп объектов", "List", "PointGroup", null, new { @class = "footer-link pull-right additional-header-link" })
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            @using (Html.BeginForm("Edit", "PointGroup", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
+            {
+                @Html.HiddenFor(model => model.PointGroupGuid)
+                <div class="box-body">
+                    <div class="form-group @Html.ValidState("Name")">
+                        <label for="Name" class="col-sm-3 control-label">Название</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <a id="remove-pointgroup-button" href="javascript:void(0)" class="btn bg-red">Удалить</a>
+                    <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
+                </div>
+            }
+        </div>
+    </div>
+    @*
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-9">
+                <h3>Топливные баки на объекте</h3>
+            </div>
+
+            <div class="col-md-3">
+                @Html.ActionLink("Добавить топливный бак", "Create", "Tank", new { pointGuid = Model.PointGuid }, new { @class = "btn bg-blue btn-block inline-header-button" })
+            </div>
+        </div>
+        @if (Model.HasData)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-solid">
+                        <div class="box-body table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" class="text-center table-center-header">Название</th>
+                                        <th colspan="3" class="text-center">Основной датчик</th>
+                                        <th rowspan="2" class="text-center table-center-header">Использовать дополнительный датчик</th>
+                                        <th colspan="3" class="text-center">Дополнительный датчик</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-center">Код устройства</th>
+                                        <th class="text-center">Код ИЗК</th>
+                                        <th class="text-center">Код датчика</th>
+                                        <th class="text-center">Код устройства</th>
+                                        <th class="text-center">Код ИЗК</th>
+                                        <th class="text-center">Код датчика</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Data)
+                                    {
+                                        <tr>
+                                            <td>@Html.ActionLink(item.Name, "Edit", "Tank", new { pointGuid = Model.PointGuid, tankGuid = item.TankGuid }, null)</td>
+                                            <td>@item.MainDeviceGuid</td>
+                                            <td>@item.MainIZKId</td>
+                                            <td>@item.MainSensorId</td>
+                                            <td>@Html.CheckBox("DualMode", item.DualMode, new { disabled = "disabled" })</td>
+                                            <td>@item.SecondDeviceGuid</td>
+                                            <td>@item.SecondIZKId</td>
+                                            <td>@item.SecondSensorId</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    *@
+</div>
+@using (Html.BeginForm("Remove", "PointGroup", FormMethod.Post, new { id = "remove-pointgroup-form", @class = "hidden" }))
+{
+    @Html.HiddenFor(m => m.PointGroupGuid)
+}
+<script>
+    document.querySelector('#Name').focus();
+    $('#remove-pointgroup-button').click(function () {
+        new ConfirmModal('Удалить группу объектов?', function () {
+            $('#remove-pointgroup-form').submit();
+        }).show();
+    });
+</script>
+@Html.ViewModelWindow()
