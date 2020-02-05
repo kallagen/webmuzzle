@@ -24,7 +24,7 @@ namespace TSensor.Web.Controllers
         {
             if (Guid.TryParse(pointGuid, out var _pointGuid))
             {
-                var point = _pointRepository.GetPointByGuid(_pointGuid);
+                var point = _pointRepository.GetByGuid(_pointGuid);
                 if (point != null)
                 {
                     var viewModel = new TankCreateEditViewModel
@@ -56,7 +56,7 @@ namespace TSensor.Web.Controllers
             Point point = null;
             if (viewModel?.PointGuid.HasValue == true)
             {
-                point = _pointRepository.GetPointByGuid(viewModel.PointGuid.Value);
+                point = _pointRepository.GetByGuid(viewModel.PointGuid.Value);
             }
             if (point == null)
             {
@@ -105,7 +105,7 @@ namespace TSensor.Web.Controllers
             Point point = null;
             if (Guid.TryParse(pointGuid, out var _pointGuid))
             {
-                point = _pointRepository.GetPointByGuid(_pointGuid);
+                point = _pointRepository.GetByGuid(_pointGuid);
             }
             if (point == null)
             {
@@ -158,7 +158,7 @@ namespace TSensor.Web.Controllers
             Point point = null;
             if (viewModel?.PointGuid.HasValue == true)
             {
-                point = _pointRepository.GetPointByGuid(viewModel.PointGuid.Value);
+                point = _pointRepository.GetByGuid(viewModel.PointGuid.Value);
             }
             if (point == null)
             {

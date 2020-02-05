@@ -90,7 +90,7 @@ namespace TSensor.Web.Controllers
         {
             if (Guid.TryParse(pointGuid, out var _pointGuid))
             {
-                var point = _pointRepository.GetPointByGuid(_pointGuid);
+                var point = _pointRepository.GetByGuid(_pointGuid);
                 if (point != null)
                 {
                     var viewModel = new PointCreateEditViewModel

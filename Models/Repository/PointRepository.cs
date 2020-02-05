@@ -16,7 +16,7 @@ namespace TSensor.Web.Models.Repository
                 ORDER BY [Name]");
         }
 
-        public Point GetPointByGuid(Guid pointGuid)
+        public Point GetByGuid(Guid pointGuid)
         {
             return QueryFirst<Point>(@"
                 SELECT PointGuid, [Name]
