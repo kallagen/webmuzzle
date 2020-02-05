@@ -139,7 +139,7 @@ namespace TSensor.Web.Controllers
                 var editResult = _pointRepository.Edit(viewModel.PointGuid, viewModel.Name);
                 if (editResult)
                 {
-                    var pointUrl = Url.Action("Edit", "Point", new { pointUrl = viewModel.PointGuid });
+                    var pointUrl = Url.Action("Edit", "Point", new { pointGuid = viewModel.PointGuid });
                     TempData["Point.List.SuccessMessage"] =
                         $"Объект <a href=\"{pointUrl}\">\"{viewModel.Name}\"</a> изменен";
 
