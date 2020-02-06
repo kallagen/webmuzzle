@@ -37,11 +37,7 @@ namespace TSensor.Web.Controllers
                 }
             }
 
-            ViewBag.Title = "Объект не найден";
-            ViewBag.BackTitle = "назад к списку объектов";
-            ViewBag.BackUrl = Url.ActionLink("List", "Point");
-
-            return View("NotFound");
+            return NotFound();
         }
 
         [Route("point/{pointGuid}/tank/new")]
@@ -60,11 +56,7 @@ namespace TSensor.Web.Controllers
             }
             if (point == null)
             {
-                ViewBag.Title = "Объект не найден";
-                ViewBag.BackTitle = "назад к списку объектов";
-                ViewBag.BackUrl = Url.ActionLink("List", "Point");
-
-                return View("NotFound");
+                return NotFound();
             }
 
             viewModel.Name = viewModel.Name?.Trim();
@@ -109,11 +101,7 @@ namespace TSensor.Web.Controllers
             }
             if (point == null)
             {
-                ViewBag.Title = "Объект не найден";
-                ViewBag.BackTitle = "назад к списку объектов";
-                ViewBag.BackUrl = Url.ActionLink("List", "Point");
-
-                return View("NotFound");
+                return NotFound();
             }
 
             Tank tank = null;
@@ -162,11 +150,7 @@ namespace TSensor.Web.Controllers
             }
             if (point == null)
             {
-                ViewBag.Title = "Объект не найден";
-                ViewBag.BackTitle = "назад к списку объектов";
-                ViewBag.BackUrl = Url.ActionLink("List", "Point");
-
-                return View("NotFound");
+                return NotFound();
             }
 
             viewModel.Name = viewModel.Name?.Trim();
@@ -208,11 +192,7 @@ namespace TSensor.Web.Controllers
             if (!Guid.TryParse(pointGuid, out var _pointGuid) ||
                 !Guid.TryParse(tankGuid, out var _tankGuid))
             {
-                ViewBag.Title = "Объект не найден";
-                ViewBag.BackTitle = "назад к списку объектов";
-                ViewBag.BackUrl = Url.ActionLink("List", "Point");
-
-                return View("NotFound");
+                return NotFound();
             }
             else
             {
@@ -227,6 +207,15 @@ namespace TSensor.Web.Controllers
                     return RedirectToAction("List", "Point");
                 }
             }
+        }
+
+        private new IActionResult NotFound()
+        {
+            ViewBag.Title = "Объект не найден";
+            ViewBag.BackTitle = "назад к списку объектов";
+            ViewBag.BackUrl = Url.ActionLink("List", "Point");
+
+            return View("NotFound");
         }
     }
 }
