@@ -31,7 +31,7 @@ namespace TSensor.Web.Models.Repository
                 new { search, role });
         }
 
-        public User GetUserByLogin(string login)
+        public User GetByLogin(string login)
         {
             return QueryFirst<User>(@"
                 SELECT TOP 1 UserGuid 
@@ -52,7 +52,7 @@ namespace TSensor.Web.Models.Repository
                 new { name, login, password, role });
         }
 
-        public User GetUserByGuid(Guid userGuid)
+        public User GetByGuid(Guid userGuid)
         {
             return QueryFirst<User>(@"
                 SELECT UserGuid, [Login], [Name], Role, IsInactive

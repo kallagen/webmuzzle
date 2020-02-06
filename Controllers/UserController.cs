@@ -82,7 +82,7 @@ namespace TSensor.Web.Controllers
             viewModel.Name = viewModel.Name?.Trim();
 
             viewModel.Validate(ModelState);
-            if (_repository.GetUserByLogin(viewModel.Login) != null)
+            if (_repository.GetByLogin(viewModel.Login) != null)
             {
                 ModelState.AddModelError("Login", "Пользователь с таким логином уже есть");
             }
@@ -115,7 +115,7 @@ namespace TSensor.Web.Controllers
         {
             if (Guid.TryParse(userGuid, out var _userGuid))
             {
-                var user = _repository.GetUserByGuid(_userGuid);
+                var user = _repository.GetByGuid(_userGuid);
                 if (user != null)
                 {
                     var viewModel = new UserEditViewModel
@@ -150,7 +150,7 @@ namespace TSensor.Web.Controllers
             viewModel.Name = viewModel.Name?.Trim();
 
             viewModel.Validate(ModelState);
-            var userByLogin = _repository.GetUserByLogin(viewModel.Login);
+            var userByLogin = _repository.GetByLogin(viewModel.Login);
             if (userByLogin != null && userByLogin.UserGuid != viewModel.UserGuid)
             {
                 ModelState.AddModelError("Login", "Пользователь с таким логином уже есть");
@@ -189,7 +189,7 @@ namespace TSensor.Web.Controllers
                 }
             }
 
-            var user = _repository.GetUserByGuid(viewModel.UserGuid);
+            var user = _repository.GetByGuid(viewModel.UserGuid);
             viewModel.Login = user.Login;
 
             return View(viewModel);
