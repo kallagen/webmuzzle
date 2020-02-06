@@ -82,8 +82,8 @@
 </div>
 @using (Html.BeginForm("Remove", "Tank", FormMethod.Post, new { id = "remove-tank-form", @class = "hidden" }))
 {
-    @Html.HiddenFor(m => m.TankGuid)
-    @Html.HiddenFor(m => m.PointGuid)
+    @Html.Hidden("TankGuid", Model.TankGuid, new { id = "remove-tank-guid" })
+    @Html.Hidden("PointGuid", Model.PointGuid, new { id = "remove-tank-point-guid" })
 }
 <script>
     document.querySelector('#Name').focus();
