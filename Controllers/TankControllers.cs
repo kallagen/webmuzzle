@@ -119,7 +119,7 @@ namespace TSensor.Web.Controllers
             Tank tank = null;
             if (Guid.TryParse(tankGuid, out var _tankGuid))
             {
-                tank = _tankRepository.GetTankByGuid(_tankGuid);
+                tank = _tankRepository.GetByGuid(_tankGuid);
             }
             if (tank == null)
             {

@@ -8,7 +8,7 @@ namespace TSensor.Web.Models.Repository
     {
         public TankRepository(string connectionString) : base(connectionString) { }
 
-        public IEnumerable<Tank> GetTankListByPoint(Guid pointGuid)
+        public IEnumerable<Tank> GetListByPoint(Guid pointGuid)
         {
             return Query<Tank>(@"
                 SELECT 
@@ -19,7 +19,7 @@ namespace TSensor.Web.Models.Repository
                 WHERE PointGuid = @pointGuid", new { pointGuid });
         }
 
-        public Tank GetTankByGuid(Guid tankGuid)
+        public Tank GetByGuid(Guid tankGuid)
         {
             return QueryFirst<Tank>(@"
                 SELECT TOP 1

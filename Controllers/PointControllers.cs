@@ -97,7 +97,7 @@ namespace TSensor.Web.Controllers
                     {
                         PointGuid = point.PointGuid,
                         Name = point.Name,
-                        Data = _tankRepository.GetTankListByPoint(point.PointGuid)
+                        Data = _tankRepository.GetListByPoint(point.PointGuid)
                     };
 
                     var successMessage = TempData["Point.Edit.SuccessMessage"] as string;
@@ -151,7 +151,7 @@ namespace TSensor.Web.Controllers
                 }
             }
 
-            viewModel.Data = _tankRepository.GetTankListByPoint(viewModel.PointGuid);
+            viewModel.Data = _tankRepository.GetListByPoint(viewModel.PointGuid);
             return View(viewModel);
         }
 
