@@ -1,6 +1,6 @@
 ﻿@model TankCreateEditViewModel
 @{
-    ViewBag.Title = $"Редактирование топливного бака \"{Model.Name}\"";
+    ViewBag.Title = $"Редактирование резервуара \"{Model.Name}\"";
 }
 
 @section AdditionalHeader
@@ -88,7 +88,7 @@
 <script>
     document.querySelector('#Name').focus();
     $('#remove-tank-button').click(function () {
-        new ConfirmModal('Удалить топливный бак?', function () {
+        new ConfirmModal('Удалить резервуар?', function () {
             $('#remove-tank-form').submit();
         }).show();
     });

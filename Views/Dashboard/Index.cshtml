@@ -55,7 +55,7 @@
 @foreach (var point in Model)
 {
     var pointHeader = point.First();
-    var pointName = pointHeader.PointGuid.HasValue ? pointHeader.PointName : "Датчики без привязки к объекту и топливному баку";
+    var pointName = pointHeader.PointGuid.HasValue ? pointHeader.PointName : "Датчики без привязки к объекту и резервуару";
 
     <h3>@pointName</h3>
     <div class="row">

@@ -33,11 +33,11 @@
     <div class="col-md-12">
         <div class="row">
             <div class="col-md-9">
-                <h3>Топливные баки на объекте</h3>
+                <h3>Резервуары на объекте</h3>
             </div>
 
             <div class="col-md-3">
-                @Html.ActionLink("Добавить топливный бак", "Create", "Tank", new { pointGuid = Model.PointGuid }, new { @class = "btn bg-blue btn-block inline-header-button" })
+                @Html.ActionLink("Добавить резервуар", "Create", "Tank", new { pointGuid = Model.PointGuid }, new { @class = "btn bg-blue btn-block inline-header-button" })
             </div>
         </div>
         <div class="row">
@@ -99,7 +99,7 @@
 <script>
     document.querySelector('#Name').focus();
     $('#remove-point-button').click(function () {
-        new ConfirmModal('Удалить объект вместе со всеми топливными баками?', function () {
+        new ConfirmModal('Удалить объект вместе со всеми резервуарами?', function () {
             $('#remove-point-form').submit();
         }).show();
     });

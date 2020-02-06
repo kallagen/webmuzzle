@@ -81,7 +81,7 @@ namespace TSensor.Web.Controllers
                 {
                     var tankUrl = Url.Action("Edit", "Tank", new { pointGuid = viewModel.PointGuid.Value, tankGuid });
                     TempData["Point.Edit.SuccessMessage"] =
-                        $"Топливный бак <a href=\"{tankUrl}\">\"{viewModel.Name}\"</a> добавлен";
+                        $"Резервуар <a href=\"{tankUrl}\">\"{viewModel.Name}\"</a> добавлен";
 
                     return RedirectToAction("Edit", "Point", new { pointGuid = viewModel.PointGuid.Value });
                 }
@@ -111,7 +111,7 @@ namespace TSensor.Web.Controllers
             }
             if (tank == null)
             {
-                TempData["Point.Edit.ErrorMessage"] = "Топливный бак не найден";
+                TempData["Point.Edit.ErrorMessage"] = "Резервуар не найден";
                 return RedirectToAction("Edit", "Point", new { pointGuid = point.PointGuid });
             }
 
@@ -171,7 +171,7 @@ namespace TSensor.Web.Controllers
                 {
                     var tankUrl = Url.Action("Edit", "Tank", new { pointGuid = viewModel.PointGuid.Value, tankGuid = viewModel.TankGuid.Value });
                     TempData["Point.Edit.SuccessMessage"] =
-                        $"Топливный бак <a href=\"{tankUrl}\">\"{viewModel.Name}\"</a> изменен";
+                        $"Резервуар <a href=\"{tankUrl}\">\"{viewModel.Name}\"</a> изменен";
 
                     return RedirectToAction("Edit", "Point", new { pointGuid = viewModel.PointGuid.Value });
                 }
@@ -198,12 +198,12 @@ namespace TSensor.Web.Controllers
             {
                 if (_tankRepository.Remove(_tankGuid, _pointGuid))
                 {
-                    TempData["Point.Edit.SuccessMessage"] = "Топливный бак удален";
+                    TempData["Point.Edit.SuccessMessage"] = "Резервуар удален";
                     return RedirectToAction("Edit", "Point", new { pointGuid = _pointGuid });
                 }
                 else
                 {
-                    TempData["Point.List.ErrorMessage"] = "При удалении топливного бака произошла ошибка";
+                    TempData["Point.List.ErrorMessage"] = "При удалении резервуара произошла ошибка";
                     return RedirectToAction("List", "Point");
                 }
             }
