@@ -206,3 +206,16 @@ span.form-control {
 }
 
 /*end sensor card*/
+
+
+tr .table-remove-cell {
+    text-align: right;
+}
+
+tr .table-remove-cell a {
+    visibility: hidden;
+}
+
+tr:hover .table-remove-cell a {
+    visibility: visible;
+}

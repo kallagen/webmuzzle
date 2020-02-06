@@ -11,5 +11,7 @@ namespace TSensor.Web.Models.Repository
         public Guid? Create(string name);
         public bool Edit(Guid pointGroupGuid, string name);
         public bool Remove(Guid pointGroupGuid);
+        public bool AddPoint(Guid pointGroupGuid, Guid pointGuid);
+        public bool RemovePoint(Guid pointGroupGuid, Guid pointGuid);
     }
 }

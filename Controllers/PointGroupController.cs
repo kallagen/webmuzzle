@@ -11,10 +11,12 @@ namespace TSensor.Web.Controllers
     public class PointGroupController : Controller
     {
         private readonly IPointGroupRepository _pointGroupRepository;
+        private readonly IPointRepository _pointRepository;
 
-        public PointGroupController(IPointGroupRepository pointGroupRepository)
+        public PointGroupController(IPointGroupRepository pointGroupRepository, IPointRepository pointRepository)
         {
             _pointGroupRepository = pointGroupRepository;
+            _pointRepository = pointRepository;
         }
 
         [Authorize(Policy = "Admin")]
@@ -70,9 +72,9 @@ namespace TSensor.Web.Controllers
                 }
                 else
                 {
-                    var pointUrl = Url.Action("Edit", "PointGroup", new { pointGroupGuid });
+                    var pointGroupUrl = Url.Action("Edit", "PointGroup", new { pointGroupGuid });
                     TempData["PointGroup.List.SuccessMessage"] =
-                        $"Группа объектов <a href=\"{pointUrl}\">\"{viewModel.Name}\"</a> создана";
+                        $"Группа объектов <a href=\"{pointGroupUrl}\">\"{viewModel.Name}\"</a> создана";
 
                     return RedirectToAction("List", "PointGroup");
                 }
@@ -94,7 +96,8 @@ namespace TSensor.Web.Controllers
                     {
                         PointGroupGuid = group.PointGroupGuid,
                         Name = group.Name,
-                        //Data = _tankRepository.GetTankListByPoint(point.PointGuid)
+                        Data = group.PointList,
+                        AvailablePointList = group.AvailablePointList
                     };
 
                     var successMessage = TempData["PointGroup.Edit.SuccessMessage"] as string;
@@ -112,11 +115,7 @@ namespace TSensor.Web.Controllers
                 }
             }
 
-            ViewBag.Title = "Группа объектов не найдена";
-            ViewBag.BackTitle = "назад к списку групп объектов";
-            ViewBag.BackUrl = Url.ActionLink("List", "PointGroup");
-
-            return View("NotFound");
+            return NotFound();
         }
 
         [Authorize(Policy = "Admin")]
@@ -136,9 +135,9 @@ namespace TSensor.Web.Controllers
                 var editResult = _pointGroupRepository.Edit(viewModel.PointGroupGuid, viewModel.Name);
                 if (editResult)
                 {
-                    var pointUrl = Url.Action("Edit", "PointGroup", new { pointGroupGuid = viewModel.PointGroupGuid });
+                    var pointGroupUrl = Url.Action("Edit", "PointGroup", new { pointGroupGuid = viewModel.PointGroupGuid });
                     TempData["PointGroup.List.SuccessMessage"] =
-                        $"Группа объектов <a href=\"{pointUrl}\">\"{viewModel.Name}\"</a> изменена";
+                        $"Группа объектов <a href=\"{pointGroupUrl}\">\"{viewModel.Name}\"</a> изменена";
 
                     return RedirectToAction("List", "PointGroup");
                 }
@@ -148,8 +147,17 @@ namespace TSensor.Web.Controllers
                 }
             }
 
-            //viewModel.Data = _tankRepository.GetTankListByPoint(viewModel.PointGuid);
-            return View(viewModel);
+            var group = _pointGroupRepository.GetByGuid(viewModel.PointGroupGuid);
+            if (group != null)
+            {
+                viewModel.Data = group.PointList;
+                viewModel.AvailablePointList = group.AvailablePointList;
+                return View(viewModel);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         [Authorize(Policy = "Admin")]
@@ -159,11 +167,7 @@ namespace TSensor.Web.Controllers
         {
             if (!Guid.TryParse(pointGroupGuid, out var _pointGroupGuid))
             {
-                ViewBag.Title = "Группа объектов не найдена";
-                ViewBag.BackTitle = "назад к списку групп объектов";
-                ViewBag.BackUrl = Url.ActionLink("List", "PointGroup");
-
-                return View("NotFound");
+                return NotFound();
             }
             else
             {
@@ -177,6 +181,82 @@ namespace TSensor.Web.Controllers
                 }
                 return RedirectToAction("List", "PointGroup");
             }
+        }
+
+        [Authorize(Policy = "Admin")]
+        [Route("group/point/add")]
+        public IActionResult AddPoint(string pointGroupGuid, string pointGuid)
+        {
+            PointGroup group = null;
+            if (Guid.TryParse(pointGroupGuid, out var _pointGroupGuid))
+            {
+                group = _pointGroupRepository.GetByGuid(_pointGroupGuid);
+            }
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            Point point = null;
+            if (Guid.TryParse(pointGuid, out var _pointGuid))
+            {
+                point = _pointRepository.GetByGuid(_pointGuid);
+                if (point != null)
+                {
+                    var addResult = _pointGroupRepository.AddPoint(_pointGroupGuid, _pointGuid);
+                    if (addResult)
+                    {
+                        var pointUrl = Url.Action("Edit", "Point", new { pointGuid = _pointGuid });
+                        TempData["PointGroup.Edit.SuccessMessage"] =
+                            $"Объект <a href=\"{pointUrl}\">\"{point.Name}\"</a> добавлен в группу";
+                    }
+                    else
+                    {
+                        TempData["PointGroup.Edit.ErrorMessage"] = Program.GLOBAL_ERROR_MESSAGE;
+                    }
+                }
+            }
+
+            if (point == null)
+            {
+                TempData["PointGroup.Edit.ErrorMessage"] = "Объект не найден";
+            }
+
+            return RedirectToAction("Edit", "PointGroup", new { pointGroupGuid = _pointGroupGuid });
+        }
+
+        [Authorize(Policy = "Admin")]
+        [Route("group/point/remove")]
+        [HttpPost]
+        public IActionResult RemovePoint(string pointGroupGuid, string pointGuid)
+        {
+            if (!Guid.TryParse(pointGroupGuid, out var _pointGroupGuid) ||
+                !Guid.TryParse(pointGuid, out var _pointGuid))
+            {
+                return NotFound();
+            }
+            else
+            {
+                if (_pointGroupRepository.RemovePoint(_pointGroupGuid, _pointGuid))
+                {
+                    TempData["PointGroup.Edit.SuccessMessage"] = "Объект удален из группы";
+                    return RedirectToAction("Edit", "PointGroup", new { pointGroupGuid = _pointGroupGuid });
+                }
+                else
+                {
+                    TempData["PointGroup.List.ErrorMessage"] = "При удалении объекта из группы произошла ошибка";
+                    return RedirectToAction("List", "PointGroup");
+                }
+            }
+        }
+
+        private new IActionResult NotFound()
+        {
+            ViewBag.Title = "Группа объектов не найдена";
+            ViewBag.BackTitle = "назад к списку групп объектов";
+            ViewBag.BackUrl = Url.ActionLink("List", "PointGroup");
+
+            return View("NotFound");
         }
     }
 }
