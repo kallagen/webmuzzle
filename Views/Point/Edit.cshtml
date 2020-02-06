@@ -13,7 +13,7 @@
         <div class="box">
             @using (Html.BeginForm("Edit", "Point", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
             {
-                @Html.HiddenFor(model => model.PointGuid)
+                @Html.HiddenFor(m => m.PointGuid)
                 <div class="box-body">
                     <div class="form-group @Html.ValidState("Name")">
                         <label for="Name" class="col-sm-3 control-label">Название</label>
@@ -40,10 +40,11 @@
                 @Html.ActionLink("Добавить топливный бак", "Create", "Tank", new { pointGuid = Model.PointGuid }, new { @class = "btn bg-blue btn-block inline-header-button" })
             </div>
         </div>
-        @if (Model.HasData)
-        {
-            <div class="row">
-                <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12">
+                @if (Model.HasData)
+                {
+
                     <div class="box box-solid">
                         <div class="box-body table-responsive">
                             <table class="table table-hover">
@@ -81,14 +82,19 @@
                             </table>
                         </div>
                     </div>
-                </div>
+
+                }
+                else
+                {
+                    <div>На объекте нет резервуаров</div>
+                }
             </div>
-        }
+        </div>
     </div>
 </div>
 @using (Html.BeginForm("Remove", "Point", FormMethod.Post, new { id = "remove-point-form", @class = "hidden" }))
 {
-    @Html.HiddenFor(m => m.PointGuid)
+    @Html.Hidden("PointGuid", Model.PointGuid, new { id = "remove-point-guid" })
 }
 <script>
     document.querySelector('#Name').focus();

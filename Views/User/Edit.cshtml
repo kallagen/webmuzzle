@@ -14,8 +14,8 @@
         <div class="box">
             @using (Html.BeginForm("Edit", "User", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
             {
-                @Html.HiddenFor(model => model.UserGuid)
-                @Html.HiddenFor(model => model.SetNewPassword)
+                @Html.HiddenFor(m => m.UserGuid)
+                @Html.HiddenFor(m => m.SetNewPassword)
                 <div class="box-body">
                     <div class="form-group @Html.ValidState("Login")">
                         <label for="Login" class="col-sm-3 control-label">Логин</label>
@@ -31,7 +31,7 @@
                     <div class="form-group @Html.ValidState("Role")">
                         <label for="Role" class="col-sm-3 control-label">Группа</label>
                         <div class="col-sm-9">
-                            @Html.DropDownListFor(model => model.Role, new SelectList(AuthService.Roles, "Key", "Value"), string.Empty, new { @class = "form-control" })
+                            @Html.DropDownListFor(m => m.Role, new SelectList(AuthService.Roles, "Key", "Value"), string.Empty, new { @class = "form-control" })
                             @Html.ValidationMessageFor(m => m.Role, null, new { @class = "help-block" })
                         </div>
                     </div>
