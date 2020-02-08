@@ -13,5 +13,6 @@ namespace TSensor.Web.Models.Repository
         public bool Remove(Guid pointGroupGuid);
         public bool AddPoint(Guid pointGroupGuid, Guid pointGuid);
         public bool RemovePoint(Guid pointGroupGuid, Guid pointGuid);
+        public IEnumerable<PointGroup> GetPointGroupStructure(Guid userGuid);
     }
 }

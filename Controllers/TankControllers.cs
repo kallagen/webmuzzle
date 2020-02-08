@@ -8,12 +8,13 @@ using TSensor.Web.ViewModels.Tank;
 namespace TSensor.Web.Controllers
 {
     [Authorize(Policy = "Admin")]
-    public class TankController : Controller
+    public class TankController : LayoutControllerBase
     {
         private readonly IPointRepository _pointRepository;
         private readonly ITankRepository _tankRepository;
 
-        public TankController(IPointRepository pointRepository, ITankRepository tankRepository)
+        public TankController(IPointRepository pointRepository, ITankRepository tankRepository,
+            IPointGroupRepository pointGroupRepository) : base(pointGroupRepository)
         {
             _pointRepository = pointRepository;
             _tankRepository = tankRepository;

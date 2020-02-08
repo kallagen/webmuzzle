@@ -9,12 +9,13 @@ using TSensor.Web.ViewModels.Point;
 
 namespace TSensor.Web.Controllers
 {
-    public class PointController : Controller
+    public class PointController : LayoutControllerBase
     {
         private readonly IPointRepository _pointRepository;
         private readonly ITankRepository _tankRepository;
 
-        public PointController(IPointRepository pointRepository, ITankRepository tankRepository)
+        public PointController(IPointRepository pointRepository, ITankRepository tankRepository,
+            IPointGroupRepository pointGroupRepository) : base(pointGroupRepository)
         {
             _pointRepository = pointRepository;
             _tankRepository = tankRepository;

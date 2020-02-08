@@ -6,11 +6,12 @@ using TSensor.Web.Models.Repository;
 namespace TSensor.Web.Controllers
 {
     [Authorize]
-    public class DashboardController : Controller
+    public class DashboardController : LayoutControllerBase
     {
         private readonly IPointRepository _pointRepository;
 
-        public DashboardController(IPointRepository pointRepository)
+        public DashboardController(IPointRepository pointRepository,
+            IPointGroupRepository pointGroupRepository) : base(pointGroupRepository)
         {
             _pointRepository = pointRepository;
         }

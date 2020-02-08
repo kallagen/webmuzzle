@@ -90,5 +90,10 @@ namespace TSensor.Web.Models.Repository
                 SELECT @@ROWCOUNT",
                 new { pointGroupGuid }) == 1;
         }
+
+        public IEnumerable<PointGroup> GetPointGroupStructure(Guid userGuid)
+        {
+            return new[] { new PointGroup() { Name = "1" }, new PointGroup() { Name = "23" } };
+        }
     }
 }
