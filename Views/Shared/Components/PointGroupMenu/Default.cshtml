@@ -1,0 +1,47 @@
+﻿@using TSensor.Web.ViewComponents;
+@model IEnumerable<TSensor.Web.Models.Entity.PointGroup>
+@{
+    Layout = null;
+}
+@if (Model?.Any() == true)
+{
+    if (Model.Any(p => p.PointGroupGuid == PointGroupMenu.NotAssignedSensorGroupGuid))
+    {
+        <li>@Html.ActionLink("Датчики без привязки", "NotAssigned", "Point")</li>
+    }
+    foreach (var group in Model.Where(p => p.PointGroupGuid != PointGroupMenu.NotAssignedSensorGroupGuid)
+        .OrderBy(p => string.IsNullOrEmpty(p.Name)).ThenBy(p => p.Name))
+    {
+        if (string.IsNullOrEmpty(group.Name))
+        {
+            foreach (var point in group.PointList.OrderBy(p => p.Name))
+            {
+                <li><a href="@Url.Action("State", "Point", new { pointGuid = point.PointGuid })"><i class="fa fa-square menu-point"></i>@point.Name</a></li>
+            }
+        }
+        else
+        {
+            @if (group.PointList.Any())
+            {
+                <li class="treeview">
+                    <a href="javascript:void(0)">
+                        <i class="fa fa-th"></i><span>@group.Name</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @foreach (var point in group.PointList.OrderBy(p => p.Name))
+                        {
+                            <li><a href="@Url.Action("State", "Point", new { pointGuid = point.PointGuid })"><i class="fa fa-square menu-point"></i>@point.Name</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+            else
+            {
+                <li><a href="@Url.Action("GroupState", "Point", new { pointGroupGuid = group.PointGroupGuid })"><i class="fa fa-th"></i>@group.Name</a></li>
+            }
+        }
+    }
+}
