@@ -9,14 +9,13 @@ using TSensor.Web.ViewModels.User;
 namespace TSensor.Web.Controllers
 {
     [Authorize(Policy = "Admin")]
-    public class UserController : LayoutControllerBase
+    public class UserController : Controller
     {
         private readonly IUserRepository _repository;
         private readonly AuthService _authService;
         private readonly IMemoryCache _memoryCache;
 
-        public UserController(IUserRepository repository, AuthService authService, IMemoryCache memoryCache,
-            IPointGroupRepository pointGroupRepository) : base(pointGroupRepository)
+        public UserController(IUserRepository repository, AuthService authService, IMemoryCache memoryCache)
         {
             _repository = repository;
             _authService = authService;
