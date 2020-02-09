@@ -219,3 +219,11 @@ tr .table-remove-cell a {
 tr:hover .table-remove-cell a {
     visibility: visible;
 }
+
+i.menu-point {
+    font-size: 10px;
+    line-height: 16px;
+    vertical-align: middle;
+    height: 20px;
+    padding-left: 3px;
+}
