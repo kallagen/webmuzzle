@@ -93,7 +93,27 @@ namespace TSensor.Web.Models.Repository
 
         public IEnumerable<PointGroup> GetPointGroupStructure(Guid userGuid)
         {
-            return new[] { new PointGroup() { Name = "1" }, new PointGroup() { Name = "23" } };
+            var pointList = Query<dynamic>(@"
+                SELECT p.PointGuid, p.Name AS PointName,
+                	pg.PointGroupGuid, pg.Name AS PointGroupName
+                FROM Point p
+                	LEFT JOIN PointGroupPoint pgp ON pgp.PointGuid = p.PointGuid
+                	FULL JOIN PointGroup pg ON pg.PointGroupGuid = pgp.PointGroupGuid");
+
+            return pointList.GroupBy(p => p.PointGroupGuid).Select(g =>
+            {
+                return new PointGroup
+                {
+                    PointGroupGuid = g.Key ?? default(Guid),
+                    Name = g.FirstOrDefault()?.PointGroupName,
+                    PointList = g.Where(p => p.PointGuid != null)
+                        .Select(p => new Point
+                        {
+                            PointGuid = p.PointGuid,
+                            Name = p.PointName
+                        })
+                };
+            });
         }
     }
 }
