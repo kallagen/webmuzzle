@@ -24,6 +24,7 @@
     <script src="~/lib/fastclick/lib/fastclick.js"></script>
     <script src="~/lib/adminlte/dist/js/adminlte.min.js"></script>
     <script src="~/js/main.js"></script>
+    <script src="~/js/tree.js"></script>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
     <div class="wrapper">
@@ -49,14 +50,15 @@
         </header>
         <aside class="main-sidebar">
             <section class="sidebar">
-                <ul class="sidebar-menu" data-widget="tree">
+                <ul class="sidebar-menu">
+                    <li><a href="@Url.Action("Index", "Dashboard")">Измерения по системе</a></li>
                     @await Component.InvokeAsync("PointGroupMenu")
                     @if (User.IsInRole("admin"))
                     {
-                        <li class="header">НАСТРОЙКИ</li>
-                        <li><a href="@Url.Action("List", "Point")">Объекты и резервуары</a></li>
-                        <li><a href="@Url.Action("List", "PointGroup")">Группы объектов</a></li>
-                        <li><a href="@Url.Action("Search", "User")">Пользователи</a></li>
+                    <li class="header">НАСТРОЙКИ</li>
+                    <li><a href="@Url.Action("List", "Point")">Объекты и резервуары</a></li>
+                    <li><a href="@Url.Action("List", "PointGroup")">Группы объектов</a></li>
+                    <li><a href="@Url.Action("Search", "User")">Пользователи</a></li>
                     }
                 </ul>
             </section>
@@ -75,3 +77,8 @@
     </div>
 </body>
 </html>
+<script>
+    $('.sidebar-menu').tree({
+        trigger: '.pull-right-container'
+    });
+</script>

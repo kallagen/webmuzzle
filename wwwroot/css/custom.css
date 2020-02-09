@@ -212,9 +212,9 @@ tr .table-remove-cell {
     text-align: right;
 }
 
-tr .table-remove-cell a {
-    visibility: hidden;
-}
+    tr .table-remove-cell a {
+        visibility: hidden;
+    }
 
 tr:hover .table-remove-cell a {
     visibility: visible;
@@ -227,3 +227,16 @@ i.menu-point {
     height: 20px;
     padding-left: 3px;
 }
+
+.sidebar-menu li > a > .pull-right-container {
+    height: 100%;
+    margin: 0;
+    top: 0;
+    right: 0;
+    width: 30px;
+}
+
+    .sidebar-menu li > a > .fa-angle-left, .sidebar-menu li > a > .pull-right-container > .fa-angle-left {
+        margin-right: 12px;
+        margin-top: 14px;
+    }
