@@ -20,7 +20,6 @@
   <ItemGroup>
     <Folder Include="Models\Services\Security\" />
     <Folder Include="ViewModels\Auth\" />
-    <Folder Include="wwwroot\js\" />
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
