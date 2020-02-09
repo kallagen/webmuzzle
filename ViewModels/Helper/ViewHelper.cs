@@ -35,21 +35,5 @@ namespace TSensor.Web.ViewModels.Helper
                 return null;
             }
         }
-
-        public static HtmlString MenuPage(this IHtmlHelper html, string controllerName)
-        {
-            var routeData = html?.ViewContext.RouteData.Values;
-
-            if (
-                routeData?.ContainsKey("controller") == true &&
-                routeData["controller"] as string == controllerName)
-            {
-                return new HtmlString("class=\"active\"");
-            }
-            else
-            {
-                return null;
-            }
-        }
     }
 }
