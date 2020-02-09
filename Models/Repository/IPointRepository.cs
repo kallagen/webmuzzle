@@ -13,5 +13,6 @@ namespace TSensor.Web.Models.Repository
         public bool Remove(Guid pointGuid);
         public IEnumerable<PointTankInfo> GetAllPointInfo();
         public IEnumerable<ActualSensorValue> GetSensorActualState(Guid? pointGuid = null);
+        public IEnumerable<ActualSensorValue> GetNotAssignedSensorState();
     }
 }
