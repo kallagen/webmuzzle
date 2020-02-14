@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TSensor.Web.Models.Entity;
+using TSensor.Web.Models.Services.Security;
 
 namespace TSensor.Web.Models.Repository
 {
@@ -18,10 +20,28 @@ namespace TSensor.Web.Models.Repository
 
         public Point GetByGuid(Guid pointGuid)
         {
-            return QueryFirst<Point>(@"
+			var point = QueryFirst<Point>(@"
                 SELECT PointGuid, [Name]
                 FROM [Point] WHERE PointGuid = @pointGuid", new { pointGuid });
-        }
+
+			if (point != null)
+			{
+				var userList = Query<dynamic>($@"
+                    SELECT u.UserGuid, u.Name, u.Login, upr.PointGuid
+                    FROM [User] u 
+                        LEFT JOIN UserPointRights upr ON 
+                            upr.UserGuid = u.UserGuid AND upr.PointGuid = @pointGuid
+                    WHERE u.[Role] = '{RoleCollection.Operator}'",
+					new { pointGuid });
+
+				point.UserList = userList.Where(p => p.PointGuid != null)
+					.Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login });
+				point.AvailableUserList = userList.Where(p => p.PointGuid == null)
+					.Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login });
+			}
+
+			return point;
+		}
 
         public Guid? Create(string name)
         {

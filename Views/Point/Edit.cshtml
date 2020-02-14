@@ -91,16 +91,82 @@
             </div>
         </div>
     </div>
+    <div class="col-md-12">
+        <div class="row">
+            @using (Html.BeginForm("AddUser", "Point", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
+            {
+                <div class="col-md-6">
+                    <h3>Доступ к объекту</h3>
+                </div>
+                @if (Model.HasAvailableUser)
+                {
+                    <div class="col-md-4">
+                        @Html.Hidden("pointGuid", Model.PointGuid)
+                        @Html.DropDownList("userGuid", new SelectList(Model.AvailableUserList, "UserGuid", "Name"), new { @class = "form-control inline-header-button" })
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn bg-blue btn-block inline-header-button">Добавить оператора</button>
+                    </div>
+                }
+            }
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                @if (Model.HasUser)
+                {
+                    <div class="box box-solid">
+                        <div class="box-body table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center table-center-header">Логин</th>
+                                        <th class="text-center table-center-header">Имя</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.UserList)
+                                    {
+                                        <tr>
+                                            <td>@Html.ActionLink(item.Login, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                            <td>@Html.ActionLink(item.Name, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                            <td class="table-remove-cell"><a class="remove-user-button text-red" href="javascript:void(0)" data-userguid="@item.UserGuid">удалить</a></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div>Ни у одного оператора нет доступа на группу объектов</div>
+                }
+            </div>
+        </div>
+    </div>
 </div>
 @using (Html.BeginForm("Remove", "Point", FormMethod.Post, new { id = "remove-point-form", @class = "hidden" }))
 {
     @Html.Hidden("PointGuid", Model.PointGuid, new { id = "remove-point-guid" })
+}
+@using (Html.BeginForm("RemoveUser", "Point", FormMethod.Post, new { id = "remove-user-form", @class = "hidden" }))
+{
+    @Html.Hidden("PointGuid", Model.PointGuid, new { id = "remove-point-guid" })
+    @Html.Hidden("UserGuid", null, new { id = "remove-user-guid" })
 }
 <script>
     document.querySelector('#Name').focus();
     $('#remove-point-button').click(function () {
         new ConfirmModal('Удалить объект вместе со всеми резервуарами?', function () {
             $('#remove-point-form').submit();
+        }).show();
+    });
+    $('.remove-user-button').click(function () {
+        var userGuid = $(this).data('userguid');
+        new ConfirmModal('Запретить оператору доступ к объекту?', function () {
+            $('#remove-user-guid').val(userGuid);
+            $('#remove-user-form').submit();
         }).show();
     });
 </script>

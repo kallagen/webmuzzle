@@ -13,11 +13,14 @@ namespace TSensor.Web.Controllers
     {
         private readonly IPointRepository _pointRepository;
         private readonly ITankRepository _tankRepository;
+        private readonly IUserRepository _userRepository;
 
-        public PointController(IPointRepository pointRepository, ITankRepository tankRepository)            
+        public PointController(IPointRepository pointRepository, ITankRepository tankRepository,
+            IUserRepository userRepository)
         {
             _pointRepository = pointRepository;
             _tankRepository = tankRepository;
+            _userRepository = userRepository;
         }
 
         [Authorize(Policy = "Admin")]
@@ -97,7 +100,9 @@ namespace TSensor.Web.Controllers
                     {
                         PointGuid = point.PointGuid,
                         Name = point.Name,
-                        Data = _tankRepository.GetListByPoint(point.PointGuid)
+                        Data = _tankRepository.GetListByPoint(point.PointGuid),
+                        UserList = point.UserList,
+                        AvailableUserList = point.AvailableUserList
                     };
 
                     var successMessage = TempData["Point.Edit.SuccessMessage"] as string;
@@ -151,8 +156,22 @@ namespace TSensor.Web.Controllers
                 }
             }
 
-            viewModel.Data = _tankRepository.GetListByPoint(viewModel.PointGuid);
-            return View(viewModel);
+            var point = _pointRepository.GetByGuid(viewModel.PointGuid);
+            if (point != null)
+            {
+                viewModel.Data = _tankRepository.GetListByPoint(viewModel.PointGuid);
+                viewModel.UserList = point.UserList;                
+                viewModel.AvailableUserList = point.AvailableUserList;
+                return View(viewModel);
+            }
+            else
+            {
+                ViewBag.Title = "Объект не найден";
+                ViewBag.BackTitle = "назад к списку объектов";
+                ViewBag.BackUrl = Url.ActionLink("List", "Point");
+
+                return View("NotFound");
+            }
         }
 
         [Authorize(Policy = "Admin")]
@@ -228,6 +247,82 @@ namespace TSensor.Web.Controllers
             ViewBag.BackUrl = Url.ActionLink("All", "Point");
 
             return View("NotFound");
+        }
+
+        [Authorize(Policy = "Admin")]
+        [Route("point/user/add")]
+        [HttpPost]
+        public IActionResult AddUser(string pointGuid, string userGuid)
+        {
+            Point point = null;
+            if (Guid.TryParse(pointGuid, out var _pointGuid))
+            {
+                point = _pointRepository.GetByGuid(_pointGuid);
+            }
+            if (point == null)
+            {
+                ViewBag.Title = "Объект не найден";
+                ViewBag.BackTitle = "назад к списку объектов";
+                ViewBag.BackUrl = Url.ActionLink("List", "Point");
+
+                return View("NotFound");
+            }
+
+            User user = null;
+            if (Guid.TryParse(userGuid, out var _userGuid))
+            {
+                user = _userRepository.GetByGuid(_userGuid);
+                if (user != null)
+                {
+                    var addResult = _userRepository.AddPointUser(_pointGuid, _userGuid);
+                    if (addResult)
+                    {
+                        var userUrl = Url.Action("Edit", "User", new { userGuid = _userGuid });
+                        TempData["Point.Edit.SuccessMessage"] =
+                            $"Оператору <a href=\"{userUrl}\">\"{user.Name}\"</a> выдано разрешение на доступ к объекту";
+                    }
+                    else
+                    {
+                        TempData["Point.Edit.ErrorMessage"] = Program.GLOBAL_ERROR_MESSAGE;
+                    }
+                }
+            }
+
+            if (user == null)
+            {
+                TempData["Point.Edit.ErrorMessage"] = "Оператор не найден";
+            }
+
+            return RedirectToAction("Edit", "Point", new { pointGuid = _pointGuid });
+        }
+
+        [Authorize(Policy = "Admin")]
+        [Route("point/user/remove")]
+        [HttpPost]
+        public IActionResult RemoveUser(string pointGuid, string userGuid)
+        {
+            if (!Guid.TryParse(pointGuid, out var _pointGuid) ||
+                !Guid.TryParse(userGuid, out var _userGuid))
+            {
+                ViewBag.Title = "Объект не найден";
+                ViewBag.BackTitle = "назад к списку объектов";
+                ViewBag.BackUrl = Url.ActionLink("List", "Point");
+
+                return View("NotFound");
+            }
+            else
+            {
+                if (_userRepository.RemovePointUser(_pointGuid, _userGuid))
+                {
+                    TempData["Point.Edit.SuccessMessage"] = "Оператору запрещен доступ к объекту";
+                    return RedirectToAction("Edit", "Point", new { pointGuid = _pointGuid });
+                }
+                else
+                {
+                    TempData["Point.List.ErrorMessage"] = "При запрещении доступа оператору к объекту произошла ошибка";
+                    return RedirectToAction("List", "Point");
+                }
+            }
         }
     }
 }
