@@ -54,7 +54,7 @@ function sensorUpdate(data, date) {
         var container = $('.t-cell[data-sensorguid="' + sensorGuid + '"],.t-cell[data-secondsensorguid="' + sensorGuid + '"]');
         var point = $('i[data-sensorguid="' + sensorGuid + '"]');
 
-        if (data && data[sensorGuid] && data[sensorGuid].insertDate != listenSensors[sensorGuid].updateDate) {
+        if (data && data[sensorGuid] && data[sensorGuid].insertDate !== listenSensors[sensorGuid].updateDate) {
 
             var val = data[sensorGuid];
 
@@ -74,7 +74,7 @@ function sensorUpdate(data, date) {
 
             container.find('span[data-sensorguid="' + sensorGuid + '"]').html(val.insertDateStr);
 
-            if (listenSensors[sensorGuid].isSecond == 0 || listenSensors[sensorGuid].isSecond == -1) {
+            if (listenSensors[sensorGuid].isSecond === 0 || listenSensors[sensorGuid].isSecond === -1) {
                 container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
                 container.find('.t-environmentVolume').html(val.environmentVolume);
                 container.find('.t-liquidDensity').html(val.liquidDensity);
@@ -82,7 +82,7 @@ function sensorUpdate(data, date) {
                 container.find('.t-environmentLevel').html(val.environmentLevel);
             }
 
-            if (listenSensors[sensorGuid].isSecond == 1 || listenSensors[sensorGuid].isSecond == -1) {
+            if (listenSensors[sensorGuid].isSecond === 1 || listenSensors[sensorGuid].isSecond === -1) {
                 container.find('.t-t1').html(val.t1.toFixed(1).replace('.', ','));
                 container.find('.t-t2').html(val.t2.toFixed(1).replace('.', ','));
                 container.find('.t-t3').html(val.t3.toFixed(1).replace('.', ','));

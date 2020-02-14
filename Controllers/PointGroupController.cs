@@ -12,11 +12,14 @@ namespace TSensor.Web.Controllers
     {
         private readonly IPointGroupRepository _pointGroupRepository;
         private readonly IPointRepository _pointRepository;
+        private readonly IUserRepository _userRepository;
 
-        public PointGroupController(IPointGroupRepository pointGroupRepository, IPointRepository pointRepository)
+        public PointGroupController(IPointGroupRepository pointGroupRepository, IPointRepository pointRepository,
+            IUserRepository userRepository)
         {
             _pointGroupRepository = pointGroupRepository;
             _pointRepository = pointRepository;
+            _userRepository = userRepository;
         }
 
         [Authorize(Policy = "Admin")]
@@ -97,7 +100,9 @@ namespace TSensor.Web.Controllers
                         PointGroupGuid = group.PointGroupGuid,
                         Name = group.Name,
                         Data = group.PointList,
-                        AvailablePointList = group.AvailablePointList
+                        AvailablePointList = group.AvailablePointList,
+                        UserList = group.UserList,
+                        AvailableUserList = group.AvailableUserList
                     };
 
                     var successMessage = TempData["PointGroup.Edit.SuccessMessage"] as string;
@@ -226,6 +231,48 @@ namespace TSensor.Web.Controllers
         }
 
         [Authorize(Policy = "Admin")]
+        [Route("group/user/add")]
+        public IActionResult AddUser(string pointGroupGuid, string userGuid)
+        {
+            PointGroup group = null;
+            if (Guid.TryParse(pointGroupGuid, out var _pointGroupGuid))
+            {
+                group = _pointGroupRepository.GetByGuid(_pointGroupGuid);
+            }
+            if (group == null)
+            {
+                return NotFound();
+            }
+
+            User user = null;
+            if (Guid.TryParse(userGuid, out var _userGuid))
+            {
+                user = _userRepository.GetByGuid(_userGuid);
+                if (user != null)
+                {
+                    var addResult = _userRepository.AddPointGroupUser(_pointGroupGuid, _userGuid);
+                    if (addResult)
+                    {
+                        var userUrl = Url.Action("Edit", "User", new { userGuid = _userGuid });
+                        TempData["PointGroup.Edit.SuccessMessage"] =
+                            $"Оператору <a href=\"{userUrl}\">\"{user.Name}\"</a> выдано разрешение на доступ к группе объектов";
+                    }
+                    else
+                    {
+                        TempData["PointGroup.Edit.ErrorMessage"] = Program.GLOBAL_ERROR_MESSAGE;
+                    }
+                }
+            }
+
+            if (user == null)
+            {
+                TempData["PointGroup.Edit.ErrorMessage"] = "Оператор не найден";
+            }
+
+            return RedirectToAction("Edit", "PointGroup", new { pointGroupGuid = _pointGroupGuid });
+        }
+
+        [Authorize(Policy = "Admin")]
         [Route("group/point/remove")]
         [HttpPost]
         public IActionResult RemovePoint(string pointGroupGuid, string pointGuid)
@@ -245,6 +292,31 @@ namespace TSensor.Web.Controllers
                 else
                 {
                     TempData["PointGroup.List.ErrorMessage"] = "При удалении объекта из группы произошла ошибка";
+                    return RedirectToAction("List", "PointGroup");
+                }
+            }
+        }
+
+        [Authorize(Policy = "Admin")]
+        [Route("group/user/remove")]
+        [HttpPost]
+        public IActionResult RemoveUser(string pointGroupGuid, string userGuid)
+        {
+            if (!Guid.TryParse(pointGroupGuid, out var _pointGroupGuid) ||
+                !Guid.TryParse(userGuid, out var _userGuid))
+            {
+                return NotFound();
+            }
+            else
+            {
+                if (_userRepository.RemovePointGroupUser(_pointGroupGuid, _userGuid))
+                {
+                    TempData["PointGroup.Edit.SuccessMessage"] = "Оператору запрещен доступ к группе объектов";
+                    return RedirectToAction("Edit", "PointGroup", new { pointGroupGuid = _pointGroupGuid });
+                }
+                else
+                {
+                    TempData["PointGroup.List.ErrorMessage"] = "При запрещении доступа оператору к группе объектов произошла ошибка";
                     return RedirectToAction("List", "PointGroup");
                 }
             }

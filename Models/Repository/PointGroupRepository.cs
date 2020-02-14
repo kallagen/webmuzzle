@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TSensor.Web.Models.Entity;
+using TSensor.Web.Models.Services.Security;
 
 namespace TSensor.Web.Models.Repository
 {
@@ -69,6 +70,19 @@ namespace TSensor.Web.Models.Repository
                     .Select(p => new Point { PointGuid = p.PointGuid, Name = p.Name });
                 group.AvailablePointList = pointList.Where(p => p.PointGroupGuid == null)
                     .Select(p => new Point { PointGuid = p.PointGuid, Name = p.Name });
+
+                var userList = Query<dynamic>($@"
+                    SELECT u.UserGuid, u.Name, u.Login, upgr.PointGroupGuid
+                    FROM [User] u 
+                        LEFT JOIN UserPointGroupRights upgr ON 
+                            upgr.UserGuid = u.UserGuid AND upgr.PointGroupGuid = @pointGroupGuid
+                    WHERE u.[Role] = '{RoleCollection.Operator}'",
+                    new { pointGroupGuid });
+
+                group.UserList = userList.Where(p => p.PointGroupGuid != null)
+                    .Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login });
+                group.AvailableUserList = userList.Where(p => p.PointGroupGuid == null)
+                    .Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login });
             }
 
             return group;
