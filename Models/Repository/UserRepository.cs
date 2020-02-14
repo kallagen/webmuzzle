@@ -90,5 +90,51 @@ namespace TSensor.Web.Models.Repository
                 SELECT @@ROWCOUNT",
                 new { userGuid }) == 1;
         }
+
+        public bool AddPointUser(Guid pointGuid, Guid userGuid)
+        {
+            return QueryFirst<int?>(@"
+                IF NOT EXISTS (SELECT 1
+                    FROM UserPointRights
+                    WHERE PointGuid = @pointGuid AND UserGuid = @userGuid)
+
+                    INSERT UserPointRights(PointGuid, UserGuid)
+                    VALUES(@pointGuid, @userGuid)
+
+                SELECT @@ROWCOUNT", new { pointGuid, userGuid }) == 1;
+        }
+
+        public bool RemovePointUser(Guid pointGuid, Guid userGuid)
+        {
+            return QueryFirst<int?>(@"
+                DELETE UserPointRights
+                WHERE PointGuid = @pointGuid AND UserGuid = @userGuid
+
+                SELECT @@ROWCOUNT",
+                new { pointGuid, userGuid }) == 1;
+        }
+
+        public bool AddPointGroupUser(Guid pointGroupGuid, Guid userGuid)
+        {
+            return QueryFirst<int?>(@"
+                IF NOT EXISTS (SELECT 1
+                    FROM UserPointGroupRights
+                    WHERE PointGroupGuid = @pointGroupGuid AND UserGuid = @userGuid)
+
+                    INSERT UserPointGroupRights(PointGroupGuid, UserGuid)
+                    VALUES(@pointGroupGuid, @userGuid)
+
+                SELECT @@ROWCOUNT", new { pointGroupGuid, userGuid }) == 1;
+        }
+
+        public bool RemovePointGroupUser(Guid pointGroupGuid, Guid userGuid)
+        {
+            return QueryFirst<int?>(@"
+                DELETE UserPointGroupRights
+                WHERE PointGroupGuid = @pointGroupGuid AND UserGuid = @userGuid
+
+                SELECT @@ROWCOUNT",
+                new { pointGroupGuid, userGuid }) == 1;
+        }
     }
 }

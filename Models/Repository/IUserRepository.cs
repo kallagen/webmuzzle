@@ -14,5 +14,11 @@ namespace TSensor.Web.Models.Repository
         public bool Edit(Guid userGuid, string name, string role, bool isInactive);
         public bool ChangePassword(Guid userGuid, string password);
         public bool Remove(Guid userGuid);
+
+        public bool AddPointUser(Guid pointGuid, Guid userGuid);
+        public bool RemovePointUser(Guid pointGuid, Guid userGuid);
+
+        public bool AddPointGroupUser(Guid pointGroupGuid, Guid userGuid);
+        public bool RemovePointGroupUser(Guid pointGroupGuid, Guid userGuid);
     }
 }
