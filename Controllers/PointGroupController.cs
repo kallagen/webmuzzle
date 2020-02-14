@@ -157,6 +157,8 @@ namespace TSensor.Web.Controllers
             {
                 viewModel.Data = group.PointList;
                 viewModel.AvailablePointList = group.AvailablePointList;
+                viewModel.UserList = group.UserList;
+                viewModel.AvailableUserList = group.AvailableUserList;
                 return View(viewModel);
             }
             else
@@ -232,6 +234,7 @@ namespace TSensor.Web.Controllers
 
         [Authorize(Policy = "Admin")]
         [Route("group/user/add")]
+        [HttpPost]
         public IActionResult AddUser(string pointGroupGuid, string userGuid)
         {
             PointGroup group = null;
