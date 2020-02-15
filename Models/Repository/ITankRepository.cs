@@ -8,12 +8,12 @@ namespace TSensor.Web.Models.Repository
     {
         public IEnumerable<Tank> GetListByPoint(Guid pointGuid);
         public Tank GetByGuid(Guid tankGuid);
-        public Guid? Create(Guid pointGuid, string name, bool dualMode,
+        public Guid? Create(Guid pointGuid, string name, Guid? productGuid, bool dualMode,
             string mainDeviceGuid, string mainIZKId, string mainSensorId,
-            string secondDeviceGuid, string secondIZKId, string secondSensorId);
-        public bool Edit(Guid tankGuid, Guid pointGuid, string name, bool dualMode,
+            string secondDeviceGuid, string secondIZKId, string secondSensorId, string description);
+        public bool Edit(Guid tankGuid, Guid pointGuid, string name, Guid? productGuid, bool dualMode,
             string mainDeviceGuid, string mainIZKId, string mainSensorId,
-            string secondDeviceGuid, string secondIZKId, string secondSensorId);
+            string secondDeviceGuid, string secondIZKId, string secondSensorId, string description);
         public bool Remove(Guid tankGuid, Guid pointGuid);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace TSensor.Web.ViewModels.Tank
@@ -24,5 +25,9 @@ namespace TSensor.Web.ViewModels.Tank
         public string SecondIZKId { get; set; }
         [StringLength(2, ErrorMessage = "Значение должно быть не больше 2 символов")]
         public string SecondSensorId { get; set; }
+        public string Description { get; set; }
+        public Guid? ProductGuid { get; set; }
+
+        public IEnumerable<Models.Entity.Product> ProductList { get; set; }
     }
 }

@@ -12,11 +12,14 @@ namespace TSensor.Web.Controllers
     {
         private readonly IPointRepository _pointRepository;
         private readonly ITankRepository _tankRepository;
+        private readonly IProductRepository _productRepository;
 
-        public TankController(IPointRepository pointRepository, ITankRepository tankRepository)
+        public TankController(IPointRepository pointRepository, ITankRepository tankRepository,
+            IProductRepository productRepository)
         {
             _pointRepository = pointRepository;
             _tankRepository = tankRepository;
+            _productRepository = productRepository;
         }
 
         [Route("point/{pointGuid}/tank/new")]
@@ -30,7 +33,8 @@ namespace TSensor.Web.Controllers
                     var viewModel = new TankCreateEditViewModel
                     {
                         PointGuid = point.PointGuid,
-                        PointName = point.Name
+                        PointName = point.Name,
+                        ProductList = _productRepository.List()
                     };
 
                     return View(viewModel);
@@ -70,9 +74,10 @@ namespace TSensor.Web.Controllers
             if (ModelState.IsValid)
             {
                 var tankGuid = _tankRepository.Create(
-                    viewModel.PointGuid.Value, viewModel.Name, viewModel.DualMode,
+                    viewModel.PointGuid.Value, viewModel.Name, viewModel.ProductGuid, viewModel.DualMode,
                     viewModel.MainDeviceGuid, viewModel.MainIZKId, viewModel.MainSensorId,
-                    viewModel.SecondDeviceGuid, viewModel.SecondIZKId, viewModel.SecondSensorId);
+                    viewModel.SecondDeviceGuid, viewModel.SecondIZKId, viewModel.SecondSensorId,
+                    viewModel.Description);
                 if (tankGuid == null)
                 {
                     viewModel.ErrorMessage = Program.GLOBAL_ERROR_MESSAGE;
@@ -87,6 +92,7 @@ namespace TSensor.Web.Controllers
                 }
             }
 
+            viewModel.ProductList = _productRepository.List();
             viewModel.PointName = point.Name;
             return View(viewModel);
         }
@@ -121,16 +127,18 @@ namespace TSensor.Web.Controllers
                 PointGuid = point.PointGuid,
                 PointName = point.Name,
                 Name = tank.Name,
+                ProductGuid = tank.ProductGuid,
                 MainDeviceGuid = tank.MainDeviceGuid,
                 MainIZKId = tank.MainIZKId,
                 MainSensorId = tank.MainSensorId,
                 DualMode = tank.DualMode,
                 SecondDeviceGuid = tank.SecondDeviceGuid,
                 SecondIZKId = tank.SecondIZKId,
-                SecondSensorId = tank.SecondSensorId
+                SecondSensorId = tank.SecondSensorId,
+                Description = tank.Description
             };
 
-
+            viewModel.ProductList = _productRepository.List();
             return View(viewModel);
         }
 
@@ -164,9 +172,11 @@ namespace TSensor.Web.Controllers
             if (ModelState.IsValid && viewModel.TankGuid.HasValue)
             {
                 var editResult = _tankRepository.Edit(
-                    viewModel.TankGuid.Value, viewModel.PointGuid.Value, viewModel.Name, viewModel.DualMode,
+                    viewModel.TankGuid.Value, viewModel.PointGuid.Value, viewModel.Name, 
+                    viewModel.ProductGuid, viewModel.DualMode,
                     viewModel.MainDeviceGuid, viewModel.MainIZKId, viewModel.MainSensorId,
-                    viewModel.SecondDeviceGuid, viewModel.SecondIZKId, viewModel.SecondSensorId);
+                    viewModel.SecondDeviceGuid, viewModel.SecondIZKId, viewModel.SecondSensorId,
+                    viewModel.Description);
                 if (editResult)
                 {
                     var tankUrl = Url.Action("Edit", "Tank", new { pointGuid = viewModel.PointGuid.Value, tankGuid = viewModel.TankGuid.Value });
@@ -181,6 +191,7 @@ namespace TSensor.Web.Controllers
                 }
             }
 
+            viewModel.ProductList = _productRepository.List();
             viewModel.PointName = point.Name;
             return View(viewModel);
         }

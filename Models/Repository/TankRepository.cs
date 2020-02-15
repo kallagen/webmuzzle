@@ -23,58 +23,62 @@ namespace TSensor.Web.Models.Repository
         {
             return QueryFirst<Tank>(@"
                 SELECT TOP 1
-                    TankGuid, Name, DualMode,
+                    TankGuid, Name, ProductGuid, DualMode,
                     MainDeviceGuid, MainIZKId, MainSensorId,
-                    SecondDeviceGuid, SecondIZKId, SecondSensorId
+                    SecondDeviceGuid, SecondIZKId, SecondSensorId, Description
                 FROM Tank 
                 WHERE TankGuid = @tankGuid", new { tankGuid });
         }
 
-        public Guid? Create(Guid pointGuid, string name, bool dualMode,
+        public Guid? Create(Guid pointGuid, string name, Guid? productGuid, bool dualMode,
             string mainDeviceGuid, string mainIZKId, string mainSensorId,
-            string secondDeviceGuid, string secondIZKId, string secondSensorId)
+            string secondDeviceGuid, string secondIZKId, string secondSensorId, string description)
         {
             return QueryFirst<Guid?>(@"
                 DECLARE @guid UNIQUEIDENTIFIER = NEWID()
 
                 INSERT [Tank](
-                    TankGuid, PointGuid, [Name], DualMode,
+                    TankGuid, PointGuid, [Name], ProductGuid, DualMode,
                     MainDeviceGuid, MainIZKId, MainSensorId,
-                    SecondDeviceGuid, SecondIZKId, SecondSensorId)
+                    SecondDeviceGuid, SecondIZKId, SecondSensorId, Description)
                 VALUES(
-                    @guid, @pointGuid, @name, @dualMode,
+                    @guid, @pointGuid, @name, @productGuid, @dualMode,
                     @mainDeviceGuid, @mainIZKId, @mainSensorId,
-                    @secondDeviceGuid, @secondIZKId, @secondSensorId)
+                    @secondDeviceGuid, @secondIZKId, @secondSensorId, @description)
                 
                 SELECT TankGuid FROM [Tank] WHERE TankGuid = @guid",
                 new
                 {
                     pointGuid,
                     name,
+                    productGuid,
                     dualMode,
                     mainDeviceGuid,
                     mainIZKId,
                     mainSensorId,
                     secondDeviceGuid,
                     secondIZKId,
-                    secondSensorId
+                    secondSensorId,
+                    description
                 });
         }
 
-        public bool Edit(Guid tankGuid, Guid pointGuid, string name, bool dualMode,
-            string mainDeviceGuid, string mainIZKId, string mainSensorId,
-            string secondDeviceGuid, string secondIZKId, string secondSensorId)
+        public bool Edit(Guid tankGuid, Guid pointGuid, string name, Guid? productGuid, 
+            bool dualMode, string mainDeviceGuid, string mainIZKId, string mainSensorId,
+            string secondDeviceGuid, string secondIZKId, string secondSensorId, string description)
         {
             return QueryFirst<int?>(@"
                 UPDATE [Tank] SET 
                     [Name] = @name,
+                    ProductGuid = @productGuid,
                     DualMode = @dualMode,
                     MainDeviceGuid = @mainDeviceGuid, 
                     MainIZKId = @mainIZKId, 
                     MainSensorId = @mainSensorId,
                     SecondDeviceGuid = @secondDeviceGuid, 
                     SecondIZKId = @secondIZKId, 
-                    SecondSensorId = @secondSensorId
+                    SecondSensorId = @secondSensorId,
+                    Description = @description
                 WHERE TankGuid = @tankGuid AND PointGuid = @pointGuid
 
                 SELECT @@ROWCOUNT",
@@ -83,13 +87,15 @@ namespace TSensor.Web.Models.Repository
                     tankGuid,
                     pointGuid,
                     name,
+                    productGuid,
                     dualMode,
                     mainDeviceGuid,
                     mainIZKId,
                     mainSensorId,
                     secondDeviceGuid,
                     secondIZKId,
-                    secondSensorId
+                    secondSensorId,
+                    description
                 }) == 1;
         }
 
