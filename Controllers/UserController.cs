@@ -90,7 +90,8 @@ namespace TSensor.Web.Controllers
             if (ModelState.IsValid)
             {
                 var userGuid = _repository.Create(viewModel.Login, viewModel.Name,
-                    _authService.EncryptPassword(viewModel.Password), viewModel.Role);
+                    _authService.EncryptPassword(viewModel.Password), viewModel.Role,
+                    viewModel.Description);
 
                 if (userGuid == null)
                 {
@@ -124,7 +125,8 @@ namespace TSensor.Web.Controllers
                         Login = user.Login,
                         Name = user.Name,
                         Role = user.Role,
-                        IsInactive = user.IsInactive
+                        IsInactive = user.IsInactive,
+                        Description = user.Description
                     };
 
                     return View(viewModel);
@@ -159,7 +161,7 @@ namespace TSensor.Web.Controllers
             if (ModelState.IsValid)
             {
                 var editResult = _repository.Edit(viewModel.UserGuid, viewModel.Name,
-                    viewModel.Role, viewModel.IsInactive);
+                    viewModel.Role, viewModel.IsInactive, viewModel.Description);
 
                 var changePasswordResult = true;
                 if (viewModel.SetNewPassword)

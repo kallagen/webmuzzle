@@ -9,5 +9,6 @@ namespace TSensor.Web.Models.Entity
         public string Name { get; set; }
         public string Role { get; set; }
         public bool IsInactive { get; set; }
+        public string Description { get; set; }
     }
 }

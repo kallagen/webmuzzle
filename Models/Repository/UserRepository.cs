@@ -22,7 +22,7 @@ namespace TSensor.Web.Models.Repository
             search = string.IsNullOrWhiteSpace(search) ? null : $"%{search}%";
 
             return Query<User>(@"
-                SELECT UserGuid, [Login], [Name], Role, IsInactive
+                SELECT UserGuid, [Login], [Name], Role, IsInactive, Description
                 FROM [User]
                 WHERE 
                     (@search IS NULL OR [Login] LIKE @search OR [Name] LIKE @search) AND
@@ -40,36 +40,37 @@ namespace TSensor.Web.Models.Repository
                 new { login });
         }
 
-        public Guid? Create(string login, string name, string password, string role)
+        public Guid? Create(string login, string name, string password, string role, string description)
         {
             return QueryFirst<Guid?>(@"
                 DECLARE @guid UNIQUEIDENTIFIER = NEWID()
 
-                INSERT [User](UserGuid, [Login], [Name], Password, Role)
-                VALUES(@guid, @login, @name, @password, @role)
+                INSERT [User](UserGuid, [Login], [Name], Password, Role, Description)
+                VALUES(@guid, @login, @name, @password, @role, @description)
 
                 SELECT UserGuid FROM [User] WHERE UserGuid = @guid",
-                new { name, login, password, role });
+                new { name, login, password, role, description });
         }
 
         public User GetByGuid(Guid userGuid)
         {
             return QueryFirst<User>(@"
-                SELECT UserGuid, [Login], [Name], Role, IsInactive
+                SELECT UserGuid, [Login], [Name], Role, IsInactive, Description
                 FROM [User] WHERE UserGuid = @userGuid", new { userGuid });
         }
 
-        public bool Edit(Guid userGuid, string name, string role, bool isInactive)
+        public bool Edit(Guid userGuid, string name, string role, bool isInactive, string description)
         {
             return QueryFirst<int?>(@"
                 UPDATE [User] SET 
                     [Name] = @name,
                     Role = @role,
-                    IsInactive = @isInactive
+                    IsInactive = @isInactive,
+                    Description = @description
                 WHERE UserGuid = @userGuid
 
                 SELECT @@ROWCOUNT",
-                new { userGuid, name, role, isInactive }) == 1;
+                new { userGuid, name, role, isInactive, description }) == 1;
         }
 
         public bool ChangePassword(Guid userGuid, string password)

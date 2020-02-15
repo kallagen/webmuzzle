@@ -36,6 +36,12 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="Description" class="col-sm-3 control-label">Примечание</label>
+                        <div class="col-sm-9">
+                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <div class="col-sm-offset-3 col-sm-9">
                             <div class="checkbox">
                                 <label>@Html.CheckBoxFor(m => m.IsInactive)пользователь заблокирован</label>
