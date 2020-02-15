@@ -55,7 +55,7 @@ namespace TSensor.Web.Models.Repository
                 new { name });
         }
 
-        public bool Edit(Guid PointGuid, string name)
+        public bool Edit(Guid pointGuid, string name)
         {
             return QueryFirst<int?>(@"
                 UPDATE [Point] SET 
@@ -63,7 +63,7 @@ namespace TSensor.Web.Models.Repository
                 WHERE PointGuid = @pointGuid
 
                 SELECT @@ROWCOUNT",
-                new { PointGuid, name }) == 1;
+                new { pointGuid, name }) == 1;
         }
 
         public bool Remove(Guid pointGuid)
