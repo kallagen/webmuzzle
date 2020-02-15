@@ -1,0 +1,35 @@
+﻿@model ProductCreateEditViewModel
+@{
+    ViewBag.Title = "Создание нового продукта";
+}
+
+@section AdditionalHeader
+{
+    @Html.ActionLink("назад к списку продуктов", "List", "Product", null, new { @class = "footer-link pull-right additional-header-link" })
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            @using (Html.BeginForm("Create", "Product", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
+            {
+                <div class="box-body">
+                    <div class="form-group @Html.ValidState("Name")">
+                        <label for="Name" class="col-sm-3 control-label">Название</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('#Name').focus();
+</script>
+@Html.ViewModelWindow()

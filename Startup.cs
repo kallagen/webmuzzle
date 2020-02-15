@@ -55,6 +55,7 @@ namespace TSensor.Web
             services.AddScoped<IPointRepository, PointRepository>(p => new PointRepository(connectionString));
             services.AddScoped<ITankRepository, TankRepository>(p => new TankRepository(connectionString));
             services.AddScoped<IPointGroupRepository, PointGroupRepository>(p => new PointGroupRepository(connectionString));
+            services.AddScoped<IProductRepository, ProductRepository>(p => new ProductRepository(connectionString));
 
             services.AddHostedService<BroadcastService>();
 

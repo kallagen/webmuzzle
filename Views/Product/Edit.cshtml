@@ -1,0 +1,46 @@
+﻿@model ProductCreateEditViewModel
+@{
+    ViewBag.Title = $"Редактирование продукта \"{Model.Name}\"";
+}
+
+@section AdditionalHeader
+{
+    @Html.ActionLink("назад к списку продуктов", "List", "Product", null, new { @class = "footer-link pull-right additional-header-link" })
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            @using (Html.BeginForm("Edit", "Product", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
+            {
+                @Html.HiddenFor(m => m.ProductGuid)
+                <div class="box-body">
+                    <div class="form-group @Html.ValidState("Name")">
+                        <label for="Name" class="col-sm-3 control-label">Название</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <a id="remove-product-button" href="javascript:void(0)" class="btn bg-red">Удалить</a>
+                    <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("Remove", "Product", FormMethod.Post, new { id = "remove-product-form", @class = "hidden" }))
+{
+    @Html.Hidden("ProductGuid", Model.ProductGuid, new { id = "remove-product-guid" })
+}
+<script>
+    document.querySelector('#Name').focus();
+    $('#remove-product-button').click(function () {
+        new ConfirmModal('Удалить продукт?', function () {
+            $('#remove-product-form').submit();
+        }).show();
+    });
+</script>
+@Html.ViewModelWindow()
