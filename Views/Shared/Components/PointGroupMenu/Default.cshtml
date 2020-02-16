@@ -45,6 +45,9 @@
             }
         }
     }
+    @using (Html.BeginForm("Index", "Dashboard", FormMethod.Post, new { @class = "hidden", autocomplete = "off", id = "goto-form" }))
+    {
+    }
 }
 <script>
     var MainMenu = function () {
@@ -56,6 +59,15 @@
         that.applyButton = $('.apply-button');
         that.showApplyButton = function () {
             that.applyButton.removeClass('hidden');
+        }
+        that.goto = function () {
+            var gotoForm = $('#goto-form');
+
+            $('input[data-kind="tank"]:checked').each(function (i, e) {
+                gotoForm.append('<input type="hidden" name="tankGuid[]" value="' + $(e).data('guid') + '" />');
+            });
+
+            gotoForm.submit();
         }
 
         that.checkParent = function (state, guid, parent) {
@@ -107,6 +119,8 @@
             that.checkboxes.iCheck({
                 checkboxClass: 'icheckbox_square-blue'
             });
+
+            that.applyButton.click(that.goto);
         };
 
         that.init();

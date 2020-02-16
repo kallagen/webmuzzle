@@ -54,5 +54,12 @@ namespace TSensor.Web.Controllers
                 }).ThenBy(p => p.First().PointName);
             return View(allSensorActualValues);
         }
+
+        [Route("dashboard")]
+        [HttpPost]
+        public IActionResult Index(string[] tankGuid)
+        {
+            return View();
+        }
     }
 }

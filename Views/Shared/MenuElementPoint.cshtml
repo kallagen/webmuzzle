@@ -10,7 +10,7 @@
         <ul class="treeview-menu">
             @foreach (var tank in Model.Point.TankList.OrderBy(t => t.Name))
             {
-                <li><a><input type="checkbox" data-parent="@Model.Point.PointGuid" data-guid="@tank.TankGuid" class="menu-checkbox" />@tank.Name</a></li>
+                <li><a><input type="checkbox" data-parent="@Model.Point.PointGuid" data-guid="@tank.TankGuid" data-kind="tank" class="menu-checkbox" />@tank.Name</a></li>
             }
         </ul>
     </li>

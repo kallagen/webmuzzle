@@ -268,3 +268,8 @@ i.menu-point {
     padding: 10px 0 10px 0;
     color: #fff;
 }
+
+
+.skin-blue .sidebar-menu > li.header {
+    color: #69818C;
+}
