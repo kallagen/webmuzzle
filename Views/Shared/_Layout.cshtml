@@ -26,7 +26,6 @@
     <script src="~/lib/adminlte/dist/js/adminlte.min.js"></script>
     <script src="~/lib/iCheck/icheck.min.js"></script>
     <script src="~/js/main.js"></script>
-    <script src="~/js/tree.js"></script>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
     <div class="wrapper">
@@ -52,7 +51,7 @@
         </header>
         <aside class="main-sidebar">
             <section class="sidebar">
-                <ul class="sidebar-menu">
+                <ul class="sidebar-menu" data-widget="tree">
                     <li><a href="@Url.Action("Index", "Dashboard")">Измерения по системе</a></li>
                     @await Component.InvokeAsync("PointGroupMenu")
                     @if (User.IsInRole("admin"))
@@ -80,8 +79,3 @@
     </div>
 </body>
 </html>
-<script>
-    $('.sidebar-menu').tree({
-        trigger: '.pull-right-container'
-    });
-</script>
