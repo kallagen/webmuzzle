@@ -27,18 +27,21 @@ namespace TSensor.Web.Models.Repository
             if (group != null)
             {
                 var pointList = Query<dynamic>(@"
-                    SELECT DISTINCT p.PointGuid, p.Name, pgp.PointGroupGuid
+                    SELECT DISTINCT p.PointGuid, p.Name, p.[Address], p.Phone, p.Email,
+                        p.Description, pgp.PointGroupGuid
                     FROM Point p
                         LEFT JOIN PointGroupPoint pgp ON pgp.PointGuid = p.PointGuid AND
                             pgp.PointGroupGuid = @pointGroupGuid", new { pointGroupGuid });
 
                 group.PointList = pointList.Where(p => p.PointGroupGuid != null)
-                    .Select(p => new Point { PointGuid = p.PointGuid, Name = p.Name });
+                    .Select(p => new Point { PointGuid = p.PointGuid, Name = p.Name, 
+                        Address = p.Address, Phone = p.Phone, Email = p.Email, Description = p.Description });
                 group.AvailablePointList = pointList.Where(p => p.PointGroupGuid == null)
-                    .Select(p => new Point { PointGuid = p.PointGuid, Name = p.Name });
+                    .Select(p => new Point { PointGuid = p.PointGuid, Name = p.Name,
+                        Address = p.Address, Phone = p.Phone, Email = p.Email, Description = p.Description });
 
                 var userList = Query<dynamic>($@"
-                    SELECT u.UserGuid, u.Name, u.Login, upgr.PointGroupGuid
+                    SELECT u.UserGuid, u.Name, u.Login, u.Description, upgr.PointGroupGuid
                     FROM [User] u 
                         LEFT JOIN UserPointGroupRights upgr ON 
                             upgr.UserGuid = u.UserGuid AND upgr.PointGroupGuid = @pointGroupGuid
@@ -46,9 +49,11 @@ namespace TSensor.Web.Models.Repository
                     new { pointGroupGuid });
 
                 group.UserList = userList.Where(p => p.PointGroupGuid != null)
-                    .Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login });
+                    .Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login, 
+                        Description = p.Description });
                 group.AvailableUserList = userList.Where(p => p.PointGroupGuid == null)
-                    .Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login });
+                    .Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login,
+                        Description = p.Description });
             }
 
             return group;

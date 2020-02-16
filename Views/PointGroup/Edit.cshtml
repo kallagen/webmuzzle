@@ -65,6 +65,10 @@
                                 <thead>
                                     <tr>
                                         <th class="text-center table-center-header">Название</th>
+                                        <th class="text-center table-center-header">Адрес</th>
+                                        <th class="text-center table-center-header">Телефон</th>
+                                        <th class="text-center table-center-header">Email</th>
+                                        <th class="text-center table-center-header">Примечание</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -73,6 +77,10 @@
                                     {
                                         <tr>
                                             <td>@Html.ActionLink(item.Name, "Edit", "Point", new { pointGuid = item.PointGuid }, null)</td>
+                                            <td>@item.Address</td>
+                                            <td>@item.Phone</td>
+                                            <td>@item.Email</td>
+                                            <td>@item.Description</td>
                                             <td class="table-remove-cell"><a class="remove-point-button text-red" href="javascript:void(0)" data-pointguid="@item.PointGuid">удалить</a></td>
                                         </tr>
                                     }
@@ -118,6 +126,7 @@
                                     <tr>
                                         <th class="text-center table-center-header">Логин</th>
                                         <th class="text-center table-center-header">Имя</th>
+                                        <th class="text-center table-center-header">Примечание</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -127,6 +136,7 @@
                                         <tr>
                                             <td>@Html.ActionLink(item.Login, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
                                             <td>@Html.ActionLink(item.Name, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                            <td>@item.Description</td>
                                             <td class="table-remove-cell"><a class="remove-user-button text-red" href="javascript:void(0)" data-userguid="@item.UserGuid">удалить</a></td>
                                         </tr>
                                     }
