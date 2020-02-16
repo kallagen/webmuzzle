@@ -12,6 +12,8 @@ namespace TSensor.Web.Models.Entity
         public string Email { get; set; }
         public string Description { get; set; }
 
+        public IEnumerable<Tank> TankList { get; set; }
+
         public IEnumerable<User> UserList { get; set; }
         public IEnumerable<User> AvailableUserList { get; set; }
     }

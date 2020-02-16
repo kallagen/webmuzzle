@@ -112,14 +112,28 @@ namespace TSensor.Web.Models.Repository
                 SELECT @@ROWCOUNT", new { pointGroupGuid, pointGuid }) == 1;
         }
 
-        public IEnumerable<PointGroup> GetPointGroupStructure(Guid userGuid)
+        public IEnumerable<PointGroup> GetPointGroupStructure(Guid? userGuid)
         {
             var pointList = Query<dynamic>(@"
-                SELECT p.PointGuid, p.Name AS PointName,
+                SELECT DISTINCT p.PointGuid, p.Name AS PointName,
                 	pg.PointGroupGuid, pg.Name AS PointGroupName
                 FROM Point p
                 	LEFT JOIN PointGroupPoint pgp ON pgp.PointGuid = p.PointGuid
-                	FULL JOIN PointGroup pg ON pg.PointGroupGuid = pgp.PointGroupGuid");
+                	FULL JOIN PointGroup pg ON pg.PointGroupGuid = pgp.PointGroupGuid
+                	LEFT JOIN UserPointGroupRights upgr ON upgr.PointGroupGuid = pg.PointGroupGuid
+                	LEFT JOIN UserPointRights upr ON upr.PointGuid = p.PointGuid
+                WHERE
+                	@userGuid IS NULL OR
+                	(
+                		(pg.PointGroupGuid IS NOT NULL AND upgr.UserGuid = @userGuid) OR
+                		(pg.PointGroupGuid IS NULL AND upr.UserGuid = @userGuid)
+                	)", new { userGuid });
+
+            var tankList = Query<dynamic>(@"
+                SELECT TankGuid, PointGuid, Name 
+                FROM Tank
+                WHERE PointGuid IN @pointGuidList",
+                new { pointGuidList = pointList.Select(p => p.PointGuid).Where(p => p != null).Distinct() });
 
             return pointList.GroupBy(p => p.PointGroupGuid).Select(g =>
             {
@@ -131,7 +145,9 @@ namespace TSensor.Web.Models.Repository
                         .Select(p => new Point
                         {
                             PointGuid = p.PointGuid,
-                            Name = p.PointName
+                            Name = p.PointName,
+                            TankList = tankList.Where(t => t.PointGuid == p.PointGuid)
+                                .Select(t => new Tank { TankGuid = t.TankGuid, Name = t.Name })                            
                         })
                 };
             });
