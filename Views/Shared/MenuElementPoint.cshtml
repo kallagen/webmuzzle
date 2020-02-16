@@ -1,0 +1,21 @@
+﻿@model TSensor.Web.ViewModels.Point.MenuElementViewModel
+@{ 
+    var groupAttr = $" data-group=\"{Model.GroupGuid.ToString()}\"";
+}
+
+@if (Model.Point.TankList.Any())
+{
+    <li class="treeview">
+        <a href="javascript:void(0)"><input type="checkbox" data-kind="point" @groupAttr data-point="@Model.Point.PointGuid" class="menu-checkbox" />@Model.Point.Name<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+        <ul class="treeview-menu">
+            @foreach (var tank in Model.Point.TankList.OrderBy(t => t.Name))
+            {
+                <li><a><input type="checkbox" data-kind="tank" @groupAttr data-point="@Model.Point.PointGuid" data-tank="@tank.TankGuid" class="menu-checkbox" />@tank.Name</a></li>
+            }
+        </ul>
+    </li>
+}
+else
+{
+    <li><a><input type="checkbox" data-kind="point" @groupAttr data-point="@Model.Point.PointGuid" class="menu-checkbox" />@Model.Point.Name</a></li>
+}
