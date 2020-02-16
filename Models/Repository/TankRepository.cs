@@ -12,10 +12,12 @@ namespace TSensor.Web.Models.Repository
         {
             return Query<Tank>(@"
                 SELECT 
-                    TankGuid, Name, DualMode,
-                    MainDeviceGuid, MainIZKId, MainSensorId,
-                    SecondDeviceGuid, SecondIZKId, SecondSensorId
-                FROM Tank 
+                    t.TankGuid, t.Name, t.ProductGuid, p.Name AS ProductName, t.DualMode,
+                    t.MainDeviceGuid, t.MainIZKId, t.MainSensorId,
+                    t.SecondDeviceGuid, t.SecondIZKId, t.SecondSensorId, 
+                    t.Description
+                FROM Tank t
+                    LEFT JOIN Product p ON t.ProductGuid = p.ProductGuid
                 WHERE PointGuid = @pointGuid", new { pointGuid });
         }
 

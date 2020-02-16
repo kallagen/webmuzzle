@@ -77,9 +77,11 @@
                                 <thead>
                                     <tr>
                                         <th rowspan="2" class="text-center table-center-header">Название</th>
+                                        <th rowspan="2" class="text-center table-center-header">Продукт</th>
                                         <th colspan="3" class="text-center">Основной датчик</th>
                                         <th rowspan="2" class="text-center table-center-header">Использовать дополнительный датчик</th>
                                         <th colspan="3" class="text-center">Дополнительный датчик</th>
+                                        <th rowspan="2" class="text-center table-center-header">Примечание</th>
                                     </tr>
                                     <tr>
                                         <th class="text-center">Код устройства</th>
@@ -95,6 +97,7 @@
                                     {
                                         <tr>
                                             <td>@Html.ActionLink(item.Name, "Edit", "Tank", new { pointGuid = Model.PointGuid, tankGuid = item.TankGuid }, null)</td>
+                                            <td>@item.ProductName</td>
                                             <td>@item.MainDeviceGuid</td>
                                             <td>@item.MainIZKId</td>
                                             <td>@item.MainSensorId</td>
@@ -102,6 +105,7 @@
                                             <td>@item.SecondDeviceGuid</td>
                                             <td>@item.SecondIZKId</td>
                                             <td>@item.SecondSensorId</td>
+                                            <td>@item.Description</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -147,6 +151,7 @@
                                     <tr>
                                         <th class="text-center table-center-header">Логин</th>
                                         <th class="text-center table-center-header">Имя</th>
+                                        <th class="text-center table-center-header">Примечание</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -156,6 +161,7 @@
                                         <tr>
                                             <td>@Html.ActionLink(item.Login, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
                                             <td>@Html.ActionLink(item.Name, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                            <td>@item.Description</td>
                                             <td class="table-remove-cell"><a class="remove-user-button text-red" href="javascript:void(0)" data-userguid="@item.UserGuid">удалить</a></td>
                                         </tr>
                                     }
