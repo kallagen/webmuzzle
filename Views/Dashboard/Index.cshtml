@@ -1,13 +1,16 @@
-﻿@model IEnumerable<IGrouping<Guid?, ActualSensorValue>>
-@{
+﻿@model IEnumerable<ActualSensorValue>
+@{ 
     ViewBag.Title = "Измерения по системе";
+}
 
-    var hasError = Model.Any(p => p.Any(t => t.IsError));
-    var hasWarning = Model.Any(p => p.Any(t => t.IsWarning));
+@if (Model?.Any() == true)
+{
+    var hasError = Model.Any(t => t.IsError);
+    var hasWarning = Model.Any(t => t.IsWarning);
 
-    var listenSensors = Model.SelectMany(p => p.SelectMany(t =>
+    var listenSensors = Model.SelectMany(t =>
     {
-        if (t.TankGuid.HasValue && t.DualMode == true)
+        if (t.DualMode == true)
         {
             return new[]
             {
@@ -33,48 +36,43 @@
             {
                 new
                 {
-                    guid = t.TankGuid.HasValue ? t.MainSensorGuid : t.SensorGuid,
+                    guid = t.MainSensorGuid,
                     updateDate = t.MainSensorLastDate,
                     warningDate = t.MainSensorWarningDateTicks,
                     isSecond = -1
                 }
             };
         }
-    })).Where(p => p.guid != null).ToDictionary(p => p.guid, p => p);
-}
+    }).Where(p => p.guid != null).ToDictionary(p => p.guid, p => p);
 
-<div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">
-    <h4>Внимание!</h4>
-    <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
-</div>
-<div class="t-warning-message callout callout-warning @if(!hasWarning){<text>hidden</text>}">
-    <h4>Внимание!</h4>
-    <p>Данные с некоторых датчиков не поступают больше часа. Проверьте правильность настроек и исправность системы.</p>
-</div>
-
-@foreach (var point in Model)
-{
-    var pointHeader = point.First();
-    var pointName = pointHeader.PointGuid.HasValue ? pointHeader.PointName : "Датчики без привязки к объекту и резервуару";
-
-    <h3>@pointName</h3>
-    <div class="row">
-        @foreach (var tank in point.OrderBy(t => t.TankName))
-        {
-            @Html.Partial("SensorCard", tank)
-        }
+    <div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">
+        <h4>Внимание!</h4>
+        <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
     </div>
+    <div class="t-warning-message callout callout-warning @if(!hasWarning){<text>hidden</text>}">
+        <h4>Внимание!</h4>
+        <p>Данные с некоторых датчиков не поступают больше часа. Проверьте правильность настроек и исправность системы.</p>
+    </div>
+
+    @foreach (var tank in Model)
+    {
+        @Html.Partial("SensorCard", tank)
+    }
+
+    <script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
+        const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
+
+        var errorBlock = $('.t-error-message');
+        var warningBlock = $('.t-warning-message');
+
+        connection.on('sensorupdate', sensorUpdate);
+
+        connection.start();
+    </script>
 }
-
-<script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
-<script>
-    const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
-    const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
-
-    var errorBlock = $('.t-error-message');
-    var warningBlock = $('.t-warning-message');
-
-    connection.on('sensorupdate', sensorUpdate);
-
-    connection.start();
-</script>
+else
+{
+    <p>Выберите в меню данные для отображения</p>
+}

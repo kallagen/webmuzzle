@@ -1,21 +1,21 @@
 ﻿@model TSensor.Web.ViewModels.Point.MenuElementViewModel
 @{ 
-    var parentAttr = $" data-parent={(Model.GroupGuid.HasValue ? Model.GroupGuid.ToString() : "all")}";
+    var parentGuid = Model.GroupGuid?.ToString() ?? "all";
 }
 
 @if (Model.Point.TankList.Any())
 {
     <li class="treeview">
-        <a href="javascript:void(0)"><input type="checkbox" @parentAttr data-guid="@Model.Point.PointGuid" class="menu-checkbox" />@Model.Point.Name<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+        <a href="javascript:void(0)">@Html.MenuElementCheckbox(Model.Point.PointGuid, parentGuid)@Model.Point.Name<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
         <ul class="treeview-menu">
             @foreach (var tank in Model.Point.TankList.OrderBy(t => t.Name))
             {
-                <li><a><input type="checkbox" data-parent="@Model.Point.PointGuid" data-guid="@tank.TankGuid" data-kind="tank" class="menu-checkbox" />@tank.Name</a></li>
+                <li><a>@Html.MenuElementCheckbox(tank.TankGuid, Model.Point.PointGuid)@tank.Name</a></li>
             }
         </ul>
     </li>
 }
 else
 {
-    <li><a><input type="checkbox" @parentAttr data-guid="@Model.Point.PointGuid" class="menu-checkbox" />@Model.Point.Name</a></li>
+    <li><a>@Html.MenuElementCheckbox(Model.Point.PointGuid, parentGuid)@Model.Point.Name</a></li>
 }

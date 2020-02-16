@@ -11,7 +11,7 @@
         <li>@Html.ActionLink("Датчики без привязки", "NotAssigned", "Point")</li>
     }
     <li class="apply-button hidden"><a href="javascript:void(0)">ПРИМЕНИТЬ</a></li>
-    <li><a><input type="checkbox" data-parent="" data-guid="all" class="menu-checkbox" />Все объекты</a></li>
+    <li><a>@Html.MenuElementCheckbox("all", string.Empty)Все объекты</a></li>
     foreach (var group in Model.Where(p => p.PointGroupGuid != PointGroupMenu.NotAssignedSensorGroupGuid)
         .OrderBy(p => string.IsNullOrEmpty(p.Name)).ThenBy(p => p.Name))
     {
@@ -28,7 +28,7 @@
             {
                 <li class="treeview">
                     <a href="javascript:void(0)">
-                        <input type="checkbox" data-parent="all" data-guid="@group.PointGroupGuid" class="menu-checkbox" /><span>@group.Name</span>
+                        @Html.MenuElementCheckbox(group.PointGroupGuid, "all")@group.Name
                         <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                     </a>
                     <ul class="treeview-menu">
@@ -41,7 +41,7 @@
             }
             else
             {
-                <li><a><input data-parent="all" data-guid="@group.PointGroupGuid" type="checkbox" class="menu-checkbox" />@group.Name</a></li>
+                <li><a>@Html.MenuElementCheckbox(group.PointGroupGuid, "all")@group.Name</a></li>
             }
         }
     }
@@ -63,8 +63,8 @@
         that.goto = function () {
             var gotoForm = $('#goto-form');
 
-            $('input[data-kind="tank"]:checked').each(function (i, e) {
-                gotoForm.append('<input type="hidden" name="tankGuid[]" value="' + $(e).data('guid') + '" />');
+            $('.menu-checkbox:checked').each(function (i, e) {
+                gotoForm.append('<input type="hidden" name="guidList[]" value="' + $(e).data('guid') + '" />');
             });
 
             gotoForm.submit();
