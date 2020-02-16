@@ -254,3 +254,17 @@ i.menu-point {
     .treeview-menu .treeview-menu {
         padding-left: 7px;
     }
+
+.apply-button {
+    text-align: center;
+    background: #3C8DBC;
+}
+
+.sidebar-menu > li.apply-button a:hover {
+    background: #367FA9;
+}
+
+.sidebar-menu > li.apply-button > a {
+    padding: 10px 0 10px 0;
+    color: #fff;
+}
