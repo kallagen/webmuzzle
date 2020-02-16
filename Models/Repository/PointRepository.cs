@@ -145,7 +145,7 @@ namespace TSensor.Web.Models.Repository
 						(t.SecondDeviceGuid = asv.DeviceGuid AND t.SecondIZKId = asv.izkNumber AND t.SecondSensorId = asv.sensorSerial AND t.DualMode = 1))");
         }
 
-        public IEnumerable<ActualSensorValue> GetSensorActualState(Guid? pointGuid = null)
+        public IEnumerable<ActualSensorValue> GetSensorActualState(IEnumerable<Guid?> tankGuidList)
         {
             return Query<ActualSensorValue>(@"
 				SELECT 
@@ -195,10 +195,8 @@ namespace TSensor.Web.Models.Repository
 					LEFT JOIN Tank t ON p.PointGuid = t.PointGuid
 					FULL JOIN ActualSensorValue m ON t.MainDeviceGuid = m.DeviceGuid AND t.MainIZKId = m.izkNumber AND t.MainSensorId = m.sensorSerial
 					LEFT JOIN ActualSensorValue s ON t.DualMode = 1 AND t.SecondDeviceGuid = s.DeviceGuid AND t.SecondIZKId = s.izkNumber AND t.SecondSensorId = s.sensorSerial
-				WHERE 
-					(@pointGuid IS NOT NULL AND p.PointGuid = @pointGuid) OR @pointGuid IS NULL AND ((t.TankGuid IS NOT NULL OR m.InsertDate IS NOT NULL) AND NOT EXISTS(SELECT 1 
-						FROM Tank t1 
-						WHERE t1.SecondDeviceGuid = m.DeviceGuid AND t1.SecondIZKId = m.izkNumber AND t1.SecondSensorId = m.sensorSerial))", new { pointGuid });
+				WHERE
+					t.TankGuid in @tankGuidList", new { tankGuidList = tankGuidList.Where(p => p != null).Distinct() });
         }
     }
 }
