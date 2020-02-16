@@ -66,10 +66,14 @@ namespace TSensor.Web.Controllers
             }
 
             viewModel.Name = viewModel.Name?.Trim();
+            viewModel.Address = viewModel.Address?.Trim();
+            viewModel.Phone = viewModel.Phone?.Trim();
+            viewModel.Email = viewModel.Email?.Trim();
 
             if (ModelState.IsValid)
             {
-                var pointGuid = _pointRepository.Create(viewModel.Name);
+                var pointGuid = _pointRepository.Create(viewModel.Name,
+                    viewModel.Address, viewModel.Phone, viewModel.Email, viewModel.Description);
                 if (pointGuid == null)
                 {
                     viewModel.ErrorMessage = Program.GLOBAL_ERROR_MESSAGE;
@@ -100,6 +104,11 @@ namespace TSensor.Web.Controllers
                     {
                         PointGuid = point.PointGuid,
                         Name = point.Name,
+                        Address = point.Address,
+                        Phone = point.Phone,
+                        Email = point.Email,
+                        Description = point.Description,
+
                         Data = _tankRepository.GetListByPoint(point.PointGuid),
                         UserList = point.UserList,
                         AvailableUserList = point.AvailableUserList
@@ -138,10 +147,14 @@ namespace TSensor.Web.Controllers
             }
 
             viewModel.Name = viewModel.Name?.Trim();
+            viewModel.Address = viewModel.Address?.Trim();
+            viewModel.Phone = viewModel.Phone?.Trim();
+            viewModel.Email = viewModel.Email?.Trim();
 
             if (ModelState.IsValid)
             {
-                var editResult = _pointRepository.Edit(viewModel.PointGuid, viewModel.Name);
+                var editResult = _pointRepository.Edit(viewModel.PointGuid, viewModel.Name,
+                    viewModel.Address, viewModel.Phone, viewModel.Email, viewModel.Description);
                 if (editResult)
                 {
                     var pointUrl = Url.Action("Edit", "Point", new { pointGuid = viewModel.PointGuid });

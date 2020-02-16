@@ -11,6 +11,13 @@ namespace TSensor.Web.ViewModels.Point
         [Required(ErrorMessage = "Укажите название")]
         [StringLength(128, ErrorMessage = "Слишком длинное название")]
         public string Name { get; set; }
+        [StringLength(128, ErrorMessage = "Слишком длинный адрес")]
+        public string Address { get; set; }
+        [StringLength(128, ErrorMessage = "Слишком длинный телефон")]
+        public string Phone { get; set; }
+        [StringLength(128, ErrorMessage = "Слишком длинный email")]
+        public string Email { get; set; }
+        public string Description { get; set; }
 
         public IEnumerable<Models.Entity.User> UserList { get; set; }
         public bool HasUser =>

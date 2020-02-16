@@ -21,6 +21,10 @@
                         <thead>
                             <tr>
                                 <th class="text-center">Название</th>
+                                <th class="text-center">Адрес</th>
+                                <th class="text-center">Телефон</th>
+                                <th class="text-center">Email</th>
+                                <th class="text-center">Примечание</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -28,6 +32,10 @@
                             {
                                 <tr>
                                     <td>@Html.ActionLink(item.Name, "Edit", "Point", new { pointGuid = item.PointGuid }, null)</td>
+                                    <td>@item.Address</td>
+                                    <td>@item.Phone</td>
+                                    <td>@item.Email</td>
+                                    <td>@item.Description</td>
                                 </tr>
                             }
                         </tbody>

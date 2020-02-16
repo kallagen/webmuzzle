@@ -13,7 +13,7 @@ namespace TSensor.Web.Models.Repository
         public IEnumerable<Point> List()
         {
             return Query<Point>(@"
-                SELECT PointGuid, [Name]
+                SELECT PointGuid, [Name], Address, Phone, Email, Description
                 FROM [Point]
                 ORDER BY [Name]");
         }
@@ -21,7 +21,7 @@ namespace TSensor.Web.Models.Repository
         public Point GetByGuid(Guid pointGuid)
         {
 			var point = QueryFirst<Point>(@"
-                SELECT PointGuid, [Name]
+                SELECT PointGuid, [Name], Address, Phone, Email, Description
                 FROM [Point] WHERE PointGuid = @pointGuid", new { pointGuid });
 
 			if (point != null)
@@ -43,27 +43,31 @@ namespace TSensor.Web.Models.Repository
 			return point;
 		}
 
-        public Guid? Create(string name)
+        public Guid? Create(string name, string address, string phone, string email, string description)
         {
             return QueryFirst<Guid?>(@"
                 DECLARE @guid UNIQUEIDENTIFIER = NEWID()
 
-                INSERT [Point](PointGuid, [Name])
-                VALUES(@guid, @name)
+                INSERT [Point](PointGuid, [Name], [Address], Phone, Email, Description)
+                VALUES(@guid, @name, @address, @phone, @email, @description)
                 
                 SELECT PointGuid FROM [Point] WHERE PointGuid = @guid",
-                new { name });
+                new { name, address, phone, email, description });
         }
 
-        public bool Edit(Guid pointGuid, string name)
+        public bool Edit(Guid pointGuid, string name, string address, string phone, string email, string description)
         {
             return QueryFirst<int?>(@"
                 UPDATE [Point] SET 
-                    [Name] = @name
+                    [Name] = @name,
+					[Address] = @address,
+					Phone = @phone,
+					Email = @email,
+					Description = @description
                 WHERE PointGuid = @pointGuid
 
                 SELECT @@ROWCOUNT",
-                new { pointGuid, name }) == 1;
+                new { pointGuid, name, address, phone, email, description }) == 1;
         }
 
         public bool Remove(Guid pointGuid)

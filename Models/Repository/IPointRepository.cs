@@ -8,8 +8,8 @@ namespace TSensor.Web.Models.Repository
     {
         public IEnumerable<Point> List();
         public Point GetByGuid(Guid pointGuid);
-        public Guid? Create(string name);
-        public bool Edit(Guid pointGuid, string name);
+        public Guid? Create(string name, string address, string phone, string email, string description);
+        public bool Edit(Guid pointGuid, string name, string address, string phone, string email, string description);
         public bool Remove(Guid pointGuid);
         public IEnumerable<PointTankInfo> GetAllPointInfo();
         public IEnumerable<ActualSensorValue> GetSensorActualState(Guid? pointGuid = null);
