@@ -37,9 +37,11 @@ namespace TSensor.Web.ViewComponents
                 var notAssignedPointInfo = _pointRepository.GetNotAssignedSensorState();
                 if (notAssignedPointInfo.Any())
                 {
+                    /*
                     return View(
                         pointStructure.Union(new[] {
                             new PointGroup { PointGroupGuid = NotAssignedSensorGroupGuid, Name = "Датчики без привязки" } }));
+                    */
                 }
             }
 
