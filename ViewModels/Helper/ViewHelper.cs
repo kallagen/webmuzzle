@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TSensor.Web.ViewModels.Helper
 {
@@ -34,6 +36,15 @@ namespace TSensor.Web.ViewModels.Helper
             {
                 return null;
             }
+        }
+
+        public static HtmlString MenuElementCheckbox(this IHtmlHelper html, object guid, object parentGuid)
+        {
+            var selectedMenuItems = html?.ViewBag.SelectedMenuElements as IEnumerable<string>;
+            var isChecked = selectedMenuItems?.Any(p => p == guid.ToString()) == true ? " checked=\"checked\"" : string.Empty;
+
+            return new HtmlString(
+                $"<input type=\"checkbox\" {isChecked} data-parent=\"{parentGuid}\" data-guid=\"{guid}\" class=\"menu-checkbox\" />");
         }
     }
 }
