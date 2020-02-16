@@ -233,7 +233,7 @@ i.menu-point {
     margin: 0;
     top: 0;
     right: 0;
-    width: 30px;
+    width: 17px;
 }
 
     .sidebar-menu li > a > .fa-angle-left, .sidebar-menu li > a > .pull-right-container > .fa-angle-left {
@@ -246,3 +246,11 @@ i.menu-point {
     margin-right: 6px;
     margin-bottom: 1px;
 }
+
+.treeview-menu {
+    padding-left: 8px;
+}
+
+    .treeview-menu .treeview-menu {
+        padding-left: 7px;
+    }
