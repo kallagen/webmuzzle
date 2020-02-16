@@ -68,7 +68,7 @@ namespace TSensor.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var pointGroupGuid = _pointGroupRepository.Create(viewModel.Name);
+                var pointGroupGuid = _pointGroupRepository.Create(viewModel.Name, viewModel.Description);
                 if (pointGroupGuid == null)
                 {
                     viewModel.ErrorMessage = Program.GLOBAL_ERROR_MESSAGE;
@@ -99,6 +99,7 @@ namespace TSensor.Web.Controllers
                     {
                         PointGroupGuid = group.PointGroupGuid,
                         Name = group.Name,
+                        Description = group.Description,
                         Data = group.PointList,
                         AvailablePointList = group.AvailablePointList,
                         UserList = group.UserList,
@@ -137,7 +138,7 @@ namespace TSensor.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var editResult = _pointGroupRepository.Edit(viewModel.PointGroupGuid, viewModel.Name);
+                var editResult = _pointGroupRepository.Edit(viewModel.PointGroupGuid, viewModel.Name, viewModel.Description);
                 if (editResult)
                 {
                     var pointGroupUrl = Url.Action("Edit", "PointGroup", new { pointGroupGuid = viewModel.PointGroupGuid });

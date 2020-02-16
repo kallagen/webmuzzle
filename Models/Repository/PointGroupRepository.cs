@@ -10,51 +10,17 @@ namespace TSensor.Web.Models.Repository
     {
         public PointGroupRepository(string connectionString) : base(connectionString) { }
 
-        public bool AddPoint(Guid pointGroupGuid, Guid pointGuid)
+        public IEnumerable<PointGroup> List()
         {
-            return QueryFirst<int?>(@"
-                INSERT PointGroupPoint(PointGroupGuid, PointGuid)
-                VALUES(@pointGroupGuid, @pointGuid)
-
-                SELECT @@ROWCOUNT", new { pointGroupGuid, pointGuid }) == 1;
-        }
-
-        public bool RemovePoint(Guid pointGroupGuid, Guid pointGuid)
-        {
-            return QueryFirst<int?>(@"
-                DELETE PointGroupPoint
-                WHERE PointGroupGuid = @pointGroupGuid AND PointGuid = @pointGuid
-
-                SELECT @@ROWCOUNT", new { pointGroupGuid, pointGuid }) == 1;
-        }
-
-        public Guid? Create(string name)
-        {
-            return QueryFirst<Guid?>(@"
-                DECLARE @guid UNIQUEIDENTIFIER = NEWID()
-
-                INSERT [PointGroup](
-                    PointGroupGuid, [Name])
-                VALUES(
-                    @guid, @name)
-                
-                SELECT PointGroupGuid FROM [PointGroup] WHERE PointGroupGuid = @guid", new { name });
-        }
-
-        public bool Edit(Guid pointGroupGuid, string name)
-        {
-            return QueryFirst<int?>(@"
-                UPDATE [PointGroup] SET 
-                    [Name] = @name
-                WHERE PointGroupGuid = @pointGroupGuid
-
-                SELECT @@ROWCOUNT", new { pointGroupGuid, name }) == 1;
+            return Query<PointGroup>(@"
+                SELECT PointGroupGuid, Name, Description
+                FROM PointGroup");
         }
 
         public PointGroup GetByGuid(Guid pointGroupGuid)
         {
             var group = QueryFirst<PointGroup>(@"
-                SELECT PointGroupGuid, Name
+                SELECT PointGroupGuid, Name, Description
                 FROM PointGroup
                 WHERE PointGroupGuid = @pointGroupGuid", new { pointGroupGuid });
 
@@ -88,11 +54,29 @@ namespace TSensor.Web.Models.Repository
             return group;
         }
 
-        public IEnumerable<PointGroup> List()
+        public Guid? Create(string name, string descirption)
         {
-            return Query<PointGroup>(@"
-                SELECT PointGroupGuid, Name
-                FROM PointGroup");
+            return QueryFirst<Guid?>(@"
+                DECLARE @guid UNIQUEIDENTIFIER = NEWID()
+
+                INSERT [PointGroup](
+                    PointGroupGuid, [Name], Description)
+                VALUES(
+                    @guid, @name, @description)
+                
+                SELECT PointGroupGuid FROM [PointGroup] WHERE PointGroupGuid = @guid", 
+                new { name, descirption });
+        }
+
+        public bool Edit(Guid pointGroupGuid, string name, string description)
+        {
+            return QueryFirst<int?>(@"
+                UPDATE [PointGroup] SET 
+                    [Name] = @name,
+                    Description = @description
+                WHERE PointGroupGuid = @pointGroupGuid
+
+                SELECT @@ROWCOUNT", new { pointGroupGuid, name, description }) == 1;
         }
 
         public bool Remove(Guid pointGroupGuid)
@@ -103,6 +87,24 @@ namespace TSensor.Web.Models.Repository
                     
                 SELECT @@ROWCOUNT",
                 new { pointGroupGuid }) == 1;
+        }
+
+        public bool AddPoint(Guid pointGroupGuid, Guid pointGuid)
+        {
+            return QueryFirst<int?>(@"
+                INSERT PointGroupPoint(PointGroupGuid, PointGuid)
+                VALUES(@pointGroupGuid, @pointGuid)
+
+                SELECT @@ROWCOUNT", new { pointGroupGuid, pointGuid }) == 1;
+        }
+
+        public bool RemovePoint(Guid pointGroupGuid, Guid pointGuid)
+        {
+            return QueryFirst<int?>(@"
+                DELETE PointGroupPoint
+                WHERE PointGroupGuid = @pointGroupGuid AND PointGuid = @pointGuid
+
+                SELECT @@ROWCOUNT", new { pointGroupGuid, pointGuid }) == 1;
         }
 
         public IEnumerable<PointGroup> GetPointGroupStructure(Guid userGuid)

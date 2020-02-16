@@ -21,6 +21,7 @@
                         <thead>
                             <tr>
                                 <th class="text-center">Название</th>
+                                <th class="text-center">Примечание</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -28,6 +29,7 @@
                             {
                                 <tr>
                                     <td>@Html.ActionLink(item.Name, "Edit", "PointGroup", new { pointGroupGuid = item.PointGroupGuid }, null)</td>
+                                    <td>@item.Description</td>
                                 </tr>
                             }
                         </tbody>

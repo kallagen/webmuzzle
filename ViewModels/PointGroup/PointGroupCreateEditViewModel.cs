@@ -11,6 +11,7 @@ namespace TSensor.Web.ViewModels.PointGroup
         [Required(ErrorMessage = "Укажите название")]
         [StringLength(128, ErrorMessage = "Слишком длинное название")]
         public string Name { get; set; }
+        public string Description { get; set; }
 
         public IEnumerable<Models.Entity.Point> AvailablePointList { get; set; }
         public bool HasAvailablePoint =>

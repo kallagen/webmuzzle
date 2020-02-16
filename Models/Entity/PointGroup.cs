@@ -7,6 +7,7 @@ namespace TSensor.Web.Models.Entity
     {
         public Guid PointGroupGuid { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
 
         public IEnumerable<Point> PointList { get; set; }
         public IEnumerable<Point> AvailablePointList { get; set; }
