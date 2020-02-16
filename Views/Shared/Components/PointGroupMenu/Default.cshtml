@@ -10,7 +10,7 @@
     {
         <li>@Html.ActionLink("Датчики без привязки", "NotAssigned", "Point")</li>
     }
-    <li><a><input type="checkbox" data-kind="all" class="menu-checkbox" />Все объекты</a></li>
+    <li><a><input type="checkbox" data-parent="" data-kind="all" data-guid="all" class="menu-checkbox" />Все объекты</a></li>
     foreach (var group in Model.Where(p => p.PointGroupGuid != PointGroupMenu.NotAssignedSensorGroupGuid)
         .OrderBy(p => string.IsNullOrEmpty(p.Name)).ThenBy(p => p.Name))
     {
@@ -27,7 +27,7 @@
             {
                 <li class="treeview">
                     <a href="javascript:void(0)">
-                        <input type="checkbox" data-kind="group" data-group="@group.PointGroupGuid" class="menu-checkbox" /><span>@group.Name</span>
+                        <input type="checkbox" data-parent="all" data-kind="group" data-guid="@group.PointGroupGuid" class="menu-checkbox" /><span>@group.Name</span>
                         <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                     </a>
                     <ul class="treeview-menu">
@@ -40,13 +40,52 @@
             }
             else
             {
-                <li><a><input data-kind="group" data-group="@group.PointGroupGuid" type="checkbox" class="menu-checkbox" />@group.Name</a></li>
+                <li><a><input data-parent="all" data-kind="group" data-guid="@group.PointGroupGuid" type="checkbox" class="menu-checkbox" />@group.Name</a></li>
             }
         }
     }
 }
 <script>
-    $('.menu-checkbox').iCheck({
+    var menuEl = $('.menu-checkbox');
+
+    var ignoreCallbackGuid;
+
+    function checkParent(state, guid, parent) {
+        var el = $('input[data-guid="' + parent + '"]');
+        if (el.length !== 0) {
+            if (state === 'checked' && !el.is(':checked') &&
+                $('input[data-parent="' + parent + '"][data-guid!="' + guid + '"]:not(:checked)').length === 0) {
+                el.iCheck('check');
+            }
+            if (state === 'unchecked' && el.is(':checked')) {
+                ignoreCallbackGuid = parent;
+                el.iCheck('uncheck');                
+            }
+        }
+    }
+
+    menuEl.on('ifChecked', function (event) {
+        var el = $(this);
+        var parent = el.data('parent');
+        var guid = el.data('guid');
+
+        $('input:not(:checked)[data-parent="' + guid + '"]').iCheck('check');
+        checkParent('checked', guid, parent);
+    });
+    menuEl.on('ifUnchecked', function (event) {
+        var el = $(this);
+        var parent = el.data('parent');
+        var guid = el.data('guid');
+
+        if (ignoreCallbackGuid === guid) {
+            ignoreCallbackGuid = null;
+        } else {
+            $('input:checked[data-parent="' + guid + '"]').iCheck('uncheck');
+        }
+
+        checkParent('unchecked', guid, parent);
+    });
+    menuEl.iCheck({
         checkboxClass: 'icheckbox_square-blue'
     });
 </script>
