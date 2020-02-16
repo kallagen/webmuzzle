@@ -52,7 +52,7 @@
         <aside class="main-sidebar">
             <section class="sidebar">
                 <ul class="sidebar-menu" data-widget="tree">
-                    <li><a href="@Url.Action("Index", "Dashboard")">Измерения по системе</a></li>
+                    <li class="header">ИЗМЕРЕНИЯ ПО СИСТЕМЕ</li>
                     @await Component.InvokeAsync("PointGroupMenu")
                     @if (User.IsInRole("admin"))
                     {
