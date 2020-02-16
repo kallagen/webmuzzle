@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Services.Security;
 
 namespace TSensor.Web.ViewComponents
 {
@@ -20,8 +21,9 @@ namespace TSensor.Web.ViewComponents
 
         private IEnumerable<PointGroup> GetPointGroupStructure()
         {
-            var currentUserGuid = Guid.Parse(HttpContext.User.Claims.FirstOrDefault(p => p.Type == "Guid")?.Value);
-            return _pointGroupRepository.GetPointGroupStructure(currentUserGuid);
+            return _pointGroupRepository.GetPointGroupStructure(
+                !User.IsInRole(RoleCollection.Operator) ? null as Guid? :
+                    Guid.Parse(HttpContext.User.Claims.FirstOrDefault(p => p.Type == "Guid")?.Value));
         }
 
         public static readonly Guid NotAssignedSensorGroupGuid = new Guid("00000000-0000-0000-0000-000000000001");
