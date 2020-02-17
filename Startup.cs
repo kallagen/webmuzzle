@@ -56,11 +56,11 @@ namespace TSensor.Web
             services.AddScoped<ITankRepository, TankRepository>(p => new TankRepository(connectionString));
             services.AddScoped<IPointGroupRepository, PointGroupRepository>(p => new PointGroupRepository(connectionString));
             services.AddScoped<IProductRepository, ProductRepository>(p => new ProductRepository(connectionString));
+            services.AddScoped<IFavoriteRepository, FavoriteRepository>(p => new FavoriteRepository(connectionString));
 
             services.AddHostedService<BroadcastService>();
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
-            //services.AddControllersWithViews();
             services.AddSignalR();            
         }
 
