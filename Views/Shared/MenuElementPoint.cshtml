@@ -1,6 +1,7 @@
-﻿@model TSensor.Web.ViewModels.Point.MenuElementViewModel
+﻿@using TSensor.Web.Models.Entity;
+@model TSensor.Web.ViewModels.Point.MenuElementViewModel
 @{ 
-    var parentGuid = Model.GroupGuid?.ToString() ?? "all";
+    var parentGuid = Model.GroupGuid ?? PointGroup.RootGuid;
 }
 
 @if (Model.Point.TankList.Any())
