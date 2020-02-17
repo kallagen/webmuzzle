@@ -145,7 +145,7 @@ namespace TSensor.Web.Models.Repository
 						(t.SecondDeviceGuid = asv.DeviceGuid AND t.SecondIZKId = asv.izkNumber AND t.SecondSensorId = asv.sensorSerial AND t.DualMode = 1))");
         }
 
-        public IEnumerable<ActualSensorValue> GetSensorActualState(IEnumerable<Guid?> tankGuidList)
+        public IEnumerable<ActualSensorValue> GetSensorActualState(IEnumerable<Guid> tankGuidList)
         {
             return Query<ActualSensorValue>(@"
 				SELECT 

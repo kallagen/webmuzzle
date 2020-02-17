@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -38,10 +39,10 @@ namespace TSensor.Web.ViewModels.Helper
             }
         }
 
-        public static HtmlString MenuElementCheckbox(this IHtmlHelper html, object guid, object parentGuid)
+        public static HtmlString MenuElementCheckbox(this IHtmlHelper html, Guid guid, Guid? parentGuid)
         {
-            var selectedMenuItems = html?.ViewBag.SelectedMenuElements as IEnumerable<string>;
-            var isChecked = selectedMenuItems?.Any(p => p == guid.ToString()) == true ? " checked=\"checked\"" : string.Empty;
+            var selectedMenuItems = html?.ViewBag.SelectedMenuElements as IEnumerable<Guid>;
+            var isChecked = selectedMenuItems?.Any(p => p == guid) == true ? " checked=\"checked\"" : string.Empty;
 
             return new HtmlString(
                 $"<input type=\"checkbox\" {isChecked} data-parent=\"{parentGuid}\" data-guid=\"{guid}\" class=\"menu-checkbox\" />");
