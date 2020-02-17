@@ -1,0 +1,17 @@
+﻿@using TSensor.Web.Models.Entity;
+@model IEnumerable<Favorite>
+@{
+    Layout = null;
+}
+@if (Model?.Any() == true)
+{
+    <li class="treeview">
+        <a href="javascript:void(0)">Избранное<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+        <ul class="treeview-menu">
+            @foreach (var favorite in Model.OrderBy(p => p.Name))
+            {
+                <li>@Html.ActionLink(favorite.Name, "Favorite", "Dashboard", new { favoriteGuid = favorite.FavoriteGuid })</li>
+            }
+        </ul>
+    </li>
+}
