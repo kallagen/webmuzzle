@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TSensor.Web.ViewModels.Dashboard;
-using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Entity;
+using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Services.Security;
+using TSensor.Web.ViewModels.Dashboard;
 
 namespace TSensor.Web.Controllers
 {

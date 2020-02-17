@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Linq;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.ViewModels;
@@ -212,54 +211,6 @@ namespace TSensor.Web.Controllers
                 }
                 return RedirectToAction("List", "Point");
             }
-        }
-
-        [Route("point/all")]
-        public IActionResult All()
-        {
-            var data = _pointRepository.GetAllPointInfo().GroupBy(p => p.PointGuid)
-                .OrderBy(p =>
-                {
-                    var hasError = p.Any(t => t.IsError);
-                    var hasWarning = p.Any(t => t.IsWarning);
-
-                    if (hasError & hasWarning)
-                    {
-                        return 0;
-                    }
-                    else if (hasError)
-                    {
-                        return 1;
-                    }
-                    else if (hasWarning)
-                    {
-                        return 2;
-                    }
-                    else
-                    {
-                        return 3;
-                    }
-                }).ThenBy(p => p.First().PointName);
-            return View(data);
-        }
-
-        [Route("point/{pointGuid}/state")]
-        public IActionResult State(string pointGuid)
-        {
-            if (Guid.TryParse(pointGuid, out var _pointGuid))
-            {
-                var pointActualState = _pointRepository.GetSensorActualState(_pointGuid);
-                if (pointActualState.Any())
-                {
-                    return View(pointActualState);
-                }
-            }
-
-            ViewBag.Title = "Объект не найден";
-            ViewBag.BackTitle = "назад к списку объектов";
-            ViewBag.BackUrl = Url.ActionLink("All", "Point");
-
-            return View("NotFound");
         }
 
         [Authorize(Policy = "Admin")]
