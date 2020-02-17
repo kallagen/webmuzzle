@@ -1,0 +1,115 @@
+﻿@model ActualSensorValuesViewModel
+@{
+    ViewBag.Title = "Измерения по системе";
+}
+
+@if (Model?.ActualSensorValueList?.Any() == true)
+{
+    @section AdditionalHeader
+    {
+        @if (Model.Favorite == null)
+        {
+            @using (Html.BeginForm("AddFavorite", "Dashboard", FormMethod.Post, new { @class = "form-horizontal page-header-form", autocomplete = "off" }))
+            {
+                <div class="row">
+                    <div class="col-md-6">
+                        @Html.TextBox("name", null, new { @class = "form-control inline-header-button", placeholder = "название" })
+                        @foreach (var item in ViewBag.SelectedMenuElements)
+                        {
+                            @Html.Hidden("valueList[]", (Guid)item)
+                        }
+                    </div>
+                    <div class="col-md-6"><button type="submit" class="btn bg-blue btn-block inline-header-button">Добавить в избранное</button></div>
+                </div>
+            }
+        }
+        else
+        {
+            @using (Html.BeginForm("RemoveFavorite", "Dashboard", FormMethod.Post, new { @class = "form-horizontal page-header-form", autocomplete = "off" }))
+            {
+                <div class="row">
+                    <div class="col-md-6">
+                        @Html.Hidden("favoriteGuid", Model.Favorite.FavoriteGuid)
+                        @foreach (var item in ViewBag.SelectedMenuElements)
+                        {
+                            @Html.Hidden("valueList[]", (Guid)item)
+                        }
+                    </div>
+                    <div class="col-md-6"><button type="submit" class="btn bg-red btn-block inline-header-button">Убрать из избранного</button></div>
+                </div>
+            }
+        }
+    }
+    var hasError = Model.ActualSensorValueList.Any(t => t.IsError);
+    var hasWarning = Model.ActualSensorValueList.Any(t => t.IsWarning);
+
+    var listenSensors = Model.ActualSensorValueList.SelectMany(t =>
+    {
+        if (t.DualMode == true)
+        {
+            return new[]
+            {
+                new
+                {
+                    guid = t.MainSensorGuid,
+                    updateDate = t.MainSensorLastDate,
+                    warningDate = t.MainSensorWarningDateTicks,
+                    isSecond = 0
+                },
+                new
+                {
+                    guid = t.SecondSensorGuid,
+                    updateDate = t.SecondSensorLastDate,
+                    warningDate = t.SecondSensorWarningDateTicks,
+                    isSecond = 1
+                }
+                                                                                                                                    };
+        }
+        else
+        {
+            return new[]
+            {
+                new
+                {
+                    guid = t.MainSensorGuid,
+                    updateDate = t.MainSensorLastDate,
+                    warningDate = t.MainSensorWarningDateTicks,
+                    isSecond = -1
+                }
+                                                                                                                                    };
+        }
+    }).Where(p => p.guid != null).ToDictionary(p => p.guid, p => p);
+
+    <div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">
+        <h4>Внимание!</h4>
+        <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
+    </div>
+    <div class="t-warning-message callout callout-warning @if(!hasWarning){<text>hidden</text>}">
+        <h4>Внимание!</h4>
+        <p>Данные с некоторых датчиков не поступают больше часа. Проверьте правильность настроек и исправность системы.</p>
+    </div>
+
+    @foreach (var tank in Model.ActualSensorValueList)
+    {
+        @Html.Partial("SensorCard", tank)
+    }
+
+    <script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
+        const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
+
+        var errorBlock = $('.t-error-message');
+        var warningBlock = $('.t-warning-message');
+
+        connection.on('sensorupdate', sensorUpdate);
+
+        connection.start();
+    </script>
+
+    @Html.ViewModelWindow()
+}
+else
+{
+    <p>Выберите в меню данные для отображения</p>
+}

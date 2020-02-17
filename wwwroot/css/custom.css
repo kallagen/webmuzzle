@@ -273,3 +273,12 @@ i.menu-point {
 .skin-blue .sidebar-menu > li.header {
     color: #69818C;
 }
+
+.page-header-form {
+    margin-top: -16px;
+    margin-bottom: -16px;
+}
+
+    .page-header-form .col-md-6 {
+        padding-left: 0;
+    }

@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using TSensor.Web.ViewModels.Dashboard;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Entity;
+using TSensor.Web.Models.Services.Security;
 
 namespace TSensor.Web.Controllers
 {
@@ -10,10 +14,54 @@ namespace TSensor.Web.Controllers
     public class DashboardController : Controller
     {
         private readonly IPointRepository _pointRepository;
+        private readonly IFavoriteRepository _favoriteRepository;
+        private readonly AuthService _authService;
 
-        public DashboardController(IPointRepository pointRepository)
+        public DashboardController(IPointRepository pointRepository, IFavoriteRepository favoriteRepository,
+            AuthService authService)
         {
             _pointRepository = pointRepository;
+            _favoriteRepository = favoriteRepository;
+            _authService = authService;
+        }
+
+        private IActionResult ActualSensorValues(IEnumerable<Guid> guidList, Favorite favorite = null, 
+            string errorMessage = null)
+        {
+            //todo check user rights
+
+            var viewModel = new ActualSensorValuesViewModel
+            {
+                ActualSensorValueList = _pointRepository.GetSensorActualState(guidList)
+                    .OrderBy(t =>
+                    {
+                        if (t.IsError && t.IsWarning)
+                        {
+                            return 1;
+                        }
+                        else if (t.IsError)
+                        {
+                            return 2;
+                        }
+                        else if (t.IsWarning)
+                        {
+                            return 3;
+                        }
+                        else
+                        {
+                            return 4;
+                        }
+                    }).ThenBy(t => t.PointName).ThenBy(t => t.TankName),
+                Favorite = favorite,
+            };
+
+            ViewBag.SelectedMenuElements = guidList;
+            
+            if (errorMessage != null)
+            {
+                viewModel.ErrorMessage = errorMessage;
+            }
+            return View("ActualSensorValues", viewModel);
         }
 
         [Route("")]
@@ -25,71 +73,81 @@ namespace TSensor.Web.Controllers
         [Route("dashboard")]
         public IActionResult Index()
         {
-            /*var allSensorActualValues = _pointRepository.GetSensorActualState()
-                .GroupBy(p => p.PointGuid).OrderBy(p =>
-                {
-                    if (p.Any(t => !t.PointGuid.HasValue))
-                    {
-                        return 0;
-                    }
+            return View("ActualSensorValues");
+        }
 
-                    var hasError = p.Any(t => t.IsError);
-                    var hasWarning = p.Any(t => t.IsWarning);
-
-                    if (hasError && hasWarning)
-                    {
-                        return 1;
-                    }
-                    else if (hasError)
-                    {
-                        return 2;
-                    }
-                    else if (hasWarning)
-                    {
-                        return 3;
-                    }
-                    else
-                    {
-                        return 4;
-                    }
-                }).ThenBy(p => p.First().PointName);
-            return View(allSensorActualValues);*/
-            return View();
+        private static IEnumerable<Guid> FilterRequestList(IEnumerable<string> list)
+        {
+            return (list ?? Enumerable.Empty<string>())
+                .Select(p => Guid.TryParse(p, out var tankGuid) ? (Guid?)tankGuid : null)
+                .Where(p => p != null)
+                .Select(p => p.Value)
+                .Distinct();
         }
 
         [Route("dashboard")]
         [HttpPost]
-        public IActionResult Index(string[] guidList)
+        public IActionResult Index(IEnumerable<string> guidList)
         {
-            //todo check user rights
+            return ActualSensorValues(FilterRequestList(guidList));
+        }
 
-            var tankGuidList = (guidList ?? Enumerable.Empty<string>())
-                .Select(p => Guid.TryParse(p, out var tankGuid) ? (Guid?)tankGuid : null)
-                .Where(p => p != null);
-
-            var sensorActualValues = _pointRepository.GetSensorActualState(tankGuidList)
-                .OrderBy(t =>
+        [Route("favorite/{favoriteGuid}")]
+        public IActionResult Favorite(string favoriteGuid)
+        {
+            if (Guid.TryParse(favoriteGuid, out var _favoriteGuid))
+            {
+                var favorite = _favoriteRepository.GetByGuid(_favoriteGuid);
+                if (favorite != null)
                 {
-                    if (t.IsError && t.IsWarning)
-                    {
-                        return 1;
-                    }
-                    else if (t.IsError)
-                    {
-                        return 2;
-                    }
-                    else if (t.IsWarning)
-                    {
-                        return 3;
-                    }
-                    else
-                    {
-                        return 4;
-                    }
-                }).ThenBy(t => t.PointName).ThenBy(t => t.TankName);
+                    return ActualSensorValues(favorite.ItemList, favorite);
+                }
+            }
 
-            ViewBag.SelectedMenuElements = guidList;
-            return View(sensorActualValues);
+            ViewBag.Title = "Избранное не найдено";
+
+            return View("NotFound");
+        }
+
+        [Route("favorite/add")]
+        [HttpPost]
+        public IActionResult AddFavorite(string name, IEnumerable<string> valueList)
+        {
+            var guidList = FilterRequestList(valueList);
+
+            name = name?.Trim();
+            if (string.IsNullOrEmpty(name))
+            {
+                name = "Избранные объекты";
+            }
+
+            var favoriteGuid = _favoriteRepository.Create(_authService.CurrentUserGuid, name, guidList);
+            if (favoriteGuid.HasValue)
+            {
+                return RedirectToAction("Favorite", "Dashboard", new { favoriteGuid });
+            }
+            else
+            {
+                return ActualSensorValues(guidList, errorMessage: "При сохранении избранного произошла ошибка");
+            }
+        }
+
+        [Route("favorite/remove")]
+        [HttpPost]
+        public IActionResult RemoveFavorite(string favoriteGuid, IEnumerable<string> valueList)
+        {
+            var guidList = FilterRequestList(valueList);
+
+            if (Guid.TryParse(favoriteGuid, out var _favoriteGuid))
+            {
+                var removeResult = _favoriteRepository.Remove(_authService.CurrentUserGuid, _favoriteGuid);
+                if (removeResult)
+                {
+                    return ActualSensorValues(guidList);
+                }
+            }
+
+            return ActualSensorValues(guidList, errorMessage: "При удалении избранного произошла ошибка");
         }
     }
 }
