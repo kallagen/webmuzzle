@@ -282,3 +282,7 @@ i.menu-point {
     .page-header-form .col-md-6 {
         padding-left: 0;
     }
+
+.favorite-container > li > a {
+    line-height: 23px;
+}
