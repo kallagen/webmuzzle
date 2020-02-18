@@ -24,7 +24,7 @@ namespace TSensor.Web.Controllers
         {
             _logService.Write("inputerror", $"{guid} {date} {value} {message}");
 
-            return StatusCode(418, message);
+            return StatusCode(418, $"{{\"success\":false,\"error\": \"{message}\"}}");
         }
 
         [Route("sensorvalue/push")]
