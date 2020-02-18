@@ -25,7 +25,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.Data)
+                            @foreach (var item in Model.Data.OrderBy(p => p.Name))
                             {
                                 <tr>
                                     <td>@Html.ActionLink(item.Name, "Edit", "PointGroup", new { pointGroupGuid = item.PointGroupGuid }, null)</td>

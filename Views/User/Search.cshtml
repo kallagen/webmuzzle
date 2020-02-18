@@ -51,7 +51,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.Data)
+                            @foreach (var item in Model.Data.OrderBy(p => p.Name))
                             {
                                 <tr @if (item.IsInactive) { <text> class="text-muted" </text> }>
                                     @if (Model.HasInactiveRecord)
