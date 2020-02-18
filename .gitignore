@@ -9,3 +9,5 @@
 /obj
 /log/exception/20200126.log
 /log/exception
+/log/inputerror
+/log/rawinput
