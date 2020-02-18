@@ -132,7 +132,7 @@
                 {
                     <div class="col-md-4">
                         @Html.Hidden("pointGuid", Model.PointGuid)
-                        @Html.DropDownList("userGuid", new SelectList(Model.AvailableUserList, "UserGuid", "Name"), new { @class = "form-control inline-header-button" })
+                        @Html.DropDownList("userGuid", new SelectList(Model.AvailableUserList.OrderBy(p => p.Name), "UserGuid", "Name"), new { @class = "form-control inline-header-button" })
                     </div>
                     <div class="col-md-2">
                         <button type="submit" class="btn bg-blue btn-block inline-header-button">Добавить оператора</button>

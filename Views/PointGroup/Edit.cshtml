@@ -47,7 +47,7 @@
                 {
                     <div class="col-md-4">
                         @Html.Hidden("pointGroupGuid", Model.PointGroupGuid)
-                        @Html.DropDownList("pointGuid", new SelectList(Model.AvailablePointList, "PointGuid", "Name"), new { @class = "form-control inline-header-button" })
+                        @Html.DropDownList("pointGuid", new SelectList(Model.AvailablePointList.OrderBy(p => p.Name), "PointGuid", "Name"), new { @class = "form-control inline-header-button" })
                     </div>
                     <div class="col-md-2">
                         <button type="submit" class="btn bg-blue btn-block inline-header-button">Добавить объект</button>
@@ -107,7 +107,7 @@
                 {
                     <div class="col-md-4">
                         @Html.Hidden("pointGroupGuid", Model.PointGroupGuid)
-                        @Html.DropDownList("userGuid", new SelectList(Model.AvailableUserList, "UserGuid", "Name"), new { @class = "form-control inline-header-button" })
+                        @Html.DropDownList("userGuid", new SelectList(Model.AvailableUserList.OrderBy(p => p.Name), "UserGuid", "Name"), new { @class = "form-control inline-header-button" })
                     </div>
                     <div class="col-md-2">
                         <button type="submit" class="btn bg-blue btn-block inline-header-button">Добавить оператора</button>
