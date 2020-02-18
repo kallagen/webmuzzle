@@ -155,7 +155,7 @@
 </div>
 @using (Html.BeginForm("Remove", "PointGroup", FormMethod.Post, new { id = "remove-pointgroup-form", @class = "hidden" }))
 {
-    @Html.Hidden("PointGroupGuid, Model.PointGroupGuid", new { id = "remove-pointgroup-guid" })
+    @Html.Hidden("PointGroupGuid", Model.PointGroupGuid, new { id = "remove-pointgroup-guid" })
 }
 @using (Html.BeginForm("RemovePoint", "PointGroup", FormMethod.Post, new { id = "remove-point-form", @class = "hidden" }))
 {
