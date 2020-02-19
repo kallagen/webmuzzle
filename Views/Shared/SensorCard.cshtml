@@ -1,37 +1,24 @@
-﻿@model TSensor.Web.Models.Entity.ActualSensorValue
-@{
-    var cellClass = Model.IsGlobalError ? "t-error" : (Model.IsWarning ? "t-warning" : "t-normal");
-    var guid = Model.TankGuid.HasValue ? Model.MainSensorGuid : Model.SensorGuid;
+﻿@model TSensor.Web.Models.Entity.SensorValue
 
-    var mainClass = Model.IsErrorMain ? "text-red" : (Model.IsWarningMain ? "text-yellow" : "");
-    var secondClass = Model.IsErrorSecond ? "text-red" : (Model.IsWarningSecond ? "text-yellow" : "");
-}
-
-<div class="t-cell @cellClass" data-sensorguid="@guid" data-secondsensorguid="@Model.SecondSensorGuid">
-    <h5>
-        @Model.TankName<i class="fa fa-circle @mainClass" data-sensorguid="@guid"></i>@if (Model.DualMode == true){<i class="fa fa-circle @secondClass" data-sensorguid="@Model.SecondSensorGuid"></i>}
+<div class="t-cell" data-sensorguid="@Model.SensorGuid">
+    <h5 class="t-info">
+        <span title="Идентификатор устройства">@Model.DeviceGuid</span>
+        <span title="Идентификатор ИЗК">@Model.IzkNumber</span>
+        <span title="Идентификатор датчика">@Model.SensorSerial</span>
     </h5>
-    <h6><span data-sensorguid="@guid">@Model.MainSensorLastDate</span>@if (Model.DualMode == true) {<span style="padding-left: 16px;" data-sensorguid="@Model.SecondSensorGuid">@Model.SecondSensorLastDate</span> }</h6>
+    <h6><span class="t-date">@Model.InsertDateStr</span></h6>
     <div>
-        <div class="bl1">
-            <span><span class="t-t1">@Model.t1</span> °C</span>
-            <span><span class="t-t2">@Model.t2</span> °C</span>
-            <span><span class="t-t3">@Model.t3</span> °C</span>
-            <span><span class="t-t4">@Model.t4</span> °C</span>
-            <span><span class="t-t5">@Model.t5</span> °C</span>
-            <span><span class="t-t6">@Model.t6</span> °C</span>
-        </div>
         <div class="bl2">
             <div>
-                <div style="height: @Model.PercentLevel%"></div>
+                <div style="height: @Model.PercentLevel<text>%</text>"></div>
             </div>
         </div>
         <div class="bl3">
-            <span>M <span class="t-liquidEnvironmentLevel">@Model.liquidEnvironmentLevel</span> т</span>
-            <span>V <span class="t-environmentVolume">@Model.environmentVolume</span> м²</span>
-            <span>P <span class="t-liquidDensity">@Model.liquidDensity</span> кг/м³</span>
-            <span>T <span class="t-avgT">@Model.AvgT</span> °C</span>
-            <span>S1 <span class="t-environmentLevel">@Model.environmentLevel</span> мм</span>
+            <span><span class="t-label">Масса</span><span class="t-liquidEnvironmentLevel">@Model.LiquidEnvironmentLevel</span> т</span>
+            <span><span class="t-label">Объём</span><span class="t-environmentVolume">@Model.EnvironmentVolume</span> м²</span>
+            <span><span class="t-label">Плотность</span><span class="t-liquidDensity">@Model.LiquidDensity</span> кг/м³</span>
+            <span><span class="t-label">Температура</span><span class="t-avgT">@Model.AvgT</span> °C</span>
+            <span><span class="t-label">Уровень</span><span class="t-environmentLevel">@Model.EnvironmentLevel</span> мм</span>
         </div>
         <div class="bl-error"></div>
     </div>
