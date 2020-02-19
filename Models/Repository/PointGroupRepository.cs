@@ -59,7 +59,7 @@ namespace TSensor.Web.Models.Repository
             return group;
         }
 
-        public Guid? Create(string name, string descirption)
+        public Guid? Create(string name, string description)
         {
             return QueryFirst<Guid?>(@"
                 DECLARE @guid UNIQUEIDENTIFIER = NEWID()
@@ -70,7 +70,7 @@ namespace TSensor.Web.Models.Repository
                     @guid, @name, @description)
                 
                 SELECT PointGroupGuid FROM [PointGroup] WHERE PointGroupGuid = @guid", 
-                new { name, descirption });
+                new { name, description });
         }
 
         public bool Edit(Guid pointGroupGuid, string name, string description)
