@@ -95,54 +95,33 @@ namespace TSensor.Web.Models.Repository
                     LEFT JOIN ActualSensorValue s ON t.TankGuid = s.TankGuid AND t.DualMode = 1 AND s.IsSecond = 1");
         }
 
-        public IEnumerable<ActualSensorValue> GetNotAssignedSensorState()
+        public IEnumerable<SensorValue> GetNotAssignedSensorState()
         {
-			return Query<ActualSensorValue>(@"
+			return Query<SensorValue>(@"
 				SELECT 
-					InsertDate
+					InsertDate,					
 					DeviceGuid,
-					izkNumber,
-					banderolType,
-					sensorSerial,
-					sensorChannel,
-					pressureAndTempSensorState,
-					sensorFirmwareVersionAndReserv,
-					alarma,
-					environmentLevel,
-					pressureFilter,
-					pressureMeasuring,
-					levelInPercent,
-					environmentVolume,
-					liquidEnvironmentLevel,
-					steamMass,
-					liquidDensity,
-					steamDensity,
-					dielectricPermeability,
-					dielectricPermeability2,
-					t1,
-					t2,
-					t3,
-					t4,
-					t5,
-					t6,
-					plateTemp,
-					[period],
-					plateServiceParam,
-					environmentComposition,
-					cs1,
-					plateServiceParam2,
-					plateServiceParam3,
-					sensorWorkMode,
-					plateServiceParam4,
-					plateServiceParam5,
-					crc
+					izkNumber AS IzkNumber,
+					sensorSerial AS SensorSerial,
+			        environmentLevel AS EnvironmentLevel,
+					levelInPercent AS LevelInPercent,
+					environmentVolume AS EnvironmentVolume,
+					liquidEnvironmentLevel AS LiquidEnvironmentLevel,
+					liquidDensity AS LiquidDensity,
+					t1 AS T1,
+					t2 AS T2,
+					t3 AS T3,
+					t4 AS T4,
+					t5 AS T5,
+					t6 AS T6
 				FROM ActualSensorValue asv
 				WHERE NOT EXISTS(
 					SELECT 1 
 					FROM Tank t
 					WHERE 
 						(t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial) OR
-						(t.SecondDeviceGuid = asv.DeviceGuid AND t.SecondIZKId = asv.izkNumber AND t.SecondSensorId = asv.sensorSerial AND t.DualMode = 1))");
+						(t.SecondDeviceGuid = asv.DeviceGuid AND t.SecondIZKId = asv.izkNumber AND t.SecondSensorId = asv.sensorSerial AND t.DualMode = 1)) AND
+						InsertDate >= DATEADD(HOUR, -1, GETDATE())");
         }
 
         public IEnumerable<ActualSensorValue> GetSensorActualState(IEnumerable<Guid> tankGuidList)
