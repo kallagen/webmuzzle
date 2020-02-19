@@ -13,8 +13,8 @@ namespace TSensor.Web.Models.Repository
 				SELECT 
 					InsertDate,					
 					DeviceGuid,
-					izkNumber AS IzkNumber,
-					sensorSerial AS SensorSerial,
+					CAST(izkNumber AS nvarchar(2)) AS IzkNumber,
+					CAST(sensorSerial AS nvarchar(2)) AS SensorSerial,
 			        environmentLevel AS EnvironmentLevel,
 					levelInPercent AS LevelInPercent,
 					environmentVolume AS EnvironmentVolume,
