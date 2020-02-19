@@ -126,3 +126,23 @@ function sensorUpdate(data, date) {
         }
     }
 }
+
+function notAssignedSensorUpdate(data) {
+    for (sensorGuid in listenSensors) {
+        var container = $('.t-cell[data-sensorguid="' + sensorGuid + '"]');
+
+        if (data && data[sensorGuid] && data[sensorGuid].insertDate !== listenSensors[sensorGuid]) {
+
+            var val = data[sensorGuid];
+
+            container.find('.t-date').html(val.insertDateStr);
+            container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
+            container.find('.t-environmentVolume').html(val.environmentVolume);
+            container.find('.t-liquidDensity').html(val.liquidDensity);
+            container.find('.t-avgT').html(val.avgT);
+            container.find('.t-environmentLevel').html(val.environmentLevel);
+
+            listenSensors[sensorGuid] = data[sensorGuid].insertDate;
+        }
+    }
+}
