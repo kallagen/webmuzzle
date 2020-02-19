@@ -1,19 +1,11 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace TSensor.Web.Models.Entity
 {
     public class ActualSensorValue
     {
-        public bool IsSecond { get; set; }
         public string DeviceGuid { get; set; }
         public string Raw { get; set; }
-
-        #region sensor values 
-
-        public DateTime? InsertDate { get; set; }
-        public string InsertDateStr =>
-            InsertDate?.ToString("dd.MM.yyyy HH:mm:ss");
 
         public int izkNumber { get; set; }
         public int banderolType { get; set; }
@@ -50,13 +42,6 @@ namespace TSensor.Web.Models.Entity
         public decimal plateServiceParam4 { get; set; }
         public int plateServiceParam5 { get; set; }
         public string crc { get; set; }
-        #endregion
-
-        public decimal AvgT =>
-            decimal.Round((t1 + t2 + t3 + t4 + t5 + t6) / 6, 1);
-
-        public int PercentLevel =>
-            (int)decimal.Round(levelInPercent, 0);
 
         public static ActualSensorValue Parse(string raw)
         {
