@@ -82,27 +82,14 @@ namespace TSensor.Web.Models.Repository
                 new { pointGuid }) == 1;
         }
 
-        public IEnumerable<PointTankInfo> GetAllPointInfo()
-        {
-            return Query<PointTankInfo>(@"
-                SELECT
-                    p.PointGuid, p.Name AS PointName,
-					t.TankGuid, t.Name AS TankName, t.DualMode AS DualMode,
-					m.InsertDate AS MainSensorLastDate, s.InsertDate AS SecondSensorLastDate
-                FROM Point p
-                    LEFT JOIN Tank t ON p.PointGuid = t.PointGuid
-                    LEFT JOIN ActualSensorValue m ON t.TankGuid = m.TankGuid AND m.IsSecond = 0
-                    LEFT JOIN ActualSensorValue s ON t.TankGuid = s.TankGuid AND t.DualMode = 1 AND s.IsSecond = 1");
-        }
-
         public IEnumerable<SensorValue> GetNotAssignedSensorState()
         {
 			return Query<SensorValue>(@"
 				SELECT 
-					InsertDate,					
+					InsertDate,
 					DeviceGuid,
-					izkNumber AS IzkNumber,
-					sensorSerial AS SensorSerial,
+					CAST(izkNumber AS nvarchar(2)) AS IzkNumber,
+					CAST(sensorSerial AS nvarchar(2)) AS SensorSerial,
 			        environmentLevel AS EnvironmentLevel,
 					levelInPercent AS LevelInPercent,
 					environmentVolume AS EnvironmentVolume,
@@ -124,55 +111,29 @@ namespace TSensor.Web.Models.Repository
 						InsertDate >= DATEADD(HOUR, -1, GETDATE())");
         }
 
-        public IEnumerable<ActualSensorValue> GetSensorActualState(IEnumerable<Guid> tankGuidList)
+        public IEnumerable<TankSensorValue> GetSensorActualState(IEnumerable<Guid> tankGuidList)
         {
-            return Query<ActualSensorValue>(@"
-				SELECT 
-					p.PointGuid, p.Name AS PointName,
-					t.TankGuid, t.Name AS TankName, t.DualMode AS DualMode,
-					m.InsertDate AS MainSensorLastDate, s.InsertDate AS SecondSensorLastDate,
+            return Query<TankSensorValue>(@"
+				SELECT
+					p.Name AS PointName, t.Name AS TankName, t.DualMode AS DualMode,
 					t.MainDeviceGuid, t.MainIZKId, t.MainSensorId,
 					t.SecondDeviceGuid, t.SecondIZKId, t.SecondSensorId,
+					m.InsertDate AS MainSensorInsertDate, s.InsertDate AS SecondSensorInsertDate,
 
-					m.DeviceGuid,
-					m.izkNumber,
-					m.banderolType,
-					m.sensorSerial,
-					m.sensorChannel,
-					m.pressureAndTempSensorState,
-					m.sensorFirmwareVersionAndReserv,
-					m.alarma,
-					m.environmentLevel,
-					m.pressureFilter,
-					m.pressureMeasuring,
-					m.levelInPercent,
-					m.environmentVolume,
-					m.liquidEnvironmentLevel,
-					m.steamMass,
-					m.liquidDensity,
-					m.steamDensity,
-					m.dielectricPermeability,
-					m.dielectricPermeability2,
-					ISNULL(s.t1, m.t1) AS t1,
-					ISNULL(s.t2, m.t2) AS t2,
-					ISNULL(s.t3, m.t3) AS t3,
-					ISNULL(s.t4, m.t4) AS t4,
-					ISNULL(s.t5, m.t5) AS t5,
-					ISNULL(s.t6, m.t6) AS t6,
-					m.plateTemp,
-					m.[period],
-					m.plateServiceParam,
-					m.environmentComposition,
-					m.cs1,
-					m.plateServiceParam2,
-					m.plateServiceParam3,
-					m.sensorWorkMode,
-					m.plateServiceParam4,
-					m.plateServiceParam5,
-					m.crc
+					m.environmentLevel AS EnvironmentLevel,
+					m.levelInPercent AS LevelInPercent,
+					m.environmentVolume AS EnvironmentVolume,
+					m.liquidEnvironmentLevel AS LiquidEnvironmentLevel,
+					m.liquidDensity AS LiquidDensity,
+					ISNULL(s.t1, m.t1) AS T1,
+					ISNULL(s.t2, m.t2) AS T2,
+					ISNULL(s.t3, m.t3) AS T3,
+					ISNULL(s.t4, m.t4) AS T4,
+					ISNULL(s.t5, m.t5) AS T5,
+					ISNULL(s.t6, m.t6) AS T6
 				FROM Point p
-					LEFT JOIN Tank t ON p.PointGuid = t.PointGuid
-					FULL JOIN ActualSensorValue m ON t.MainDeviceGuid = m.DeviceGuid AND t.MainIZKId = m.izkNumber AND t.MainSensorId = m.sensorSerial
+					JOIN Tank t ON p.PointGuid = t.PointGuid
+					LEFT JOIN ActualSensorValue m ON t.MainDeviceGuid = m.DeviceGuid AND t.MainIZKId = m.izkNumber AND t.MainSensorId = m.sensorSerial
 					LEFT JOIN ActualSensorValue s ON t.DualMode = 1 AND t.SecondDeviceGuid = s.DeviceGuid AND t.SecondIZKId = s.izkNumber AND t.SecondSensorId = s.sensorSerial
 				WHERE
 					t.TankGuid in @tankGuidList", new { tankGuidList = tankGuidList.Where(p => p != null).Distinct() });
