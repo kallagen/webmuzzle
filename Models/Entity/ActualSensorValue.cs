@@ -3,14 +3,11 @@ using System.Globalization;
 
 namespace TSensor.Web.Models.Entity
 {
-    public class ActualSensorValue : PointTankInfo
+    public class ActualSensorValue
     {
         public bool IsSecond { get; set; }
         public string DeviceGuid { get; set; }
         public string Raw { get; set; }
-
-        public string SensorGuid =>
-            GetSensorGuid(DeviceGuid, izkNumber, sensorSerial);
 
         #region sensor values 
 
