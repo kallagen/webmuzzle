@@ -93,8 +93,8 @@ span.form-control {
 
     .t-cell h6 {
         text-align: center;
-        margin-top: 4px;
-        margin-bottom: 6px;
+        margin-top: 6px;
+        margin-bottom: 4px;
     }
 
 .t-error h5 {
@@ -117,11 +117,11 @@ span.form-control {
     color: #F49200;
 }
 
-.t-cell .bl1 > span, .t-cell .bl3 > span {
+.t-cell .bl3 > span {
     display: block;
     width: 100%;
     font-size: 14px;
-    line-height: 20px;
+    line-height: 22px;
     overflow: hidden;
 }
 
@@ -149,16 +149,9 @@ span.form-control {
     display: block;
 }
 
-.bl1 {
-    float: left;
-    width: 70px;
-    padding-right: 10px;
-    text-align: right;
-}
-
 .bl2 {
     float: left;
-    width: 100px;
+    width: 80px;
 }
 
     .bl2 > div {
@@ -186,12 +179,12 @@ span.form-control {
 .bl3 {
     float: left;
     vertical-align: top;
-    padding-left: 10px;
-    padding-top: 10px;
-    width: 100px;
+    padding-left: 8px;
+    padding-top: 5px;
+    width: 190px;
 }
 
-.t-error .bl1, .t-error .bl2, .t-error .bl3 {
+.t-error .bl2, .t-error .bl3 {
     display: none;
 }
 
@@ -205,9 +198,17 @@ span.form-control {
     display: block;
 }
 
+.t-info span {
+    display: inline-block;
+    margin-left: 6px;
+    border-bottom: 1px dashed #333;
+}
+
+.t-cell .t-label {
+    display: inline-block;
+    width: 96px;
+}
 /*end sensor card*/
-
-
 tr .table-remove-cell {
     text-align: right;
 }
