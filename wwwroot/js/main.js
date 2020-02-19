@@ -50,11 +50,13 @@ var ConfirmModal = function (message, callback) {
 };
 
 function sensorUpdate(data, date) {
-    for (sensorGuid in listenSensors) {
+    listenSensors.forEach(function (sensor) {
+        var sensorGuid = sensor.guid;
+
         var container = $('.t-cell[data-sensorguid="' + sensorGuid + '"],.t-cell[data-secondsensorguid="' + sensorGuid + '"]');
         var point = $('i[data-sensorguid="' + sensorGuid + '"]');
 
-        if (data && data[sensorGuid] && data[sensorGuid].insertDate !== listenSensors[sensorGuid].updateDate) {
+        if (data && data[sensorGuid] && data[sensorGuid].insertDate !== sensor.updateDate) {
 
             var val = data[sensorGuid];
 
@@ -74,7 +76,7 @@ function sensorUpdate(data, date) {
 
             container.find('span[data-sensorguid="' + sensorGuid + '"]').html(val.insertDateStr);
 
-            if (listenSensors[sensorGuid].isSecond === 0 || listenSensors[sensorGuid].isSecond === -1) {
+            if (sensor.isSecond === 0) {
                 container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
                 container.find('.t-environmentVolume').html(val.environmentVolume);
                 container.find('.t-liquidDensity').html(val.liquidDensity);
@@ -82,21 +84,15 @@ function sensorUpdate(data, date) {
                 container.find('.t-environmentLevel').html(val.environmentLevel);
             }
 
-            if (listenSensors[sensorGuid].isSecond === 1 || listenSensors[sensorGuid].isSecond === -1) {
-                container.find('.t-t1').html(val.t1.toFixed(1).replace('.', ','));
-                container.find('.t-t2').html(val.t2.toFixed(1).replace('.', ','));
-                container.find('.t-t3').html(val.t3.toFixed(1).replace('.', ','));
-                container.find('.t-t4').html(val.t4.toFixed(1).replace('.', ','));
-                container.find('.t-t5').html(val.t5.toFixed(1).replace('.', ','));
-                container.find('.t-t6').html(val.t6.toFixed(1).replace('.', ','));
+            if (sensor.isSecond === 1) {
                 container.find('.t-avgT').html(val.avgT.toFixed(1).replace('.', ','));
             }
 
-            listenSensors[sensorGuid].updateDate = data[sensorGuid].insertDate;
-            listenSensors[sensorGuid].warningDate = date + 600000;
+            sensor.updateDate = data[sensorGuid].insertDate;
+            sensor.warningDate = date + 600000;
         }
 
-        if (!point.hasClass('text-yellow') && date > listenSensors[sensorGuid].warningDate) {
+        if (!point.hasClass('text-yellow') && date > sensor.warningDate) {
             point.addClass('text-yellow');
 
             if (!container.hasClass('t-error') && !container.hasClass('t-warning')) {
@@ -124,7 +120,7 @@ function sensorUpdate(data, date) {
                 warningBlock.addClass('hidden');
             }
         }
-    }
+    });
 }
 
 function notAssignedSensorUpdate(data) {
