@@ -5,8 +5,8 @@ namespace TSensor.Web.Models.Entity
     public class SensorValue
     {
         public string DeviceGuid { get; set; }
-        public int IzkNumber { get; set; }
-        public int SensorSerial { get; set; }
+        public string IzkNumber { get; set; }
+        public string SensorSerial { get; set; }
         public DateTime InsertDate { get; set; }
         public decimal EnvironmentLevel { get; set; }
         public decimal LevelInPercent { get; set; }
@@ -21,7 +21,7 @@ namespace TSensor.Web.Models.Entity
         public decimal T6 { get; set; }
 
         public string SensorGuid =>
-            string.Join("_", new[] { DeviceGuid, IzkNumber.ToString(), SensorSerial.ToString() });
+            string.Join("_", new[] { DeviceGuid, IzkNumber, SensorSerial });
         public string InsertDateStr =>
             InsertDate.ToString("dd.MM.yyyy HH:mm:ss");                
         public decimal AvgT =>
