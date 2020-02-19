@@ -92,7 +92,7 @@ function sensorUpdate(data, date) {
             sensor.warningDate = date + 600000;
         }
 
-        if (!point.hasClass('text-yellow') && date > sensor.warningDate) {
+        if (!point.hasClass('text-yellow') && sensor.warningDate && date > sensor.warningDate) {
             point.addClass('text-yellow');
 
             if (!container.hasClass('t-error') && !container.hasClass('t-warning')) {
