@@ -16,7 +16,7 @@
                         @Html.TextBox("name", null, new { @class = "form-control inline-header-button", placeholder = "название" })
                         @foreach (var item in ViewBag.SelectedMenuElements)
                         {
-                            @Html.Hidden("valueList[]", (Guid)item)
+                            @Html.Hidden("valueList[]", (Guid)item, new { id = $"add-favorite-item-{item}" })
                         }
                     </div>
                     <div class="col-md-6"><button type="submit" class="btn bg-blue btn-block inline-header-button">Добавить в избранное</button></div>
@@ -32,7 +32,7 @@
                         @Html.Hidden("favoriteGuid", Model.Favorite.FavoriteGuid)
                         @foreach (var item in ViewBag.SelectedMenuElements)
                         {
-                            @Html.Hidden("valueList[]", (Guid)item)
+                            @Html.Hidden("valueList[]", (Guid)item, new { id = $"remove-favorite-item-{item}" })
                         }
                     </div>
                     <div class="col-md-6"><button type="submit" class="btn bg-red btn-block inline-header-button">Убрать из избранного</button></div>
@@ -52,18 +52,18 @@
                 new
                 {
                     guid = t.MainSensorGuid,
-                    updateDate = t.MainSensorLastDate,
+                    updateDate = t.MainSensorInsertDate,
                     warningDate = t.MainSensorWarningDateTicks,
                     isSecond = 0
                 },
                 new
                 {
                     guid = t.SecondSensorGuid,
-                    updateDate = t.SecondSensorLastDate,
+                    updateDate = t.SecondSensorInsertDate,
                     warningDate = t.SecondSensorWarningDateTicks,
                     isSecond = 1
                 }
-                                                                                                                                    };
+            };
         }
         else
         {
@@ -72,13 +72,13 @@
                 new
                 {
                     guid = t.MainSensorGuid,
-                    updateDate = t.MainSensorLastDate,
+                    updateDate = t.MainSensorInsertDate,
                     warningDate = t.MainSensorWarningDateTicks,
-                    isSecond = -1
+                    isSecond = 0
                 }
-                                                                                                                                    };
+            };
         }
-    }).Where(p => p.guid != null).ToDictionary(p => p.guid, p => p);
+    });
 
     <div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">
         <h4>Внимание!</h4>
