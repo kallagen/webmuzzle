@@ -97,11 +97,6 @@ span.form-control {
         margin-bottom: 4px;
     }
 
-.t-error h5 {
-    margin-top: 20px;
-    margin-bottom: 13px;
-}
-
 .t-cell i {
     padding-left: 8px;
     line-height: 15px;
@@ -132,6 +127,14 @@ span.form-control {
     box-shadow: 0 1px 1px rgba(0,0,0,0.1);
     border-radius: 2px;
     margin-bottom: 15px;
+}
+
+.t-cell h5 span {
+    display: block;
+}
+
+.t-cell h6 span {
+    line-height: 0;
 }
 
 .bl-error {
