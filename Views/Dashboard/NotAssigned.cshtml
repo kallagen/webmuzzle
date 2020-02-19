@@ -1,0 +1,30 @@
+﻿@model IEnumerable<SensorValue>
+@{
+    ViewBag.Title = "Датчики без привязки";
+}
+
+@if (Model?.Any() == true)
+{
+    var listenSensors = Model.ToDictionary(t => t.SensorGuid, t => t.InsertDate);
+
+    @foreach (var sensor in Model)
+    {
+        @Html.Partial("SensorCard", sensor)
+    }
+
+    <script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
+        const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
+
+        connection.on('sensorupdate', notAssignedSensorUpdate);
+
+        connection.start();
+    </script>
+
+    @Html.ViewModelWindow()
+}
+else
+{
+    <p>Датчиков без привязки к резервуару нет</p>
+}

@@ -149,5 +149,14 @@ namespace TSensor.Web.Controllers
 
             return ActualSensorValues(guidList, errorMessage: "При удалении избранного произошла ошибка");
         }
+
+        [Authorize(Policy = "Admin")]
+        [Route("sensor/notassigned")]
+        public IActionResult NotAssigned()
+        {
+            var notAssignedPointInfo = _pointRepository.GetNotAssignedSensorState();
+
+            return View(notAssignedPointInfo);
+        }
     }
 }

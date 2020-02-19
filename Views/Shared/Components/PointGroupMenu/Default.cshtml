@@ -9,7 +9,7 @@
 {
     if (Model.Any(p => p.PointGroupGuid == PointGroupMenu.NotAssignedSensorGroupGuid))
     {
-        <li>@Html.ActionLink("Датчики без привязки", "NotAssigned", "Point")</li>
+        <li>@Html.ActionLink("Датчики без привязки", "NotAssigned", "Dashboard")</li>
     }
     <li class="apply-button hidden"><a href="javascript:void(0)">ПРИМЕНИТЬ</a></li>
     <li><a>@Html.MenuElementCheckbox(PointGroup.RootGuid, null)Все объекты</a></li>
