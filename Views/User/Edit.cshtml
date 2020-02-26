@@ -72,14 +72,16 @@
                             <div class="form-group @Html.ValidState("NewPassword")">
                                 <label for="Password" class="col-sm-3 control-label">Новый пароль</label>
                                 <div class="col-sm-9">
-                                    @Html.TextBoxFor(m => m.NewPassword, new { @class = "form-control" })
+                                    @Html.PasswordFor(m => m.NewPassword, new { @class = "form-control" })
+                                    <span data-for="NewPassword" class="glyphicon glyphicon-eye-open form-control-feedback toggle-password-icon"></span>
                                     @Html.ValidationMessageFor(m => m.NewPassword, null, new { @class = "help-block" })
                                 </div>
                             </div>
                             <div class="form-group @Html.ValidState("NewPasswordConfirm")">
                                 <label for="NewPasswordConfirm" class="col-sm-3 control-label">Подтверждение пароля</label>
                                 <div class="col-sm-9">
-                                    @Html.TextBoxFor(m => m.NewPasswordConfirm, new { @class = "form-control" })
+                                    @Html.PasswordFor(m => m.NewPasswordConfirm, new { @class = "form-control" })
+                                    <span data-for="NewPasswordConfirm" class="glyphicon glyphicon-eye-open form-control-feedback toggle-password-icon"></span>
                                     @Html.ValidationMessageFor(m => m.NewPasswordConfirm, null, new { @class = "help-block" })
                                 </div>
                             </div>
@@ -113,5 +115,7 @@
             $('#remove-user-form').submit();
         }).show();
     });
+
+    new TogglePasswordButton('.toggle-password-icon');
 </script>
 @Html.ViewModelWindow()

@@ -18,7 +18,7 @@ input[type="text"], select, textarea, input[type="password"] {
     border-radius: 0;
 }
 
-/*login*/
+/*toggle-password*/
 
 .login-box-body .form-control-feedback, .form-control-feedback {
     color: #446;
@@ -29,6 +29,13 @@ input[type="text"], select, textarea, input[type="password"] {
     cursor: pointer;
 }
 
+.form-group .toggle-password-icon {
+    right: 15px;
+}
+
+.form-group.has-feedback .toggle-password-icon {
+    right: 0;
+}
 /**/
 .badge {
     font-weight: normal;
