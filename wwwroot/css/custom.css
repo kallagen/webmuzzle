@@ -159,12 +159,17 @@ span.form-control {
 .bl2 {
     float: left;
     width: 80px;
+    border: 2px solid #3C8DBC;
+}
+
+.t-warning .bl2 {
+    border-color: #F49200;
 }
 
     .bl2 > div {
         position: relative;
         background: #A2E9F9;
-        height: 120px;
+        height: 116px;
     }
 
         .bl2 > div > div {
