@@ -108,6 +108,19 @@ span.form-control {
         font-size: 11px;
     }
 
+    .t-cell .tank-header-icon {
+        font-size: 15px;
+        vertical-align: bottom;
+        display: none;
+    }
+
+    .t-cell .tank-neytral-icon {
+        font-size: 15px;
+        vertical-align: bottom;
+        line-height: 15px;
+        color: rgb(51, 51, 51);
+    }
+
 .t-error h5::after {
     color: #DD4B39;
 }
@@ -134,7 +147,8 @@ span.form-control {
 }
 
 .t-cell h5 span {
-    display: block;
+    display: inline-block;
+    margin-right: 8px;
 }
 
 .t-cell h6 span {
@@ -342,3 +356,5 @@ i.menu-point {
 .has-error .firstname-validation-block, .has-error .lastname-validation-block, .has-error .patronymic-validation-block {
     display: inline-block;
 }
+
+/**/

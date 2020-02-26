@@ -7,6 +7,7 @@ namespace TSensor.Web.Models.Entity
     {
         public string PointName { get; set; }
         public string TankName { get; set; }
+        public string ProductName { get; set; }
         public bool DualMode { get; set; }
         public string MainDeviceGuid { get; set; }
         public string MainIZKId { get; set; }

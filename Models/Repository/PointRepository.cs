@@ -108,13 +108,13 @@ namespace TSensor.Web.Models.Repository
 						(t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial) OR
 						(t.SecondDeviceGuid = asv.DeviceGuid AND t.SecondIZKId = asv.izkNumber AND t.SecondSensorId = asv.sensorSerial AND t.DualMode = 1)) AND
 						InsertDate >= DATEADD(HOUR, -1, GETDATE())");
-        }
+		}
 
-        public IEnumerable<TankSensorValue> GetSensorActualState(IEnumerable<Guid> tankGuidList)
+		public IEnumerable<TankSensorValue> GetSensorActualState(IEnumerable<Guid> tankGuidList)
         {
             return Query<TankSensorValue>(@"
 				SELECT
-					p.Name AS PointName, t.Name AS TankName, t.DualMode AS DualMode,
+					p.Name AS PointName, t.Name AS TankName, t.DualMode AS DualMode, pr.Name AS ProductName,
 					t.MainDeviceGuid, t.MainIZKId, t.MainSensorId,
 					t.SecondDeviceGuid, t.SecondIZKId, t.SecondSensorId,
 					m.InsertDate AS MainSensorInsertDate, s.InsertDate AS SecondSensorInsertDate,
@@ -132,6 +132,7 @@ namespace TSensor.Web.Models.Repository
 					ISNULL(s.t6, m.t6) AS T6
 				FROM Point p
 					JOIN Tank t ON p.PointGuid = t.PointGuid
+					LEFT JOIN Product pr ON t.ProductGuid = pr.ProductGuid
 					LEFT JOIN ActualSensorValue m ON t.MainDeviceGuid = m.DeviceGuid AND t.MainIZKId = m.izkNumber AND t.MainSensorId = m.sensorSerial
 					LEFT JOIN ActualSensorValue s ON t.DualMode = 1 AND t.SecondDeviceGuid = s.DeviceGuid AND t.SecondIZKId = s.izkNumber AND t.SecondSensorId = s.sensorSerial
 				WHERE
