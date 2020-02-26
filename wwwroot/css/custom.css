@@ -2,7 +2,7 @@
     font-family: 'Gilroy';
 }
 
-input[type="text"], select, textarea {
+input[type="text"], select, textarea, input[type="password"] {
     text-transform: uppercase;
 }
 
@@ -18,10 +18,18 @@ input[type="text"], select, textarea {
     border-radius: 0;
 }
 
-/*.logo-lg {
-    font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
-}*/
+/*login*/
 
+.login-box-body .form-control-feedback, .form-control-feedback {
+    color: #446;
+}
+
+.toggle-password-icon {
+    pointer-events: all;
+    cursor: pointer;
+}
+
+/**/
 .badge {
     font-weight: normal;
 }

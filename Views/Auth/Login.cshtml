@@ -15,6 +15,9 @@
     <link rel="stylesheet" href="~/lib/adminlte/dist/css/skins/skin-blue.min.css" />
     <link rel="stylesheet" href="~/css/fonts/stylesheet.css" />
     <link rel="stylesheet" href="~/css/custom.css" />
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/main.js"></script>
 </head>
 <body class="hold-transition login-page">
     @using (Html.BeginForm("Login", "Auth", FormMethod.Post, new { @id = "auth-form", autocomplete = "off" }))
@@ -36,7 +39,7 @@
                 </div>
                 <div class="form-group has-feedback">
                     @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Пароль" })
-                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                    <span data-for="Password" class="glyphicon glyphicon-eye-open form-control-feedback toggle-password-icon"></span>
                 </div>
                 <div class="text-center">
                     <div class="row">
@@ -56,6 +59,8 @@
         });
 
         document.querySelector('#@(Model?.IsError == true ? "Password" : "Login")').focus();
+
+        new TogglePasswordButton('.toggle-password-icon');
     </script>
 </body>
 </html> 
