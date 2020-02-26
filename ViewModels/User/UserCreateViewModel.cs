@@ -9,7 +9,8 @@ namespace TSensor.Web.ViewModels.User
     {
         [Required(ErrorMessage = "Укажите логин")]
         [StringLength(32, ErrorMessage = "Слишком длинный логин")]
-        public string Login { get; set; }
+        [RegularExpression("[A-Z0-9]+", ErrorMessage = "Логин может состоять только из латиницы и цифр")]
+        public string Login { get; set; }        
         [Required(ErrorMessage = "Укажите имя")]
         [StringLength(32, ErrorMessage = "Слишком длинное имя")]
         public string FirstName { get; set; }
