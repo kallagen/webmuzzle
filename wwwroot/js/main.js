@@ -142,3 +142,30 @@ function notAssignedSensorUpdate(data) {
         }
     }
 }
+
+var TogglePasswordButton = function (selector) {
+    var that = this;
+
+    that.el = $(selector);
+    that.parentName = that.el.data('for');
+    that.parent = $('input[name="' + that.parentName + '"]');
+
+    that.state = 'hidden';
+
+    that.click = function () {
+        if (that.state === 'hidden') {
+            that.parent.prop('type', 'text');
+            that.state = 'visible';
+        } else {
+            that.parent.attr('type', 'password');
+            that.state = 'hidden';
+        }
+
+        that.el.toggleClass('glyphicon glyphicon-eye-open');
+        that.el.toggleClass('glyphicon glyphicon-eye-close');
+    };
+
+    that.el.click(that.click);
+
+    return that;
+};
