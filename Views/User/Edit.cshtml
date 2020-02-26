@@ -76,6 +76,13 @@
                                     @Html.ValidationMessageFor(m => m.NewPassword, null, new { @class = "help-block" })
                                 </div>
                             </div>
+                            <div class="form-group @Html.ValidState("NewPasswordConfirm")">
+                                <label for="NewPasswordConfirm" class="col-sm-3 control-label">Подтверждение пароля</label>
+                                <div class="col-sm-9">
+                                    @Html.TextBoxFor(m => m.NewPasswordConfirm, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.NewPasswordConfirm, null, new { @class = "help-block" })
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

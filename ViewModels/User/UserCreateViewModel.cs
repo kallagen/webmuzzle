@@ -22,6 +22,9 @@ namespace TSensor.Web.ViewModels.User
         [Required(ErrorMessage = "Укажите пароль")]
         [StringLength(32, ErrorMessage = "Слишком длинный пароль")]
         public string Password { get; set; }
+        [Required(ErrorMessage = "Укажите пароль еще раз")]
+        [StringLength(32, ErrorMessage = "Слишком длинный пароль")]
+        public string PasswordConfirm { get; set; }
         public string Role { get; set; }
         public string Description { get; set; }
 
@@ -33,6 +36,10 @@ namespace TSensor.Web.ViewModels.User
             if (!AuthService.Roles.HasRole(Role))
             {
                 modelState?.AddModelError("Role", "Укажите группу");
+            }
+            if (Password != PasswordConfirm)
+            {
+                modelState?.AddModelError("PasswordConfirm", "Пароль и подтверждение не совпадают");
             }
         }
     }

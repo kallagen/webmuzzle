@@ -21,6 +21,8 @@ namespace TSensor.Web.ViewModels.User
         public bool SetNewPassword { get; set; }
         [StringLength(32, ErrorMessage = "Слишком длинный пароль")]
         public string NewPassword { get; set; }
+        [StringLength(32, ErrorMessage = "Слишком длинный пароль")]
+        public string NewPasswordConfirm { get; set; }
         public string Role { get; set; }
         public string Description { get; set; }
         public bool IsInactive { get; set; }
@@ -30,13 +32,21 @@ namespace TSensor.Web.ViewModels.User
 
         public void Validate(ModelStateDictionary modelState)
         {
+            if (!AuthService.Roles.HasRole(Role))
+            {
+                modelState?.AddModelError("Role", "Укажите группу");
+            }
             if (SetNewPassword && string.IsNullOrWhiteSpace(NewPassword))
             {
                 modelState?.AddModelError("NewPassword", "Укажите новый пароль");
             }
-            if (!AuthService.Roles.HasRole(Role))
+            if (SetNewPassword && string.IsNullOrWhiteSpace(NewPasswordConfirm))
             {
-                modelState?.AddModelError("Role", "Укажите группу");
+                modelState?.AddModelError("NewPasswordConfirm", "Укажите новый пароль еще раз");
+            }
+            if (SetNewPassword && NewPassword != NewPasswordConfirm)
+            {
+                modelState?.AddModelError("NewPasswordConfirm", "Пароль и подтверждение не совпадают");
             }
         }
     }
