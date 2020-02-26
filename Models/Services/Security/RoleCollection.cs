@@ -7,12 +7,12 @@ namespace TSensor.Web.Models.Services.Security
     {
         private readonly Dictionary<string, string> roles = new Dictionary<string, string>
         {
-            { Admin, "Администратор" },
-            { Operator, "Оператор" }
+            { Admin, "АДМИНИСТРАТОР" },
+            { Operator, "ОПЕРАТОР" }
         };
 
-        public const string Admin = "admin";
-        public const string Operator = "operator";
+        public const string Admin = "ADMIN";
+        public const string Operator = "OPERATOR";
 
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
