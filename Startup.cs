@@ -8,6 +8,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using System.IO;
 using TSensor.Web.Models.Broadcast;
+using TSensor.Web.Models.Middleware;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Services.Log;
 using TSensor.Web.Models.Services.Security;
@@ -81,6 +82,8 @@ namespace TSensor.Web
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseMiddleware<RequestModifyMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
