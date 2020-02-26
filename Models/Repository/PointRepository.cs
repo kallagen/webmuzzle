@@ -27,7 +27,8 @@ namespace TSensor.Web.Models.Repository
 			if (point != null)
 			{
 				var userList = Query<dynamic>($@"
-                    SELECT u.UserGuid, u.Name, u.Login, u.Description, upr.PointGuid
+                    SELECT u.UserGuid, u.FirstName, u.LastName, u.Patronymic,
+						u.Login, u.Description, upr.PointGuid
                     FROM [User] u 
                         LEFT JOIN UserPointRights upr ON 
                             upr.UserGuid = u.UserGuid AND upr.PointGuid = @pointGuid
@@ -35,11 +36,9 @@ namespace TSensor.Web.Models.Repository
 					new { pointGuid });
 
 				point.UserList = userList.Where(p => p.PointGuid != null)
-					.Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login, 
-						Description = p.Description });
+					.Select(p => User.From(p) as User);
 				point.AvailableUserList = userList.Where(p => p.PointGuid == null)
-					.Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login,
-						Description = p.Description });
+					.Select(p => User.From(p) as User);
 			}
 
 			return point;

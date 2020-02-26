@@ -16,5 +16,18 @@ namespace TSensor.Web.Models.Entity
 
         public IEnumerable<User> UserList { get; set; }
         public IEnumerable<User> AvailableUserList { get; set; }
+
+        public static Point From(dynamic entity)
+        {
+            return new Point
+            {
+                PointGuid = entity.PointGuid,
+                Name = entity.Name,
+                Address = entity.Address,
+                Phone = entity.Phone,
+                Email = entity.Email,
+                Description = entity.Description
+            };
+        }
     }
 }

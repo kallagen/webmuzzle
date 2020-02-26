@@ -34,14 +34,13 @@ namespace TSensor.Web.Models.Repository
                             pgp.PointGroupGuid = @pointGroupGuid", new { pointGroupGuid });
 
                 group.PointList = pointList.Where(p => p.PointGroupGuid != null)
-                    .Select(p => new Point { PointGuid = p.PointGuid, Name = p.Name, 
-                        Address = p.Address, Phone = p.Phone, Email = p.Email, Description = p.Description });
+                    .Select(p => Point.From(p) as Point);
                 group.AvailablePointList = pointList.Where(p => p.PointGroupGuid == null)
-                    .Select(p => new Point { PointGuid = p.PointGuid, Name = p.Name,
-                        Address = p.Address, Phone = p.Phone, Email = p.Email, Description = p.Description });
+                    .Select(p => Point.From(p) as Point);
 
                 var userList = Query<dynamic>($@"
-                    SELECT u.UserGuid, u.Name, u.Login, u.Description, upgr.PointGroupGuid
+                    SELECT u.UserGuid, u.FirstName, u.LastName, u.Patronymic,
+                        u.Login, u.Description, upgr.PointGroupGuid
                     FROM [User] u 
                         LEFT JOIN UserPointGroupRights upgr ON 
                             upgr.UserGuid = u.UserGuid AND upgr.PointGroupGuid = @pointGroupGuid
@@ -49,11 +48,9 @@ namespace TSensor.Web.Models.Repository
                     new { pointGroupGuid });
 
                 group.UserList = userList.Where(p => p.PointGroupGuid != null)
-                    .Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login, 
-                        Description = p.Description });
+                    .Select(p => User.From(p) as User);
                 group.AvailableUserList = userList.Where(p => p.PointGroupGuid == null)
-                    .Select(p => new User { UserGuid = p.UserGuid, Name = p.Name, Login = p.Login,
-                        Description = p.Description });
+                    .Select(p => User.From(p) as User);
             }
 
             return group;
