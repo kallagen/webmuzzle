@@ -32,7 +32,7 @@ namespace TSensor.Web.ViewComponents
         {
             var pointStructure = GetPointGroupStructure();
 
-            if (HttpContext.User.IsInRole("admin"))
+            if (HttpContext.User.IsInRole("ADMIN"))
             {
                 var notAssignedPointInfo = _pointRepository.GetNotAssignedSensorState();
                 if (notAssignedPointInfo.Any())

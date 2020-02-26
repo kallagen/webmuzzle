@@ -55,7 +55,7 @@
                     <li class="header">ИЗМЕРЕНИЯ ПО СИСТЕМЕ</li>
                     @await Component.InvokeAsync("FavoriteMenu")
                     @await Component.InvokeAsync("PointGroupMenu")
-                    @if (User.IsInRole("admin"))
+                    @if (User.IsInRole("ADMIN"))
                     {
                         <li class="header">НАСТРОЙКИ</li>
                         <li><a href="@Url.Action("List", "Point")">Объекты и резервуары</a></li>
