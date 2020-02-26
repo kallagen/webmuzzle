@@ -2,6 +2,10 @@
     font-family: 'Gilroy';
 }
 
+input[type="text"], select {
+    text-transform: uppercase;
+}
+
 .content-wrapper.no-footer {
     min-height: calc(100vh - 50px);
 }
