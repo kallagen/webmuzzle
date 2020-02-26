@@ -21,11 +21,25 @@
                         <label for="Login" class="col-sm-3 control-label">Логин</label>
                         <div class="col-sm-9"><span class="form-control">@Model.Login</span></div>
                     </div>
-                    <div class="form-group @Html.ValidState("Name")">
-                        <label for="Name" class="col-sm-3 control-label">Имя</label>
-                        <div class="col-sm-9">
-                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
-                            @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
+                    <div class="form-group">
+                        <span class="@Html.ValidState("FirstName")"><label for="FirstName" class="col-sm-3 control-label">Имя</label></span>
+                        <div class="col-sm-9 inline-form-container">
+                            <span class="@Html.ValidState("FirstName")">
+                                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control input-inline" })
+                            </span>
+                            <span class="@Html.ValidState("LastName")">
+                                <label for="LastName" class="control-label">Фамилия</label>
+                                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control input-inline" })
+                            </span>
+                            <span class="@Html.ValidState("Patronymic")">
+                                <label for="Patronymic" class="control-label">Отчество</label>
+                                @Html.TextBoxFor(m => m.Patronymic, new { @class = "form-control input-inline" })
+                            </span>
+                            <div class="@Html.ValidState("FirstName") @Html.ValidState("LastName") @Html.ValidState("Patronymic")">
+                                <span class="firstname-validation-block @Html.ValidState("FirstName")">@Html.ValidationMessageFor(m => m.FirstName, null, new { @class = "help-block" })</span>
+                                <span class="lastname-validation-block @Html.ValidState("LastName")">@Html.ValidationMessageFor(m => m.LastName, null, new { @class = "help-block" })</span>
+                                <span class="patronymic-validation-block @Html.ValidState("Patronymic")">@Html.ValidationMessageFor(m => m.Patronymic, null, new { @class = "help-block" })</span>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group @Html.ValidState("Role")">
@@ -78,7 +92,7 @@
     @Html.HiddenFor(m => m.UserGuid)
 }
 <script>
-    document.querySelector('#Name').focus();
+    document.querySelector('#FirstName').focus();
 
     var setNewPasswordInput = $('#SetNewPassword');
     $('#new-password-accordion').on('hide.bs.collapse', function () {

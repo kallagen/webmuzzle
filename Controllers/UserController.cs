@@ -79,7 +79,9 @@ namespace TSensor.Web.Controllers
             }
 
             viewModel.Login = viewModel.Login?.Trim();
-            viewModel.Name = viewModel.Name?.Trim();
+            viewModel.FirstName = viewModel.FirstName?.Trim();
+            viewModel.LastName = viewModel.LastName?.Trim();
+            viewModel.Patronymic = viewModel.Patronymic?.Trim();
 
             viewModel.Validate(ModelState);
             if (_repository.GetByLogin(viewModel.Login) != null)
@@ -89,7 +91,8 @@ namespace TSensor.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var userGuid = _repository.Create(viewModel.Login, viewModel.Name,
+                var userGuid = _repository.Create(viewModel.Login, 
+                    viewModel.FirstName, viewModel.LastName, viewModel.Patronymic,
                     _authService.EncryptPassword(viewModel.Password), viewModel.Role,
                     viewModel.Description);
 
@@ -123,7 +126,9 @@ namespace TSensor.Web.Controllers
                     {
                         UserGuid = user.UserGuid,
                         Login = user.Login,
-                        Name = user.Name,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Patronymic = user.Patronymic,
                         Role = user.Role,
                         IsInactive = user.IsInactive,
                         Description = user.Description
@@ -149,7 +154,9 @@ namespace TSensor.Web.Controllers
                 return RedirectToAction("Search", "User");
             }
 
-            viewModel.Name = viewModel.Name?.Trim();
+            viewModel.FirstName = viewModel.FirstName?.Trim();
+            viewModel.LastName = viewModel.LastName?.Trim();
+            viewModel.Patronymic = viewModel.Patronymic?.Trim();
 
             viewModel.Validate(ModelState);
             var userByLogin = _repository.GetByLogin(viewModel.Login);
@@ -160,7 +167,8 @@ namespace TSensor.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var editResult = _repository.Edit(viewModel.UserGuid, viewModel.Name,
+                var editResult = _repository.Edit(viewModel.UserGuid, 
+                    viewModel.FirstName, viewModel.LastName, viewModel.Patronymic,
                     viewModel.Role, viewModel.IsInactive, viewModel.Description);
 
                 var changePasswordResult = true;

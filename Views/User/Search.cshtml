@@ -44,30 +44,34 @@
                                 {
                                     <th></th>
                                 }
-                                <th class="text-center">Логин</th>
-                                <th class="text-center">Имя</th>
-                                <th class="text-center">Группа</th>
-                                <th class="text-center">Примечание</th>
+                                <th>Логин</th>
+                                <th>Имя</th>
+                                <th>Фамилия</th>
+                                <th>Отчество</th>
+                                <th>Группа</th>
+                                <th>Примечание</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model.Data.OrderBy(p => p.Name))
                             {
-                                <tr @if (item.IsInactive) { <text> class="text-muted" </text> }>
-                                    @if (Model.HasInactiveRecord)
-                                    {
-                                        <td>
-                                            @if (item.IsInactive)
-                                            {
-                                                <span class="badge">заблокирован</span>
-                                            }
-                                        </td>
-                                    }
-                                    <td>@Html.ActionLink(item.Login, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
-                                    <td>@Html.ActionLink(item.Name ?? string.Empty, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
-                                    <td>@Model.GetRoleName(item.Role)</td>
-                                    <td>@item.Description</td>
-                                </tr>
+                            <tr @if (item.IsInactive) { <text> class="text-muted" </text> }>
+                                @if (Model.HasInactiveRecord)
+                                {
+                                    <td>
+                                        @if (item.IsInactive)
+                                        {
+                                            <span class="badge">заблокирован</span>
+                                        }
+                                    </td>
+                                }
+                                <td>@Html.ActionLink(item.Login, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                <td>@Html.ActionLink(item.FirstName, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                <td>@Html.ActionLink(item.LastName, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                <td>@Html.ActionLink(item.Patronymic ?? string.Empty, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                <td>@Model.GetRoleName(item.Role)</td>
+                                <td>@item.Description</td>
+                            </tr>
                             }
                         </tbody>
                     </table>

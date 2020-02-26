@@ -11,7 +11,7 @@ namespace TSensor.Web.Models.Repository
         public User Auth(string login, string password)
         {
             return QueryFirst<User>(@"
-                SELECT TOP 1 UserGuid, Login, Name, Role
+                SELECT TOP 1 UserGuid, Login, FirstName, LastName, Patronymic, Role
                 FROM [User] 
                 WHERE [Login] = @login AND [Password] = @password AND IsInactive = 0",
                 new { login, password });
@@ -22,10 +22,14 @@ namespace TSensor.Web.Models.Repository
             search = string.IsNullOrWhiteSpace(search) ? null : $"%{search}%";
 
             return Query<User>(@"
-                SELECT UserGuid, [Login], [Name], Role, IsInactive, Description
+                SELECT UserGuid, [Login], FirstName, LastName, Patronymic, Role, IsInactive, Description
                 FROM [User]
                 WHERE 
-                    (@search IS NULL OR [Login] LIKE @search OR [Name] LIKE @search) AND
+                    (@search IS NULL OR 
+                        [Login] LIKE @search OR 
+                        FirstName LIKE @search OR 
+                        LastName LIKE @search OR
+                        Patronymic LIKE @search) AND
                     (@role IS NULL OR Role = @role)
                 ORDER BY [Login]",
                 new { search, role });
@@ -40,37 +44,41 @@ namespace TSensor.Web.Models.Repository
                 new { login });
         }
 
-        public Guid? Create(string login, string name, string password, string role, string description)
+        public Guid? Create(string login, string firstName, string lastName, string patronymic,
+            string password, string role, string description)
         {
             return QueryFirst<Guid?>(@"
                 DECLARE @guid UNIQUEIDENTIFIER = NEWID()
 
-                INSERT [User](UserGuid, [Login], [Name], Password, Role, Description)
-                VALUES(@guid, @login, @name, @password, @role, @description)
+                INSERT [User](UserGuid, [Login], FirstName, LastName, Patronymic, Password, Role, Description)
+                VALUES(@guid, @login, @firstName, @lastName, @patronymic, @password, @role, @description)
 
                 SELECT UserGuid FROM [User] WHERE UserGuid = @guid",
-                new { name, login, password, role, description });
+                new { login, firstName, lastName, patronymic, password, role, description });
         }
 
         public User GetByGuid(Guid userGuid)
         {
             return QueryFirst<User>(@"
-                SELECT UserGuid, [Login], [Name], Role, IsInactive, Description
+                SELECT UserGuid, [Login], FirstName, LastName, Patronymic, Role, IsInactive, Description
                 FROM [User] WHERE UserGuid = @userGuid", new { userGuid });
         }
 
-        public bool Edit(Guid userGuid, string name, string role, bool isInactive, string description)
+        public bool Edit(Guid userGuid, string firstName, string lastName, string patronymic,
+            string role, bool isInactive, string description)
         {
             return QueryFirst<int?>(@"
                 UPDATE [User] SET 
-                    [Name] = @name,
+                    FirstName = @firstName, 
+                    LastName = @lastName, 
+                    Patronymic = @patronymic,
                     Role = @role,
                     IsInactive = @isInactive,
                     Description = @description
                 WHERE UserGuid = @userGuid
 
                 SELECT @@ROWCOUNT",
-                new { userGuid, name, role, isInactive, description }) == 1;
+                new { userGuid, firstName, lastName, patronymic, role, isInactive, description }) == 1;
         }
 
         public bool ChangePassword(Guid userGuid, string password)

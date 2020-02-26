@@ -2,7 +2,7 @@
     font-family: 'Gilroy';
 }
 
-input[type="text"], select {
+input[type="text"], select, textarea {
     text-transform: uppercase;
 }
 
@@ -101,12 +101,12 @@ span.form-control {
         margin-bottom: 4px;
     }
 
-.t-cell i {
-    padding-left: 8px;
-    line-height: 15px;
-    color: #3C8DBC;
-    font-size: 11px;
-}
+    .t-cell i {
+        padding-left: 8px;
+        line-height: 15px;
+        color: #3C8DBC;
+        font-size: 11px;
+    }
 
 .t-error h5::after {
     color: #DD4B39;
@@ -293,4 +293,47 @@ i.menu-point {
 
 .favorite-container > li > a {
     line-height: 23px;
+}
+
+/*inline user edit style*/
+
+.inline-form-container label {
+    margin-left: 16px;
+    margin-right: 16px;
+}
+
+.inline-form-container input {
+    display: inline-block;
+    width: 200px;
+}
+
+.has-error .control-label {
+    color: #dd4b39;
+}
+
+.has-error .help-block {
+    color: #dd4b39;
+}
+
+.has-error .form-control, .has-error .form-control:active {
+    border-color: #dd4b39 !important;
+    box-shadow: none !important;
+}
+
+.firstname-validation-block, .lastname-validation-block, .patronymic-validation-block {
+    width: 295px;
+    display: none;
+}
+
+.lastname-validation-block {
+    width: 298px;
+}
+
+    .firstname-validation-block .help-block, .lastname-validation-block .help-block, .patronymic-validation-block .help-block {
+        display: inline-block;
+    }
+
+
+.has-error .firstname-validation-block, .has-error .lastname-validation-block, .has-error .patronymic-validation-block {
+    display: inline-block;
 }
