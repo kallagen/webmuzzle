@@ -26,15 +26,18 @@ namespace TSensor.Web.Models.Middleware
                     var content = await reader.ReadToEndAsync();
                     var query = QueryHelpers.ParseNullableQuery(content);
 
-                    var modifiedQuery = new QueryBuilder();
-                    foreach (var item in query.SelectMany(p => p.Value, (k, v) => new { key = k.Key, value = v }))
+                    if (query != null)
                     {
-                        modifiedQuery.Add(item.key,
-                            item.key == "__RequestVerificationToken" ? item.value : item.value.ToUpperInvariant());
-                    }
+                        var modifiedQuery = new QueryBuilder();
+                        foreach (var item in query.SelectMany(p => p.Value, (k, v) => new { key = k.Key, value = v }))
+                        {
+                            modifiedQuery.Add(item.key,
+                                item.key == "__RequestVerificationToken" ? item.value : item.value.ToUpperInvariant());
+                        }
 
-                    var modifiedContent = new StringContent(modifiedQuery.ToQueryString().ToString().Substring(1));
-                    context.Request.Body = await modifiedContent.ReadAsStreamAsync();
+                        var modifiedContent = new StringContent(modifiedQuery.ToQueryString().ToString().Substring(1));
+                        context.Request.Body = await modifiedContent.ReadAsStreamAsync();
+                    }
                 }
             }
 
