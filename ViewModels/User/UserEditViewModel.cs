@@ -28,7 +28,7 @@ namespace TSensor.Web.ViewModels.User
         public bool IsInactive { get; set; }
 
         public string Name =>
-            string.Join(" ", new[] { FirstName, LastName, Patronymic }.Where(p => !string.IsNullOrWhiteSpace(p)));
+            string.Join(" ", new[] { LastName, FirstName, Patronymic }.Where(p => !string.IsNullOrWhiteSpace(p)));
 
         public void Validate(ModelStateDictionary modelState)
         {

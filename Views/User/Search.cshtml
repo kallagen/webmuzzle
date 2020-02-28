@@ -45,8 +45,8 @@
                                     <th></th>
                                 }
                                 <th>Логин</th>
-                                <th>Имя</th>
                                 <th>Фамилия</th>
+                                <th>Имя</th>                                
                                 <th>Отчество</th>
                                 <th>Группа</th>
                                 <th>Примечание</th>
@@ -66,8 +66,8 @@
                                     </td>
                                 }
                                 <td>@Html.ActionLink(item.Login, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
-                                <td>@Html.ActionLink(item.FirstName, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
                                 <td>@Html.ActionLink(item.LastName, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                <td>@Html.ActionLink(item.FirstName, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
                                 <td>@Html.ActionLink(item.Patronymic ?? string.Empty, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
                                 <td>@Model.GetRoleName(item.Role)</td>
                                 <td>@item.Description</td>

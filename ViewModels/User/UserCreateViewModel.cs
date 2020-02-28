@@ -29,7 +29,7 @@ namespace TSensor.Web.ViewModels.User
         public string Description { get; set; }
 
         public string Name =>
-            string.Join(" ", new[] { FirstName, LastName, Patronymic }.Where(p => !string.IsNullOrWhiteSpace(p)));
+            string.Join(" ", new[] { LastName, FirstName, Patronymic }.Where(p => !string.IsNullOrWhiteSpace(p)));
 
         public void Validate(ModelStateDictionary modelState)
         {

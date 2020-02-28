@@ -376,12 +376,12 @@ i.menu-point {
 }
 
 .firstname-validation-block, .lastname-validation-block, .patronymic-validation-block {
-    width: 295px;
+    width: 303px;
     display: none;
 }
 
 .lastname-validation-block {
-    width: 298px;
+    width: 261px;
 }
 
     .firstname-validation-block .help-block, .lastname-validation-block .help-block, .patronymic-validation-block .help-block {
