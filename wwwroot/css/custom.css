@@ -101,7 +101,7 @@ span.form-control {
 /*sensor card*/
 .t-cell {
     float: left;
-    width: 300px;
+    width: 310px;
     padding: 0 15px;
 }
 
@@ -220,9 +220,9 @@ span.form-control {
 .bl3 {
     float: left;
     vertical-align: top;
-    padding-left: 8px;
+    padding-left: 4px;
     padding-top: 5px;
-    width: 190px;
+    width: 200px;
 }
 
 .t-error .bl2, .t-error .bl3 {
@@ -247,8 +247,29 @@ span.form-control {
 
 .t-cell .t-label {
     display: inline-block;
-    width: 96px;
+    width: 120px;
+    background-repeat: no-repeat;
+    padding-left: 26px;
+    background-position: 0 0;
+    background-size: auto 100%;
 }
+
+.t-cell .t-img-weight {
+    background-image: url('../img/weight.png');
+}
+.t-cell .t-img-volume {
+    background-image: url('../img/volume.png');
+}
+.t-cell .t-img-temperature {
+    background-image: url('../img/temperature.png');
+}
+.t-cell .t-img-level {
+    background-image: url('../img/level.png');
+}
+.t-cell .t-img-density {
+    background-image: url('../img/density.png');
+}
+
 /*end sensor card*/
 tr .table-remove-cell {
     text-align: right;
