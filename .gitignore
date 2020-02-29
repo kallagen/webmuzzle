@@ -15,3 +15,8 @@
 /TSensor.FillValues/packages/EPPlus.4.5.3.3
 /TSensor.FillValues/obj/Debug
 /TSensor.FillValues/bin/Debug
+/TSensor.Web/bin
+/TSensor.Web/node_modules
+/TSensor.Web/obj
+/TSensor.Web/log
+/TSensor.Web/.config
