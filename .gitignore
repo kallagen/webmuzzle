@@ -11,3 +11,7 @@
 /log/exception
 /log/inputerror
 /log/rawinput
+/packages/EPPlus.4.5.3.3
+/TSensor.FillValues/packages/EPPlus.4.5.3.3
+/TSensor.FillValues/obj/Debug
+/TSensor.FillValues/bin/Debug
