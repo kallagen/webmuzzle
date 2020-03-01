@@ -22,3 +22,4 @@
 /TSensor.Web/.config
 /.vs/TSensor
 /TSensor.Proxy/obj
+/TSensor.FillValues/obj/Release
