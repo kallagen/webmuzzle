@@ -18,6 +18,16 @@ input[type="text"], select, textarea, input[type="password"] {
     border-radius: 0;
 }
 
+.main-header .logo {
+    padding: 0;
+}
+
+.logo-lg {
+    display: block;
+    height: 50px;
+    background: #ECF0F5 url('../img/logo.png') center center no-repeat;
+}
+
 /*toggle-password*/
 
 .login-box-body .form-control-feedback, .form-control-feedback {
