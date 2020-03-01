@@ -15,6 +15,9 @@ namespace TSensor.Web.Models.Entity
         public string SecondDeviceGuid { get; set; }
         public string SecondIZKId { get; set; }
         public string SecondSensorId { get; set; }
+        public decimal? WeightChangeDelta { get; set; }
+        public int? WeightChangeTimeout { get; set; }
+
         public DateTime? MainSensorInsertDate { get; set; }
         public DateTime? SecondSensorInsertDate { get; set; }
 

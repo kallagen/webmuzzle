@@ -54,14 +54,20 @@
                     guid = t.MainSensorGuid,
                     updateDate = t.MainSensorInsertDate,
                     warningDate = t.MainSensorWarningDateTicks,
-                    isSecond = 0
+                    isSecond = 0,
+                    weightDelta = t.WeightChangeDelta ?? 0,
+                    weightTimeout = t.WeightChangeTimeout ?? 0,
+                    weight = t.LiquidEnvironmentLevel
                 },
                 new
                 {
                     guid = t.SecondSensorGuid,
                     updateDate = t.SecondSensorInsertDate,
                     warningDate = t.SecondSensorWarningDateTicks,
-                    isSecond = 1
+                    isSecond = 1,
+                    weightDelta = t.WeightChangeDelta ?? 0,
+                    weightTimeout = t.WeightChangeTimeout ?? 0,
+                    weight = t.LiquidEnvironmentLevel
                 }
             };
         }
@@ -74,7 +80,10 @@
                     guid = t.MainSensorGuid,
                     updateDate = t.MainSensorInsertDate,
                     warningDate = t.MainSensorWarningDateTicks,
-                    isSecond = 0
+                    isSecond = 0,
+                    weightDelta = t.WeightChangeDelta ?? 0,
+                    weightTimeout = t.WeightChangeTimeout ?? 0,
+                    weight = t.LiquidEnvironmentLevel
                 }
             };
         }

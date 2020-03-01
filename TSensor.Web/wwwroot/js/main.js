@@ -82,6 +82,26 @@ function sensorUpdate(data, date) {
                 container.find('.t-liquidDensity').html(val.liquidDensity);
                 container.find('.t-avgT').html(val.avgT);
                 container.find('.t-environmentLevel').html(val.environmentLevel);
+
+                if (val.liquidEnvironmentLevel > sensor.weight + sensor.weightDelta ||
+                    val.liquidEnvironmentLevel < sensor.weight - sensor.weightDelta) {
+
+                    if (val.liquidEnvironmentLevel > sensor.weight + sensor.weightDelta) {
+                        container.find('.t-weightdown').addClass('hidden');
+                        container.find('.t-weightup').removeClass('hidden');
+                    }
+                    if (val.liquidEnvironmentLevel < sensor.weight - sensor.weightDelta) {
+                        container.find('.t-weightdown').removeClass('hidden');
+                        container.find('.t-weightup').addClass('hidden');
+                    }
+
+                    sensor.weight = sensor.liquidEnvironmentLevel;
+                    if (sensor.weightTimeout !== 0) {
+                        sensor.weightExpire = date + sensor.weightTimeout * 1000;
+                    }
+                    sensor.weightChangeExpire = date.
+                    sensor.weightChangeTime = date;
+                }
             }
 
             if (sensor.isSecond === 1) {
@@ -119,6 +139,11 @@ function sensorUpdate(data, date) {
             if (!warningBlock.hasClass('hidden')) {
                 warningBlock.addClass('hidden');
             }
+        }
+
+        if (sensor.weightExpire && sensor.weightExpire < date) {
+            container.find('.t-weightdown').addClass('hidden');
+            container.find('.t-weightup').addClass('hidden');
         }
     });
 }

@@ -117,6 +117,7 @@ namespace TSensor.Web.Models.Repository
 					p.Name AS PointName, t.Name AS TankName, t.DualMode AS DualMode, pr.Name AS ProductName,
 					t.MainDeviceGuid, t.MainIZKId, t.MainSensorId,
 					t.SecondDeviceGuid, t.SecondIZKId, t.SecondSensorId,
+					t.WeightChangeDelta, t.WeightChangeTimeout,
 					m.InsertDate AS MainSensorInsertDate, s.InsertDate AS SecondSensorInsertDate,
 
 					m.environmentLevel AS EnvironmentLevel,

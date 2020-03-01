@@ -111,7 +111,7 @@ span.form-control {
 /*sensor card*/
 .t-cell {
     float: left;
-    width: 310px;
+    width: 320px;
     padding: 0 15px;
 }
 
@@ -232,7 +232,7 @@ span.form-control {
     vertical-align: top;
     padding-left: 4px;
     padding-top: 5px;
-    width: 200px;
+    width: 210px;
 }
 
 .t-error .bl2, .t-error .bl3 {
@@ -278,6 +278,10 @@ span.form-control {
 }
 .t-cell .t-img-density {
     background-image: url('../img/density.png');
+}
+
+.t-cell .t-weightdown, .t-cell .t-weightup {
+    color: #454545 !important;
 }
 
 /*end sensor card*/
