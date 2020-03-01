@@ -81,6 +81,7 @@
                                         <th colspan="3" class="text-center">Основной датчик</th>
                                         <th rowspan="2" class="table-center-header">Использовать<br />дополнительный<br />датчик</th>
                                         <th colspan="3" class="text-center">Дополнительный датчик</th>
+                                        <th colspan="2" class="text-center">Изменения массы</th>
                                         <th rowspan="2" class="table-center-header">Примечание</th>
                                     </tr>
                                     <tr>
@@ -90,6 +91,8 @@
                                         <th>Код устройства</th>
                                         <th>Код ИЗК</th>
                                         <th>Код датчика</th>
+                                        <th>Погрешность,<br />тонн</th>
+                                        <th>Время индикации<br />изменения, секунд</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -105,6 +108,8 @@
                                             <td>@item.SecondDeviceGuid</td>
                                             <td>@item.SecondIZKId</td>
                                             <td>@item.SecondSensorId</td>
+                                            <td>@item.WeightChangeDelta</td>
+                                            <td>@item.WeightChangeTimeout</td>
                                             <td>@item.Description</td>
                                         </tr>
                                     }

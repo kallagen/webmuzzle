@@ -16,5 +16,7 @@ namespace TSensor.Web.Models.Entity
         public string SecondIZKId { get; set; }
         public string SecondSensorId { get; set; }
         public string Description { get; set; }
+        public decimal? WeightChangeDelta { get; set; }
+        public int? WeightChangeTimeout { get; set; }
     }
 }

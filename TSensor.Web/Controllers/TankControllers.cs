@@ -70,14 +70,17 @@ namespace TSensor.Web.Controllers
             viewModel.SecondDeviceGuid = viewModel.SecondDeviceGuid?.Trim();
             viewModel.SecondIZKId = viewModel.SecondIZKId?.ToUpper()?.Trim();
             viewModel.SecondSensorId = viewModel.SecondSensorId?.ToUpper()?.Trim();
+            viewModel.WeightChangeDelta = viewModel.WeightChangeDelta?.Trim();
+            viewModel.WeightChangeTimeout = viewModel.WeightChangeTimeout?.Trim();
 
+            viewModel.Validate(ModelState);
             if (ModelState.IsValid)
             {
                 var tankGuid = _tankRepository.Create(
                     viewModel.PointGuid.Value, viewModel.Name, viewModel.ProductGuid, viewModel.DualMode,
                     viewModel.MainDeviceGuid, viewModel.MainIZKId, viewModel.MainSensorId,
                     viewModel.SecondDeviceGuid, viewModel.SecondIZKId, viewModel.SecondSensorId,
-                    viewModel.Description);
+                    viewModel.Description, viewModel.ParsedWeightChangeDelta, viewModel.ParsedWeightChangeTimeout);
                 if (tankGuid == null)
                 {
                     viewModel.ErrorMessage = Program.GLOBAL_ERROR_MESSAGE;
@@ -135,7 +138,9 @@ namespace TSensor.Web.Controllers
                 SecondDeviceGuid = tank.SecondDeviceGuid,
                 SecondIZKId = tank.SecondIZKId,
                 SecondSensorId = tank.SecondSensorId,
-                Description = tank.Description
+                Description = tank.Description,
+                WeightChangeDelta = tank.WeightChangeDelta?.ToString(),
+                WeightChangeTimeout = tank.WeightChangeTimeout?.ToString()
             };
 
             viewModel.ProductList = _productRepository.List();
@@ -168,7 +173,10 @@ namespace TSensor.Web.Controllers
             viewModel.SecondDeviceGuid = viewModel.SecondDeviceGuid?.Trim();
             viewModel.SecondIZKId = viewModel.SecondIZKId?.ToUpper()?.Trim();
             viewModel.SecondSensorId = viewModel.SecondSensorId?.ToUpper()?.Trim();
+            viewModel.WeightChangeDelta = viewModel.WeightChangeDelta?.Trim();
+            viewModel.WeightChangeTimeout = viewModel.WeightChangeTimeout?.Trim();
 
+            viewModel.Validate(ModelState);
             if (ModelState.IsValid && viewModel.TankGuid.HasValue)
             {
                 var editResult = _tankRepository.Edit(
@@ -176,7 +184,7 @@ namespace TSensor.Web.Controllers
                     viewModel.ProductGuid, viewModel.DualMode,
                     viewModel.MainDeviceGuid, viewModel.MainIZKId, viewModel.MainSensorId,
                     viewModel.SecondDeviceGuid, viewModel.SecondIZKId, viewModel.SecondSensorId,
-                    viewModel.Description);
+                    viewModel.Description, viewModel.ParsedWeightChangeDelta, viewModel.ParsedWeightChangeTimeout);
                 if (editResult)
                 {
                     var tankUrl = Url.Action("Edit", "Tank", new { pointGuid = viewModel.PointGuid.Value, tankGuid = viewModel.TankGuid.Value });
