@@ -21,3 +21,4 @@
 /TSensor.Web/log
 /TSensor.Web/.config
 /.vs/TSensor
+/TSensor.Proxy/obj
