@@ -83,6 +83,8 @@ function sensorUpdate(data, date) {
                 container.find('.t-avgT').html(val.avgT);
                 container.find('.t-environmentLevel').html(val.environmentLevel);
 
+                container.find('.tank-level').css('height', val.percentLevel + '%');
+
                 if (val.liquidEnvironmentLevel > sensor.weight + sensor.weightDelta ||
                     val.liquidEnvironmentLevel < sensor.weight - sensor.weightDelta) {
 
@@ -95,7 +97,7 @@ function sensorUpdate(data, date) {
                         container.find('.t-weightup').addClass('hidden');
                     }
 
-                    sensor.weight = sensor.liquidEnvironmentLevel;
+                    sensor.weight = val.liquidEnvironmentLevel;
                     if (sensor.weightTimeout !== 0) {
                         sensor.weightExpire = date + sensor.weightTimeout * 1000;
                     }
@@ -162,6 +164,8 @@ function notAssignedSensorUpdate(data) {
             container.find('.t-liquidDensity').html(val.liquidDensity);
             container.find('.t-avgT').html(val.avgT);
             container.find('.t-environmentLevel').html(val.environmentLevel);
+
+            container.find('.tank-level').css('height', val.percentLevel + '%');
 
             listenSensors[sensorGuid] = data[sensorGuid].insertDate;
         }

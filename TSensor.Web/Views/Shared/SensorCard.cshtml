@@ -10,15 +10,15 @@
     <div>
         <div class="bl2">
             <div>
-                <div style="height: @Model.PercentLevel<text>%</text>"></div>
+                <div class="tank-level" style="height: @Model.PercentLevel%"></div>
             </div>
         </div>
         <div class="bl3">
-            <span><span class="t-label t-img-weight">Масса</span><span class="t-liquidEnvironmentLevel">@Model.LiquidEnvironmentLevel</span> т</span>
-            <span><span class="t-label t-img-volume">Объём</span><span class="t-environmentVolume">@Model.EnvironmentVolume</span> м²</span>
-            <span><span class="t-label t-img-density">Плотность</span><span class="t-liquidDensity">@Model.LiquidDensity</span> кг/м³</span>
-            <span><span class="t-label t-img-temperature">Температура</span><span class="t-avgT">@Model.AvgT</span> °C</span>
-            <span><span class="t-label t-img-level">Уровень</span><span class="t-environmentLevel">@Model.EnvironmentLevel</span> мм</span>
+            <span><span class="t-label t-img-weight">Масса</span><span class="t-liquidEnvironmentLevel">@Model.LiquidEnvironmentLevel.ToString().Replace(",", ".")</span> т</span>
+            <span><span class="t-label t-img-volume">Объём</span><span class="t-environmentVolume">@Model.EnvironmentVolume.ToString().Replace(",", ".")</span> м²</span>
+            <span><span class="t-label t-img-density">Плотность</span><span class="t-liquidDensity">@Model.LiquidDensity.ToString().Replace(",", ".")</span> кг/м³</span>
+            <span><span class="t-label t-img-temperature">Температура</span><span class="t-avgT">@Model.AvgT.ToString().Replace(",", ".")</span> °C</span>
+            <span><span class="t-label t-img-level">Уровень</span><span class="t-environmentLevel">@Model.EnvironmentLevel.ToString().Replace(",", ".")</span> мм</span>
         </div>
         <div class="bl-error"></div>
     </div>
