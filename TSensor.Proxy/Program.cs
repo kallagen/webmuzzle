@@ -1,12 +1,15 @@
-﻿using System;
-
-namespace TSensor.Proxy
+﻿namespace TSensor.Proxy
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var config = new Config();
+            
+            var serialService = new SerialService(config);
+            serialService.Refresh();
+
+            while (true) { }
         }
     }
 }
