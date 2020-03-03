@@ -19,7 +19,8 @@ namespace TSensor.Web.Models.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.Request.Method?.ToUpperInvariant() == "POST")
+            if (context.Request.Method?.ToUpperInvariant() == "POST" &&
+                !context.Request.Path.StartsWithSegments("/broadcast"))
             {
                 using (var reader = new StreamReader(context.Request.Body))
                 {
