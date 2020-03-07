@@ -7,6 +7,9 @@ namespace TSensor.Web.Models.Entity
     {
         public string DeviceGuid { get; set; }
         public DateTime EventUTCDate { get; set; }
+        public string Raw { get; set; }
+        public Guid? TankGuid { get; set; }
+        public bool? IsSecond { get; set; }
 
         public int izkNumber { get; set; }
         public int banderolType { get; set; }
@@ -44,9 +47,9 @@ namespace TSensor.Web.Models.Entity
         public int plateServiceParam5 { get; set; }
         public string crc { get; set; }
 
-        public static ActualSensorValue Parse(string raw)
+        public static ActualSensorValue Parse(string raw, bool storeRaw = false)
         {
-            return new ActualSensorValue
+            var entity = new ActualSensorValue
             {
                 izkNumber = int.Parse(raw.Substring(1, 2), NumberStyles.HexNumber),
                 banderolType = int.Parse(raw.Substring(3, 2), NumberStyles.HexNumber),
@@ -84,6 +87,13 @@ namespace TSensor.Web.Models.Entity
                 plateServiceParam5 = int.Parse(raw.Substring(121, 4), NumberStyles.HexNumber),
                 crc = raw.Substring(125, 2)
             };
+
+            if (storeRaw)
+            {
+                entity.Raw = raw;
+            }
+
+            return entity;
         }
     }
 }

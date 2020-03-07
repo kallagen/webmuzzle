@@ -1,25 +1,20 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TSensor.Web.Models.Entity;
 
 namespace TSensor.Web.Models.Repository
 {
-    public class ApiRepository : RepositoryBase, IApiRepository
+	public class ApiRepository : RepositoryBase, IApiRepository
     {
         public ApiRepository(string connectionString) : base(connectionString) { }
 
         public async Task<bool> PushValueAsync(string ip, ActualSensorValue value, string rawValue)
         {
-            await QueryFirstAsync<int>(@"
+			await ExecuteAsync(@"
                 INSERT SensorValueRaw([Ip], [Value], EventUTCDate, DeviceGuid)
-                VALUES (@ip, @rawValue, @eventUTCDate, @deviceGuid)
-                
-                SELECT @@ROWCOUNT", new
-            {
-                ip,
-				rawValue,
-				eventUTCDate = value.EventUTCDate,
-                deviceGuid = value.DeviceGuid
-            });
+                VALUES (@ip, @rawValue, @EventUTCDate, @DeviceGuid)", 
+				new { ip, rawValue, value.EventUTCDate, value.DeviceGuid });
 
             if (value.pressureAndTempSensorState != "00")
             {
@@ -86,10 +81,86 @@ namespace TSensor.Web.Models.Repository
 
 				SELECT @@ROWCOUNT", value) == 1;
             }
-			else
-			{
-				return true;
-			}
+            else
+            {
+                return true;
+            }
+        }
+
+        public async Task PushArchivedValuesAsync(string ip, string deviceGuid, IEnumerable<ActualSensorValue> valueList)
+        {
+            await ExecuteAsync(@"
+				INSERT SensorValueRaw([Ip], [Value], EventUTCDate, DeviceGuid)
+                VALUES (@ip, @rawValue, @eventUTCDate, @deviceGuid)",
+                valueList.Select(p => new { ip, rawValue = p.Raw, eventUTCDate = p.EventUTCDate, deviceGuid }));
+
+			var metaDict = valueList
+				.Select(p => new { p.izkNumber, p.sensorSerial }).Distinct()
+				.Select(p =>
+				{
+					var meta = QueryFirst<dynamic>(@"
+						SELECT TOP 1 
+							TankGuid, 
+							CASE WHEN
+								DualMode = 1 AND 
+								SecondDeviceGuid = @deviceGuid AND 
+								SecondIZKId = @izkNumber AND 
+								SecondSensorId = @sensorSerial THEN 1 ELSE 0 END AS IsSecond
+						FROM Tank
+						WHERE
+							(MainDeviceGuid = @deviceGuid AND MainIZKId = @izkNumber AND MainSensorId = @sensorSerial) OR
+							(DualMode = 1 AND SecondDeviceGuid = @deviceGuid AND SecondIZKId = @izkNumber AND SecondSensorId = @sensorSerial)", new { deviceGuid, p.izkNumber, p.sensorSerial });
+
+					if (meta != null)
+					{
+						return new
+						{
+							p.izkNumber,
+							p.sensorSerial,
+							meta.TankGuid,
+							meta.IsSecond
+						};
+					}
+					else
+					{
+						return null;
+					}
+				}).Where(p => p != null);
+
+			await ExecuteAsync(@"
+				INSERT SensorValue(
+						TankGuid, IsSecond, DeviceGuid, EventUTCDate,
+						izkNumber, banderolType, sensorSerial, sensorChannel, pressureAndTempSensorState,
+						sensorFirmwareVersionAndReserv, alarma, environmentLevel, pressureFilter, pressureMeasuring,
+						levelInPercent, environmentVolume, liquidEnvironmentLevel, steamMass, liquidDensity, 
+						steamDensity, dielectricPermeability, dielectricPermeability2, t1, t2, t3, t4, t5, t6, 
+						plateTemp, [period], plateServiceParam, environmentComposition, cs1, plateServiceParam2,
+						plateServiceParam3, sensorWorkMode, plateServiceParam4, plateServiceParam5, crc)
+					VALUES (
+						@TankGuid, @IsSecond, @DeviceGuid, @EventUTCDate,
+						@izkNumber, @banderolType, @sensorSerial, @sensorChannel, @pressureAndTempSensorState,
+						@sensorFirmwareVersionAndReserv, @alarma, @environmentLevel, @pressureFilter, @pressureMeasuring,
+						@levelInPercent, @environmentVolume, @liquidEnvironmentLevel, @steamMass, @liquidDensity,
+						@steamDensity, @dielectricPermeability, @dielectricPermeability2, @t1, @t2, @t3, @t4, @t5, @t6,
+						@plateTemp, @period, @plateServiceParam, @environmentComposition, @cs1, @plateServiceParam2,
+						@plateServiceParam3, @sensorWorkMode, @plateServiceParam4, @plateServiceParam5, @crc)",
+	 			valueList.Select(v =>
+				{
+					var meta = metaDict.FirstOrDefault(p => p.izkNumber == v.izkNumber && p.sensorSerial == v.sensorSerial);
+					if (meta != null)
+					{
+						v.DeviceGuid = deviceGuid;
+	
+						v.TankGuid = meta.TankGuid;
+						v.IsSecond = meta.IsSecond;
+	
+						return v;
+					}
+					else
+					{
+						return null;
+					}
+				}).Where(p => p != null));
         }
     }
 }
