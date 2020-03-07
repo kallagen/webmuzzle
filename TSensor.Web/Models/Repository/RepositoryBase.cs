@@ -35,5 +35,12 @@ namespace TSensor.Web.Models.Repository
 
             return await db.QueryFirstOrDefaultAsync<T>(sql, param);
         }
+
+        public async Task ExecuteAsync(string sql, object param = null)
+        {
+            using IDbConnection db = new SqlConnection(connectionString);
+
+            await db.ExecuteAsync(sql, param);
+        }
     }
 }
