@@ -9,24 +9,24 @@ namespace TSensor.Web.Models.Repository
 
         public bool PushValue(string ip, ActualSensorValue value, DateTime eventDateUTC)
         {
-            var sensorGuid = value.Raw.Substring(1, 2) + value.Raw.Substring(5, 2);
-
             QueryFirst<int>(@"
-                INSERT SensorValueRaw(SensorGuid, [Ip], [Value], EventDateUTC, DeviceGuid)
-                VALUES (@sensorGuid, @ip, @value, @eventDateUTC, @deviceGuid)
+                INSERT SensorValueRaw([Ip], [Value], EventDateUTC, DeviceGuid)
+                VALUES (@ip, @value, @eventDateUTC, @deviceGuid)
                 
                 SELECT @@ROWCOUNT", new
             {
-                sensorGuid,
                 ip,
                 value = value.Raw,
-				deviceGuid = value.DeviceGuid,
+                deviceGuid = value.DeviceGuid,
                 eventDateUTC
             });
 
-            return QueryFirst<int>(@"
-				DECLARE 
+            if (value.pressureAndTempSensorState != "00")
+            {
+                return QueryFirst<int>(@"
+				DECLARE
 					@findTankGuid uniqueidentifier,
+
 					@findIsSecond bit = 0
 					
 					SELECT TOP 1 @findTankGuid = TankGuid, @findIsSecond = CASE WHEN
@@ -190,6 +190,11 @@ namespace TSensor.Web.Models.Repository
 					@crc)
 
 				SELECT @@ROWCOUNT", value) == 1;
+            }
+			else
+			{
+				return true;
+			}
         }
     }
 }
