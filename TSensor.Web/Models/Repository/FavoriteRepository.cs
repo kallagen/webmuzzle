@@ -72,9 +72,12 @@ namespace TSensor.Web.Models.Repository
         public IEnumerable<Favorite> ListByUser(Guid userGuid)
         {
             return Query<Favorite>(@"
-                SELECT FavoriteGuid, [Name]
-                FROM Favorite
-                WHERE UserGuid = @userGuid", new { userGuid });
+                SELECT f.FavoriteGuid, f.[Name]
+                FROM Favorite f
+                WHERE f.UserGuid = @userGuid AND 
+                    EXISTS (SELECT 1 
+                        FROM FavoriteItem fi 
+                        WHERE fi.FavoriteGuid = f.FavoriteGuid)", new { userGuid });
         }
 
         public bool Remove(Guid userGuid, Guid favoriteGuid)
