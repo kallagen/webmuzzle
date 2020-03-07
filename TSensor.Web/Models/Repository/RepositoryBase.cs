@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace TSensor.Web.Models.Repository
 {
@@ -26,6 +27,13 @@ namespace TSensor.Web.Models.Repository
             using IDbConnection db = new SqlConnection(connectionString);
 
             return db.QueryFirstOrDefault<T>(sql, param);
+        }
+
+        public async Task<T> QueryFirstAsync<T>(string sql, object param = null)
+        {
+            using IDbConnection db = new SqlConnection(connectionString);
+
+            return await db.QueryFirstOrDefaultAsync<T>(sql, param);
         }
     }
 }
