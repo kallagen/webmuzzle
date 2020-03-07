@@ -1,93 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace TSensor.Proxy
 {
     public class SerialService
     {
-        private readonly string apiUrl;
-        private readonly string deviceGuid;
+        private readonly Config _config;
+        private readonly Logger _logger;
 
-        private List<SerialPort> portCollection = new List<SerialPort>();
+        private readonly object Locker = new object();
+        private List<string> portCollection = new List<string>();
 
-        public SerialService(Config config)
+        private Timer checkPortTimer;
+
+        public SerialService(Config config, Logger logger)
         {
-            apiUrl = $"http://{config.ApiHost}/api/sensorvalue/push";
-            deviceGuid = config.DeviceGuid;
+            _config = config;
+            _logger = logger;
+
+            checkPortTimer = new Timer(new TimerCallback(CheckPort), portCollection, 0, _config.CheckPortInterval);
         }
 
-        private const int MESSAGE_SIZE = 128;
-
-        private void Dispose()
+        private void CheckPort(object state)
         {
-            foreach (var port in portCollection)
+            IEnumerable<string> ports;
+            using (var elapsed = Elapsed.Create)
             {
-                port.DataReceived -= Port_DataReceived;
-                port.Close();
+                ports = SerialPort.GetPortNames().Where(p => p.Contains("USB"));
+                _logger.Write($"actual ports data received: {ports.Count()} ports", elapsed);
             }
 
-            portCollection = new List<SerialPort>();
-        }
-
-        private IEnumerable<string> GetUsbComPort()
-        {
-            return SerialPort.GetPortNames().Where(p => p.Contains("USB"));
-        }
-
-        private void Init()
-        {
-            foreach (var portName in GetUsbComPort())
+            foreach (var portName in ports)
             {
-                var port = new SerialPort(portName)
+                if (portCollection.Any(p => p == portName))
                 {
-                    BaudRate = 19200,
-                    Parity = Parity.None,
-                    StopBits = StopBits.One,
-                    DataBits = 8,
-                    Handshake = Handshake.None,
-                    RtsEnable = true
-                };
-                port.DataReceived += Port_DataReceived;
-
-                portCollection.Add(port);
-
-                port.Open();
-            }
-        }
-
-        private async void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            var strData = (sender as SerialPort).ReadLine();
-            if (strData.Length == MESSAGE_SIZE)
-            {
-                try
+                    _logger.Write($"{portName}: already initialized");
+                }
+                else
                 {
-                    var dateStart = DateTime.Now;
-
-                    var content = await Http.PostAsync(apiUrl, new Dictionary<string, string>
+                    Task.Run(() =>
                     {
-                       { "v", strData },
-                       { "d", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") },
-                       { "g", deviceGuid }
+                        lock (Locker)
+                        {
+                            portCollection.Add(portName);
+                        }
+
+                        new PortListener(portName, _config, _logger).Run();
+
+                        lock (Locker)
+                        {
+                            portCollection.Remove(portName);
+                        }
                     });
-
-                    var passedMs = (DateTime.Now - dateStart).TotalMilliseconds;
-
-                    Console.WriteLine($"{passedMs}ms: {content}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
                 }
             }
+
+            //todo remove not existed ports
         }
 
-        public void Refresh()
+        public void Run()
         {
-            Dispose();
-            Init();
+            while (true) { }
         }
     }
 }
