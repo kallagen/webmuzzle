@@ -4,8 +4,9 @@ namespace TSensor.Proxy
 {
     public class Config
     {
-        public string ApiHost { get; private set; }
+        public string ApiUrl { get; private set; }
         public string DeviceGuid { get; private set; }
+        public int CheckPortInterval { get; private set; }
 
         public Config()
         {
@@ -13,8 +14,9 @@ namespace TSensor.Proxy
                 .AddJsonFile("appconfig.json")
                 .Build();
 
-            ApiHost = config["apiHost"];
+            ApiUrl = $"http://{config["apiHost"]}/api/sensorvalue/push";
             DeviceGuid = config["deviceGuid"];
+            CheckPortInterval = int.Parse(config["portCheckInterval"]) * 1000;
         }
     }
 }

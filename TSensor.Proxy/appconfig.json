@@ -1,4 +1,5 @@
 {
   "apiHost": "80.76.40.56:8081",
-  "deviceGuid": "00002"
+  "deviceGuid": "00002",
+  "portCheckInterval":  1
 }
