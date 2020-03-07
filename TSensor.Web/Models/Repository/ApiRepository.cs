@@ -54,11 +54,11 @@ namespace TSensor.Web.Models.Repository
 						@plateServiceParam3, @sensorWorkMode, @plateServiceParam4, @plateServiceParam5, @crc)
 				END
 				
-				DECLARE @lastEventUTCDate = (SELECT TOP 1 EventUTCDate
+				DECLARE @lastEventUTCDate datetime = (SELECT TOP 1 EventUTCDate
 					FROM ActualSensorValue 
 					WHERE
 						(TankGuid = @findTankGuid AND IsSecond = @findIsSecond) OR
-						(DeviceGuid = @DeviceGuid AND izkNumber = @izkNumber AND sensorSerial = @sensorSerial)
+						(DeviceGuid = @DeviceGuid AND izkNumber = @izkNumber AND sensorSerial = @sensorSerial))
 
 				IF @lastEventUTCDate IS NULL OR @eventUTCDate > @lastEventUTCDate BEGIN
 					DELETE FROM ActualSensorValue 
