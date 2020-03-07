@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using TSensor.Web.Models.Entity;
 
 namespace TSensor.Web.Models.Repository
@@ -7,18 +7,18 @@ namespace TSensor.Web.Models.Repository
     {
         public ApiRepository(string connectionString) : base(connectionString) { }
 
-        public bool PushValue(string ip, ActualSensorValue value, DateTime eventDateUTC)
+        public async Task<bool> PushValueAsync(string ip, ActualSensorValue value, string rawValue)
         {
-            QueryFirst<int>(@"
-                INSERT SensorValueRaw([Ip], [Value], EventDateUTC, DeviceGuid)
-                VALUES (@ip, @value, @eventDateUTC, @deviceGuid)
+            await QueryFirstAsync<int>(@"
+                INSERT SensorValueRaw([Ip], [Value], EventUTCDate, DeviceGuid)
+                VALUES (@ip, @rawValue, @eventUTCDate, @deviceGuid)
                 
                 SELECT @@ROWCOUNT", new
             {
                 ip,
-                value = value.Raw,
-                deviceGuid = value.DeviceGuid,
-                eventDateUTC
+				rawValue,
+				eventUTCDate = value.EventUTCDate,
+                deviceGuid = value.DeviceGuid
             });
 
             if (value.pressureAndTempSensorState != "00")
@@ -26,7 +26,6 @@ namespace TSensor.Web.Models.Repository
                 return QueryFirst<int>(@"
 				DECLARE
 					@findTankGuid uniqueidentifier,
-
 					@findIsSecond bit = 0
 					
 					SELECT TOP 1 @findTankGuid = TankGuid, @findIsSecond = CASE WHEN
@@ -36,158 +35,54 @@ namespace TSensor.Web.Models.Repository
 						(MainDeviceGuid = @DeviceGuid AND MainIZKId = @izkNumber AND MainSensorId = @sensorSerial) OR
 						(DualMode = 1 AND SecondDeviceGuid = @DeviceGuid AND SecondIZKId = @izkNumber AND SecondSensorId = @sensorSerial)
 
-				INSERT SensorValue(
-					TankGuid, IsSecond, [Raw], DeviceGuid,
-					izkNumber,
-					banderolType,
-					sensorSerial,
-					sensorChannel,
-					pressureAndTempSensorState,
-					sensorFirmwareVersionAndReserv,
-					alarma,
-					environmentLevel,
-					pressureFilter,
-					pressureMeasuring,
-					levelInPercent,
-					environmentVolume,
-					liquidEnvironmentLevel,
-					steamMass,
-					liquidDensity,
-					steamDensity,
-					dielectricPermeability,
-					dielectricPermeability2,
-					t1,
-					t2,
-					t3,
-					t4,
-					t5,
-					t6,
-					plateTemp,
-					[period],
-					plateServiceParam,
-					environmentComposition,
-					cs1,
-					plateServiceParam2,
-					plateServiceParam3,
-					sensorWorkMode,
-					plateServiceParam4,
-					plateServiceParam5,
-					crc)
-				VALUES (@findTankGuid, @findIsSecond, @Raw, @DeviceGuid,
-					@izkNumber,
-					@banderolType,
-					@sensorSerial,
-					@sensorChannel,
-					@pressureAndTempSensorState,
-					@sensorFirmwareVersionAndReserv,
-					@alarma,
-					@environmentLevel,
-					@pressureFilter,
-					@pressureMeasuring,
-					@levelInPercent,
-					@environmentVolume,
-					@liquidEnvironmentLevel,
-					@steamMass,
-					@liquidDensity,
-					@steamDensity,
-					@dielectricPermeability,
-					@dielectricPermeability2,
-					@t1,
-					@t2,
-					@t3,
-					@t4,
-					@t5,
-					@t6,
-					@plateTemp,
-					@period,
-					@plateServiceParam,
-					@environmentComposition,
-					@cs1,
-					@plateServiceParam2,
-					@plateServiceParam3,
-					@sensorWorkMode,
-					@plateServiceParam4,
-					@plateServiceParam5,
-					@crc)
+				IF @findTankGuid IS NOT NULL BEGIN
+					INSERT SensorValue(
+						TankGuid, IsSecond, DeviceGuid, EventUTCDate,
+						izkNumber, banderolType, sensorSerial, sensorChannel, pressureAndTempSensorState,
+						sensorFirmwareVersionAndReserv, alarma, environmentLevel, pressureFilter, pressureMeasuring,
+						levelInPercent, environmentVolume, liquidEnvironmentLevel, steamMass, liquidDensity, 
+						steamDensity, dielectricPermeability, dielectricPermeability2, t1, t2, t3, t4, t5, t6, 
+						plateTemp, [period], plateServiceParam, environmentComposition, cs1, plateServiceParam2,
+						plateServiceParam3, sensorWorkMode, plateServiceParam4, plateServiceParam5, crc)
+					VALUES (
+						@findTankGuid, @findIsSecond, @DeviceGuid, @EventUTCDate,
+						@izkNumber, @banderolType, @sensorSerial, @sensorChannel, @pressureAndTempSensorState,
+						@sensorFirmwareVersionAndReserv, @alarma, @environmentLevel, @pressureFilter, @pressureMeasuring,
+						@levelInPercent, @environmentVolume, @liquidEnvironmentLevel, @steamMass, @liquidDensity,
+						@steamDensity, @dielectricPermeability, @dielectricPermeability2, @t1, @t2, @t3, @t4, @t5, @t6,
+						@plateTemp, @period, @plateServiceParam, @environmentComposition, @cs1, @plateServiceParam2,
+						@plateServiceParam3, @sensorWorkMode, @plateServiceParam4, @plateServiceParam5, @crc)
+				END
+				
+				DECLARE @lastEventUTCDate = (SELECT TOP 1 EventUTCDate
+					FROM ActualSensorValue 
+					WHERE
+						(TankGuid = @findTankGuid AND IsSecond = @findIsSecond) OR
+						(DeviceGuid = @DeviceGuid AND izkNumber = @izkNumber AND sensorSerial = @sensorSerial)
 
-				DELETE FROM ActualSensorValue 
-				WHERE
-					(TankGuid = @findTankGuid AND IsSecond = @findIsSecond) OR
-					(DeviceGuid = @DeviceGuid AND izkNumber = @izkNumber AND sensorSerial = @sensorSerial)
+				IF @lastEventUTCDate IS NULL OR @eventUTCDate > @lastEventUTCDate BEGIN
+					DELETE FROM ActualSensorValue 
+					WHERE
+						(TankGuid = @findTankGuid AND IsSecond = @findIsSecond) OR
+						(DeviceGuid = @DeviceGuid AND izkNumber = @izkNumber AND sensorSerial = @sensorSerial)
 
-				INSERT ActualSensorValue(
-					TankGuid, IsSecond, [Raw], DeviceGuid,
-					izkNumber,
-					banderolType,
-					sensorSerial,
-					sensorChannel,
-					pressureAndTempSensorState,
-					sensorFirmwareVersionAndReserv,
-					alarma,
-					environmentLevel,
-					pressureFilter,
-					pressureMeasuring,
-					levelInPercent,
-					environmentVolume,
-					liquidEnvironmentLevel,
-					steamMass,
-					liquidDensity,
-					steamDensity,
-					dielectricPermeability,
-					dielectricPermeability2,
-					t1,
-					t2,
-					t3,
-					t4,
-					t5,
-					t6,
-					plateTemp,
-					[period],
-					plateServiceParam,
-					environmentComposition,
-					cs1,
-					plateServiceParam2,
-					plateServiceParam3,
-					sensorWorkMode,
-					plateServiceParam4,
-					plateServiceParam5,
-					crc)
-				VALUES (@findTankGuid, @findIsSecond, @Raw, @DeviceGuid,
-					@izkNumber,
-					@banderolType,
-					@sensorSerial,
-					@sensorChannel,
-					@pressureAndTempSensorState,
-					@sensorFirmwareVersionAndReserv,
-					@alarma,
-					@environmentLevel,
-					@pressureFilter,
-					@pressureMeasuring,
-					@levelInPercent,
-					@environmentVolume,
-					@liquidEnvironmentLevel,
-					@steamMass,
-					@liquidDensity,
-					@steamDensity,
-					@dielectricPermeability,
-					@dielectricPermeability2,
-					@t1,
-					@t2,
-					@t3,
-					@t4,
-					@t5,
-					@t6,
-					@plateTemp,
-					@period,
-					@plateServiceParam,
-					@environmentComposition,
-					@cs1,
-					@plateServiceParam2,
-					@plateServiceParam3,
-					@sensorWorkMode,
-					@plateServiceParam4,
-					@plateServiceParam5,
-					@crc)
+					INSERT ActualSensorValue(
+						TankGuid, IsSecond, DeviceGuid, EventUTCDate,
+						izkNumber, banderolType, sensorSerial, sensorChannel, pressureAndTempSensorState,
+						sensorFirmwareVersionAndReserv, alarma, environmentLevel, pressureFilter, pressureMeasuring,
+						levelInPercent, environmentVolume, liquidEnvironmentLevel, steamMass, liquidDensity,
+						steamDensity, dielectricPermeability, dielectricPermeability2, t1, t2, t3, t4, t5, t6,
+						plateTemp, [period], plateServiceParam, environmentComposition, cs1, plateServiceParam2,
+						plateServiceParam3, sensorWorkMode, plateServiceParam4, plateServiceParam5, crc)
+					VALUES (
+						@findTankGuid, @findIsSecond, @DeviceGuid, @EventUTCDate,
+						@izkNumber, @banderolType, @sensorSerial, @sensorChannel, @pressureAndTempSensorState,
+						@sensorFirmwareVersionAndReserv, @alarma, @environmentLevel, @pressureFilter, @pressureMeasuring,
+						@levelInPercent, @environmentVolume, @liquidEnvironmentLevel, @steamMass, @liquidDensity,
+						@steamDensity, @dielectricPermeability, @dielectricPermeability2, @t1, @t2, @t3, @t4, @t5, @t6,
+						@plateTemp, @period, @plateServiceParam, @environmentComposition, @cs1, @plateServiceParam2,
+						@plateServiceParam3, @sensorWorkMode, @plateServiceParam4, @plateServiceParam5, @crc)
+				END
 
 				SELECT @@ROWCOUNT", value) == 1;
             }
