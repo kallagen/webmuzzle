@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Globalization;
+using System.Threading.Tasks;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Services.Log;
@@ -24,12 +25,12 @@ namespace TSensor.Web.Controllers
         {
             _logService.Write("inputerror", $"{guid} {date} {value} {message}");
 
-            return StatusCode(418, $"{{\"success\":false,\"error\": \"{message}\"}}");
+            return Json(new { success = false, error = message });
         }
 
         [Route("sensorvalue/push")]
         [HttpPost]
-        public IActionResult PushSensorValue(string v, string d, string g)
+        public async Task<IActionResult> PushSensorValue(string v, string d, string g)
         {
             var date = d;
             var guid = g;
@@ -45,15 +46,15 @@ namespace TSensor.Web.Controllers
                 }
 
                 var dateParseResult = DateTime.TryParseExact(date,
-                    new[] 
+                    new[]
                     {
                         "yyyy-MM-dd HH:mm:ss.fff",
                         "yyyy-MM-dd HH:mm:ss.ff",
                         "yyyy-MM-dd HH:mm:ss.f",
                         "yyyy-MM-dd HH:mm:ss.",
                         "yyyy-MM-dd HH:mm:ss"
-                    }, 
-                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventDateUTC);
+                    },
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
                 if (!dateParseResult)
                 {
                     return Error("wrong event utc date", value, date, guid);
@@ -66,10 +67,11 @@ namespace TSensor.Web.Controllers
 
                 var sensorValue = ActualSensorValue.Parse(value);
                 sensorValue.DeviceGuid = guid;
+                sensorValue.EventUTCDate = eventUTCDate;
 
-                if (_apiRepository.PushValue(
+                if (await _apiRepository.PushValueAsync(
                     Request.HttpContext.Connection.RemoteIpAddress.ToString(),
-                    sensorValue, eventDateUTC))
+                    sensorValue, value))
                 {
                     return Json(new { success = true });
                 }
