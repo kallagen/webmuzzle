@@ -1,11 +1,12 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 
 namespace TSensor.Web.Models.Entity
 {
     public class ActualSensorValue
     {
         public string DeviceGuid { get; set; }
-        public string Raw { get; set; }
+        public DateTime EventUTCDate { get; set; }
 
         public int izkNumber { get; set; }
         public int banderolType { get; set; }
@@ -47,8 +48,6 @@ namespace TSensor.Web.Models.Entity
         {
             return new ActualSensorValue
             {
-                Raw = raw,
-
                 izkNumber = int.Parse(raw.Substring(1, 2), NumberStyles.HexNumber),
                 banderolType = int.Parse(raw.Substring(3, 2), NumberStyles.HexNumber),
                 sensorSerial = int.Parse(raw.Substring(5, 2), NumberStyles.HexNumber),
