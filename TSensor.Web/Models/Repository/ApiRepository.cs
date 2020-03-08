@@ -101,11 +101,11 @@ namespace TSensor.Web.Models.Repository
 					var meta = QueryFirst<dynamic>(@"
 						SELECT TOP 1 
 							TankGuid, 
-							CASE WHEN
+							CAST(CASE WHEN
 								DualMode = 1 AND 
 								SecondDeviceGuid = @deviceGuid AND 
 								SecondIZKId = @izkNumber AND 
-								SecondSensorId = @sensorSerial THEN 1 ELSE 0 END AS IsSecond
+								SecondSensorId = @sensorSerial THEN 1 ELSE 0 END AS bit) AS IsSecond 
 						FROM Tank
 						WHERE
 							(MainDeviceGuid = @deviceGuid AND MainIZKId = @izkNumber AND MainSensorId = @sensorSerial) OR
