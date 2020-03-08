@@ -6,8 +6,13 @@ namespace TSensor.Proxy
     {
         private DateTime? start = DateTime.Now;
 
+        private Elapsed() { }
+
         public static Elapsed Create =>
             new Elapsed();
+
+        public DateTime Start =>
+            start.Value;
 
         public override string ToString()
         {
