@@ -74,7 +74,7 @@ namespace TSensor.Proxy
         {
             if (IsSendRunning)
             {
-                return;
+                _logger.Write("archive service already running, skip sending");
             }
             else
             {
