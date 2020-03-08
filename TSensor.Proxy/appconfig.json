@@ -1,10 +1,10 @@
 {
   "apiHost": "80.76.40.56:8081",
-  "deviceGuid": "00002",
+  "deviceGuid": "00001",
   //seconds
-  "portCheckInterval": 1,
+  "portCheckInterval": 10,
   //kilobytes
-  "maxArchiveFileSize": 100,
+  "maxArchiveFileSize": 10,
   //seconds
-  "archiveSendInterval":  1
+  "archiveSendInterval": 300
 }
