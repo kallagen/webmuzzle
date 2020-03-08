@@ -11,54 +11,74 @@ namespace TSensor.Proxy
         private readonly Config _config;
         private readonly Logger _logger;
 
+        private ArchiveService _archiveService;
+
         private readonly object Locker = new object();
+        private bool IsPortCheckingRunning = false;
         private List<string> portCollection = new List<string>();
 
-        private Timer checkPortTimer;
+        private Timer timer;
 
         public SerialService(Config config, Logger logger)
         {
             _config = config;
             _logger = logger;
 
-            checkPortTimer = new Timer(new TimerCallback(CheckPort), portCollection, 0, _config.CheckPortInterval);
+            Task.Run(() =>
+            {
+                _archiveService = new ArchiveService(config, logger);
+                _archiveService.Run();
+            });
+
+            timer = new Timer(new TimerCallback(CheckPort), portCollection, 0, _config.CheckPortInterval);
         }
 
         private void CheckPort(object state)
         {
-            IEnumerable<string> ports;
-            using (var elapsed = Elapsed.Create)
+            if (IsPortCheckingRunning)
             {
-                ports = SerialPort.GetPortNames().Where(p => p.Contains("USB"));
-                _logger.Write($"actual ports data received: {ports.Count()} ports", elapsed);
+                _logger.Write("port checking already running, skip checking");
             }
-
-            foreach (var portName in ports)
+            else
             {
-                if (portCollection.Any(p => p == portName))
+                IsPortCheckingRunning = true;
+
+                IEnumerable<string> ports;
+                using (var elapsed = Elapsed.Create)
                 {
-                    _logger.Write($"{portName}: already initialized");
+                    ports = SerialPort.GetPortNames().Where(p => p.Contains("USB"));
+                    _logger.Write($"actual ports data received: {ports.Count()} ports", elapsed);
                 }
-                else
+
+                foreach (var portName in ports)
                 {
-                    Task.Run(() =>
+                    if (portCollection.Any(p => p == portName))
                     {
-                        lock (Locker)
+                        _logger.Write($"{portName}: already initialized");
+                    }
+                    else
+                    {
+                        Task.Run(() =>
                         {
-                            portCollection.Add(portName);
-                        }
+                            lock (Locker)
+                            {
+                                portCollection.Add(portName);
+                            }
 
-                        new PortListener(portName, _config, _logger).Run();
+                            new PortListener(portName, _config, _archiveService, _logger).Run();
 
-                        lock (Locker)
-                        {
-                            portCollection.Remove(portName);
-                        }
-                    });
+                            lock (Locker)
+                            {
+                                portCollection.Remove(portName);
+                            }
+                        });
+                    }
                 }
-            }
 
-            //todo remove not existed ports
+                IsPortCheckingRunning = false;
+
+                //todo remove not existed ports
+            }
         }
 
         public void Run()
