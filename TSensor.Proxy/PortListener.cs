@@ -6,8 +6,9 @@ namespace TSensor.Proxy
 {
     public class PortListener : IDisposable
     {
-        private readonly Logger _logger;
         private readonly Config _config;
+        private readonly ArchiveService _archiveService;        
+        private readonly Logger _logger;
 
         private string _portName;
         private SerialPort port;
@@ -19,9 +20,10 @@ namespace TSensor.Proxy
             _logger.Write(message, elapsed: elapsed, prefix: $"{_portName}:");
         }
 
-        public PortListener(string portName, Config config, Logger logger)
+        public PortListener(string portName, Config config, ArchiveService archiveService, Logger logger)
         {
             _config = config;
+            _archiveService = archiveService;
             _logger = logger;
 
             _portName = portName;
@@ -58,14 +60,26 @@ namespace TSensor.Proxy
                 {
                     using (var elapsed = Elapsed.Create)
                     {
-                        var content = await Http.PostAsync(_config.ApiUrl, new Dictionary<string, string>
+                        var eventDate = elapsed.Start.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff");
+
+                        var result = await Http.PostAsync(_config.ApiUrlSendValue, new Dictionary<string, string>
                         {
                             { "v", strData },
-                            { "d", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") },
+                            { "d", eventDate },
                             { "g", _config.DeviceGuid }
                         });
 
-                        Log("data sended", elapsed);
+                        if (result.Exception != null)
+                        {
+                            Log("sending error");
+                            _logger.Write(result.Exception);
+
+                            _archiveService.Write(_portName, $"{eventDate};{strData}");
+                        }
+                        else
+                        {
+                            Log("data sended", elapsed);
+                        }
                     }
                 }
                 catch (Exception ex)
