@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
@@ -83,6 +84,77 @@ namespace TSensor.Web.Controllers
             catch (Exception exception)
             {
                 return Error(exception.ToString(), value, date, guid);
+            }
+        }
+
+        [Route("sensorvalue/archive/push")]
+        [HttpPost]
+        public async Task<IActionResult> PushArchivedSensorValues(string d, string a)
+        {
+            var value = a;
+            var deviceGuid = d;
+
+            if (string.IsNullOrWhiteSpace(deviceGuid))
+            {
+                return Error("missing device guid", value, null, deviceGuid);
+            }
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return Error("empty archive, nothing to insert", value, null, deviceGuid);
+            }
+
+            try
+            {
+                var valueList = a.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(p =>
+                    {
+                        var lexem = p.Split(";");
+
+                        var eventDateParseResult = DateTime.TryParseExact(lexem[0],
+                        new[]
+                        {
+                            "yyyy-MM-dd HH:mm:ss.fff",
+                            "yyyy-MM-dd HH:mm:ss.ff",
+                            "yyyy-MM-dd HH:mm:ss.f",
+                            "yyyy-MM-dd HH:mm:ss.",
+                            "yyyy-MM-dd HH:mm:ss"
+                        },
+                        CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
+
+                        if (!eventDateParseResult)
+                        {
+                            return null;
+                        }
+
+                        try
+                        {
+                            var value = ActualSensorValue.Parse(lexem[1], storeRaw: true);
+                            value.EventUTCDate = eventUTCDate;
+
+                            return value;
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    }).Where(p => p != null);
+
+                if (valueList.Any())
+                {
+                    await _apiRepository.PushArchivedValuesAsync(
+                    Request.HttpContext.Connection.RemoteIpAddress.ToString(),
+                    deviceGuid, valueList);
+
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Error("no readable records in archive", value, null, deviceGuid);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.ToString(), value, null, deviceGuid);
             }
         }
     }
