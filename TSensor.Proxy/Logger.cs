@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace TSensor.Proxy
 {
@@ -23,7 +24,7 @@ namespace TSensor.Proxy
                     log += $" ({elapsed} ms)";
                 }
 
-                Console.WriteLine(log);
+                Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}:{log}");
             }
         }
     }
