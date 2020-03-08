@@ -12,7 +12,7 @@ namespace TSensor.Proxy
     {
         private static readonly object Locker = new object();
 
-        private static bool isConnectionError = false;
+        private static bool isConnectionError = true;
         public static bool IsConnectionError
         {
             get
