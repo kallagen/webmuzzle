@@ -74,7 +74,7 @@ namespace TSensor.Proxy
                             Log("sending error");
                             _logger.Write(result.Exception);
 
-                            _archiveService.Write(_portName, $"{eventDate};{strData}");
+                            //_archiveService.Write(_portName, $"{eventDate};{strData}");
                         }
                         else
                         {

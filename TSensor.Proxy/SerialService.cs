@@ -17,20 +17,22 @@ namespace TSensor.Proxy
         private bool IsPortCheckingRunning = false;
         private List<string> portCollection = new List<string>();
 
-        private Timer timer;
+        //private Timer timer;
 
         public SerialService(Config config, Logger logger)
         {
             _config = config;
             _logger = logger;
 
+            /*
             Task.Run(() =>
             {
                 _archiveService = new ArchiveService(config, logger);
                 _archiveService.Run();
             });
+            */
 
-            timer = new Timer(new TimerCallback(CheckPort), portCollection, 0, _config.CheckPortInterval);
+            //timer = new Timer(new TimerCallback(CheckPort), portCollection, 0, _config.CheckPortInterval);
         }
 
         private void CheckPort(object state)
@@ -83,6 +85,9 @@ namespace TSensor.Proxy
 
         public void Run()
         {
+            //temporary
+            CheckPort(null);
+
             while (true) { }
         }
     }
