@@ -13,3 +13,4 @@
 /TSensor.Web/bin
 /TSensor.Web/node_modules
 /TSensor.Web/log
+TSensor.Web/package-lock.json
