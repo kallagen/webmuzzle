@@ -101,7 +101,7 @@ function sensorUpdate(data, date) {
                     if (sensor.weightTimeout !== 0) {
                         sensor.weightExpire = date + sensor.weightTimeout * 1000;
                     }
-                    sensor.weightChangeExpire = date.
+                    sensor.weightChangeExpire = date;
                     sensor.weightChangeTime = date;
                 }
             }
@@ -198,4 +198,39 @@ var TogglePasswordButton = function (selector) {
     $(selector).each(function (i, el) {
         new TogglePasswordControl(el);
     });
+};
+
+var DatePicker = function (selector, options) {
+    var that = this;
+
+    options = options || {};
+
+    var format = options.allowTime == true ? 'DD.MM.YYYY HH:mm' : 'DD.MM.YYYY';
+
+    this._control = new Pikaday({
+        field: document.getElementById(selector),
+        firstDay: 1,
+        yearRange: [2016, 2026],
+        format: format,
+        i18n: {
+            previousMonth: 'Previous Month',
+            nextMonth: 'Next Month',
+            months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            weekdays: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+            weekdaysShort: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб']
+        },
+        theme: 'as-pikadate-theme',
+        onSelect: function (e) {
+            if (options.onSelectEvent && that.initFinished) {
+                options.onSelectEvent(e);
+            }
+        }
+    });
+
+    if (options.defaultDate) {
+        this.initFinished = false;
+        this._control.setMoment(moment(options.defaultDate, format));
+    }
+
+    this.initFinished = true;
 };

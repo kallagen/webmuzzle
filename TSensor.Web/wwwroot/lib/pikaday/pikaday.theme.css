@@ -1,0 +1,30 @@
+.as-pikadate-theme, .pika-select {
+    font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+}
+
+    .as-pikadate-theme .pika-lendar {
+        margin: 6px;
+        width: 184px;
+    }
+
+    .as-pikadate-theme .pika-label {
+        font-size: 13px;
+        padding: 3px 5px;
+    }
+
+    .as-pikadate-theme .pika-prev,
+    .as-pikadate-theme .pika-next,
+    .as-pikadate-theme .is-rtl .pika-next {
+        height: 26px;
+    }
+
+    .as-pikadate-theme .pika-button {
+        border-radius: 0;
+        text-align: center;
+        background: #fff;
+    }
+
+        .as-pikadate-theme .is-selected .pika-button,
+        .as-pikadate-theme .pika-button:hover {
+            background: #33AAFF;
+        }
