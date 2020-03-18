@@ -114,7 +114,7 @@ namespace TSensor.Web.Models.Repository
         {
             return Query<TankSensorValue>(@"
 				SELECT
-					p.Name AS PointName, t.Name AS TankName, t.DualMode AS DualMode, pr.Name AS ProductName,
+					p.Name AS PointName, t.TankGuid, t.Name AS TankName, t.DualMode AS DualMode, pr.Name AS ProductName,
 					t.MainDeviceGuid, t.MainIZKId, t.MainSensorId,
 					t.SecondDeviceGuid, t.SecondIZKId, t.SecondSensorId,
 					t.WeightChangeDelta, t.WeightChangeTimeout,

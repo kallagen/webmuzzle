@@ -2,6 +2,11 @@
     font-family: 'Gilroy';
 }
 
+h3 {
+    display: inline-block;
+    vertical-align: top;
+}
+
 input[type="text"], select, textarea, input[type="password"] {
     text-transform: uppercase;
 }
@@ -408,3 +413,13 @@ i.menu-point {
 }
 
 /**/
+
+.title-button-container {
+    display: inline-block;
+    padding-left: 10px;
+}
+
+    .title-button-container .btn {
+        display: inline-block; 
+        width: 80px;
+    }

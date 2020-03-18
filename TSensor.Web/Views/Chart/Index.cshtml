@@ -1,0 +1,53 @@
+﻿@model ChartViewModel
+@{
+    ViewBag.Title = "Графики";
+}
+
+@section AdditionalHeader
+{
+    @Html.ActionLink("Обновить график", "Index", "Chart", null, new { @class = "btn bg-blue btn-block" })
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+
+<div class="box box-solid">
+    <div class="box-body table-responsive">
+		<div class="col-md-3">
+			<div class="form-group">
+                 <label for="filterDateStart">Дата с</label>
+                 <input type="text" class="form-control" id="filterDateStart" placeholder="Начало периода">
+               </div>
+		</div>
+		<div class="col-md-3">
+			<div class="form-group">
+                 <label for="filterDateEnd">Дата по</label>
+                 <input type="text" class="form-control" id="filterDateEnd" placeholder="Конец периода">
+               </div>
+		</div>
+		<div class="col-md-3">
+			<div class="form-group">
+                 <label for="exampleInputEmail1">Основной параметр</label>
+				 <select class="form-control" id="param">
+					 <option></option>
+				 </select>
+               </div>
+		</div>
+		<div class="col-md-3">
+			<div class="form-group">
+                 <label for="exampleInputEmail1">Дополнительный параметр</label>
+                 <input type="email" class="form-control" id="exampleInputEmail1">
+               </div>
+		</div>
+    </div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+
+<script>
+	new DatePicker('filterDateStart', {
+    });
+	new DatePicker('filterDateEnd', {
+
+	});
+</script>

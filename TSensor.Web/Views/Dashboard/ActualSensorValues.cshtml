@@ -40,6 +40,18 @@
             }
         }
     }
+    @section TitleButtons
+    {
+        @using (Html.BeginForm("Index", "Chart", FormMethod.Post, new { @class = "title-button-container", autocomplete = "off" }))
+        {
+            foreach(var tankGuid in Model.ActualSensorValueList.Select(p => p.TankGuid))
+            {
+                @Html.Hidden("guidList[]", tankGuid, new { id = $"guidList{tankGuid}" })
+            }
+
+            <button class="btn bg-blue btn-block" type="submit">Графики</button>
+        }
+    }
     var hasError = Model.ActualSensorValueList.Any(t => t.IsError);
     var hasWarning = Model.ActualSensorValueList.Any(t => t.IsWarning);
 
