@@ -10,7 +10,7 @@
 <div class="t-cell @cellClass" data-sensorguid="@guid" data-secondsensorguid="@Model.SecondSensorGuid">
     <h5>
         <span>@Model.TankName<i class="fa fa-tint tank-neytral-icon"></i><i class="tank-header-icon fa fa-tint @mainClass" data-sensorguid="@guid"></i>@if (Model.DualMode == true){<i class="fa fa-tint tank-header-icon @secondClass" data-sensorguid="@Model.SecondSensorGuid"></i>}</span><span>@Model.ProductName</span></h5>
-    <h6><span style="margin-right: 16px;" data-sensorguid="@guid">@Model.MainSensorInsertDate</span>@if (Model.DualMode == true){<span data-sensorguid="@Model.SecondSensorGuid">@Model.SecondSensorInsertDate</span>}</h6>
+    <h6><span style="margin-right: 16px;" data-sensorguid="@guid">@Model.MainSensorInsertDateStr</span>@if (Model.DualMode == true){<span data-sensorguid="@Model.SecondSensorGuid">@Model.SecondSensorInsertDateStr</span>}</h6>
     <div>
         <div class="bl2">
             <div>

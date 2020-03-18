@@ -6,6 +6,7 @@ namespace TSensor.Web.Models.Entity
     public class TankSensorValue : SensorValue
     {
         public string PointName { get; set; }
+        public Guid TankGuid { get; set; }
         public string TankName { get; set; }
         public string ProductName { get; set; }
         public bool DualMode { get; set; }
@@ -19,7 +20,11 @@ namespace TSensor.Web.Models.Entity
         public int? WeightChangeTimeout { get; set; }
 
         public DateTime? MainSensorInsertDate { get; set; }
+        public string MainSensorInsertDateStr =>
+            MainSensorInsertDate?.ToString("dd.MM.yyyy HH:mm:ss");
         public DateTime? SecondSensorInsertDate { get; set; }
+        public string SecondSensorInsertDateStr =>
+            SecondSensorInsertDate?.ToString("dd.MM.yyyy HH:mm:ss");
 
         private long? GetWarningDate(DateTime? date)
         {
