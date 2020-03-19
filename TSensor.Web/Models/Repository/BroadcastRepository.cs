@@ -3,30 +3,25 @@ using TSensor.Web.Models.Entity;
 
 namespace TSensor.Web.Models.Repository
 {
-	public class BroadcastRepository : RepositoryBase, IBroadcastRepository
+    public class BroadcastRepository : RepositoryBase, IBroadcastRepository
     {
         public BroadcastRepository(string connectionString) : base(connectionString) { }
 
-        public IEnumerable<SensorValue> GetActualSensorValues()
+        public IEnumerable<ActualSensorValue> GetActualSensorValues()
         {
-            return Query<SensorValue>(@"
+            return Query<ActualSensorValue>(@"
 				SELECT 
-					InsertDate,					
-					DeviceGuid,
-					CAST(izkNumber AS nvarchar(2)) AS IzkNumber,
-					CAST(sensorSerial AS nvarchar(2)) AS SensorSerial,
-			        environmentLevel AS EnvironmentLevel,
-					levelInPercent AS LevelInPercent,
-					environmentVolume AS EnvironmentVolume,
-					liquidEnvironmentLevel AS LiquidEnvironmentLevel,
-					liquidDensity AS LiquidDensity,
-					t1 AS T1,
-					t2 AS T2,
-					t3 AS T3,
-					t4 AS T4,
-					t5 AS T5,
-					t6 AS T6
+					InsertDate, DeviceGuid,
+                    izkNumber, banderolType, sensorSerial, sensorChannel
+                    pressureAndTempSensorState, sensorFirmwareVersionAndReserv,
+                    alarma, environmentLevel, pressureFilter, pressureMeasuring,
+                    levelInPercent, environmentVolume, liquidEnvironmentLevel,
+                    steamMass, liquidDensity, steamDensity, dielectricPermeability,
+                    dielectricPermeability2, t1, t2, t3, t4, t5, t6, plateTemp,
+                    period, plateServiceParam, environmentComposition, cs1, 
+                    plateServiceParam2, plateServiceParam3, sensorWorkMode,
+                    plateServiceParam4, plateServiceParam5, crc
 				FROM ActualSensorValue");
-        }        
+        }
     }
 }

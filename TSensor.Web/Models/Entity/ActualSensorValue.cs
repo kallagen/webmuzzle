@@ -11,6 +11,16 @@ namespace TSensor.Web.Models.Entity
         public Guid? TankGuid { get; set; }
         public bool? IsSecond { get; set; }
 
+        public DateTime InsertDate { get; set; }
+        public string SensorGuid =>
+            string.Join("_", new[] { DeviceGuid, izkNumber.ToString(), sensorSerial.ToString() });
+        public string InsertDateStr =>
+            InsertDate.ToString("dd.MM.yyyy HH:mm:ss");
+        public decimal AvgT =>
+            decimal.Round((t1 + t2 + t3 + t4 + t5 + t6) / 6, 1);
+        public int PercentLevel =>
+            (int)decimal.Round(levelInPercent, 0);
+
         public int izkNumber { get; set; }
         public int banderolType { get; set; }
         public int sensorSerial { get; set; }

@@ -5,6 +5,6 @@ namespace TSensor.Web.Models.Repository
 {
     public interface IBroadcastRepository
     {
-        public IEnumerable<SensorValue> GetActualSensorValues();        
+        public IEnumerable<ActualSensorValue> GetActualSensorValues();        
     }
 }
