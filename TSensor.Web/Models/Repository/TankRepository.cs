@@ -34,8 +34,8 @@ namespace TSensor.Web.Models.Repository
         }
 
         public Guid? Create(Guid pointGuid, string name, Guid? productGuid, bool dualMode,
-            string mainDeviceGuid, string mainIZKId, string mainSensorId,
-            string secondDeviceGuid, string secondIZKId, string secondSensorId, string description,
+            string mainDeviceGuid, int? mainIZKId, int? mainSensorId,
+            string secondDeviceGuid, int? secondIZKId, int? secondSensorId, string description,
             decimal? weightChangeDelta, int? weightChangeTimeout)
         {
             return QueryFirst<Guid?>(@"
@@ -72,8 +72,8 @@ namespace TSensor.Web.Models.Repository
         }
 
         public bool Edit(Guid tankGuid, Guid pointGuid, string name, Guid? productGuid, 
-            bool dualMode, string mainDeviceGuid, string mainIZKId, string mainSensorId,
-            string secondDeviceGuid, string secondIZKId, string secondSensorId, 
+            bool dualMode, string mainDeviceGuid, int? mainIZKId, int? mainSensorId,
+            string secondDeviceGuid, int? secondIZKId, int? secondSensorId, 
             string description, decimal? weightChangeDelta, int? weightChangeTimeout)
         {
             return QueryFirst<int?>(@"

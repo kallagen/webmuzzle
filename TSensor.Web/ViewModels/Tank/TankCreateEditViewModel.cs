@@ -16,16 +16,16 @@ namespace TSensor.Web.ViewModels.Tank
         public bool DualMode { get; set; }
         [StringLength(5, ErrorMessage = "Значение должно быть не больше 5 символов")]
         public string MainDeviceGuid { get; set; }
-        [StringLength(2, ErrorMessage = "Значение должно быть не больше 2 символов")]
-        public string MainIZKId { get; set; }
-        [StringLength(2, ErrorMessage = "Значение должно быть не больше 2 символов")]
-        public string MainSensorId { get; set; }
+        [Range(0, 99, ErrorMessage = "Значение должно быть от 0 до 99")]
+        public int? MainIZKId { get; set; }
+        [Range(0, 99, ErrorMessage = "Значение должно быть от 0 до 99")]
+        public int? MainSensorId { get; set; }
         [StringLength(5, ErrorMessage = "Значение должно быть не больше 5 символов")]
         public string SecondDeviceGuid { get; set; }
-        [StringLength(2, ErrorMessage = "Значение должно быть не больше 2 символов")]
-        public string SecondIZKId { get; set; }
-        [StringLength(2, ErrorMessage = "Значение должно быть не больше 2 символов")]
-        public string SecondSensorId { get; set; }
+        [Range(0, 99, ErrorMessage = "Значение должно быть от 0 до 99")]
+        public int? SecondIZKId { get; set; }
+        [Range(0, 99, ErrorMessage = "Значение должно быть от 0 до 99")]
+        public int? SecondSensorId { get; set; }
         public string Description { get; set; }
         public Guid? ProductGuid { get; set; }
         public string WeightChangeDelta { get; set; }

@@ -68,11 +68,7 @@ namespace TSensor.Web.Controllers
 
             viewModel.Name = viewModel.Name?.Trim();
             viewModel.MainDeviceGuid = viewModel.MainDeviceGuid?.Trim();
-            viewModel.MainIZKId = viewModel.MainIZKId?.ToUpper()?.Trim();
-            viewModel.MainSensorId = viewModel.MainSensorId?.ToUpper()?.Trim();
             viewModel.SecondDeviceGuid = viewModel.SecondDeviceGuid?.Trim();
-            viewModel.SecondIZKId = viewModel.SecondIZKId?.ToUpper()?.Trim();
-            viewModel.SecondSensorId = viewModel.SecondSensorId?.ToUpper()?.Trim();
             viewModel.WeightChangeDelta = viewModel.WeightChangeDelta?.Trim();
             viewModel.WeightChangeTimeout = viewModel.WeightChangeTimeout?.Trim();
 
@@ -171,11 +167,7 @@ namespace TSensor.Web.Controllers
 
             viewModel.Name = viewModel.Name?.Trim();
             viewModel.MainDeviceGuid = viewModel.MainDeviceGuid?.Trim();
-            viewModel.MainIZKId = viewModel.MainIZKId?.ToUpper()?.Trim();
-            viewModel.MainSensorId = viewModel.MainSensorId?.ToUpper()?.Trim();
             viewModel.SecondDeviceGuid = viewModel.SecondDeviceGuid?.Trim();
-            viewModel.SecondIZKId = viewModel.SecondIZKId?.ToUpper()?.Trim();
-            viewModel.SecondSensorId = viewModel.SecondSensorId?.ToUpper()?.Trim();
             viewModel.WeightChangeDelta = viewModel.WeightChangeDelta?.Trim();
             viewModel.WeightChangeTimeout = viewModel.WeightChangeTimeout?.Trim();
 

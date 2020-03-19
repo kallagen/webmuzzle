@@ -10,11 +10,11 @@ namespace TSensor.Web.Models.Entity
         public string ProductName { get; set; }
         public bool DualMode { get; set; }
         public string MainDeviceGuid { get; set; }
-        public string MainIZKId { get; set; }
-        public string MainSensorId { get; set; }
+        public int? MainIZKId { get; set; }
+        public int? MainSensorId { get; set; }
         public string SecondDeviceGuid { get; set; }
-        public string SecondIZKId { get; set; }
-        public string SecondSensorId { get; set; }
+        public int? SecondIZKId { get; set; }
+        public int? SecondSensorId { get; set; }
         public string Description { get; set; }
         public decimal? WeightChangeDelta { get; set; }
         public int? WeightChangeTimeout { get; set; }
