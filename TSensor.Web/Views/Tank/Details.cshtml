@@ -1,0 +1,112 @@
+﻿@model TankDetailsViewModel
+@{
+    ViewBag.Title = $"Резервуар {Model.TankName} {Model.ProductName}";
+
+    var exportDateStart = DateTime.Now.AddDays(-1);
+    var exportDateEnd = DateTime.Now;
+
+    void ValueRow(string name, object mainValue, object secondValue)
+    {
+        <tr>
+            <td>@name</td>
+            <td>@mainValue?.ToString()?.Replace(",", ".")</td>
+            @if (Model.DualMode)
+            {
+                <td>@secondValue?.ToString()?.Replace(",", ".")</td>
+            }
+        </tr>
+    }
+}
+
+<div class="row">
+    <div class="col-md-3">
+        @using (Html.BeginForm("Export", "Tank", FormMethod.Post, new { autocomplete = "off" }))
+        {
+            @Html.Hidden("tankGuid", Model.TankGuid)
+            <div class="box box-solid">
+                <div class="box-header">
+                    <h4>Экспорт данных с датчиков</h4>
+                </div>
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="ExportDateStart">Дата с</label>
+                        @Html.TextBox("exportDateStart", exportDateStart, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label for="ExportDateEnd">Дата по</label>
+                        @Html.TextBox("exportDateEnd", exportDateEnd, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button type="submit" class="btn bg-blue">Выгрузить значения</button>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="col-md-9">
+        <div class="box box-solid">
+            <div class="box-body table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Название параметра</th>
+                            <th>Значение датчика</th>
+                            @if (Model.DualMode)
+                            {
+                                <th>Значение дополнительного датчика</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            ValueRow("izkNumber", Model.MainValue?.izkNumber, Model.SecondValue?.izkNumber);
+                            ValueRow("banderolType", Model.MainValue?.banderolType, Model.SecondValue?.banderolType);
+                            ValueRow("sensorSerial", Model.MainValue?.sensorSerial, Model.SecondValue?.sensorSerial);
+                            ValueRow("sensorChannel", Model.MainValue?.sensorChannel, Model.SecondValue?.sensorChannel);
+                            ValueRow("pressureAndTempSensorState", Model.MainValue?.pressureAndTempSensorState, Model.SecondValue?.pressureAndTempSensorState);
+                            ValueRow("sensorFirmwareVersionAndReserv", Model.MainValue?.sensorFirmwareVersionAndReserv, Model.SecondValue?.sensorFirmwareVersionAndReserv);
+                            ValueRow("alarma", Model.MainValue?.alarma, Model.SecondValue?.alarma);
+                            ValueRow("environmentLevel", Model.MainValue?.environmentLevel, Model.SecondValue?.environmentLevel);
+                            ValueRow("pressureFilter", Model.MainValue?.pressureFilter, Model.SecondValue?.pressureFilter);
+                            ValueRow("pressureMeasuring", Model.MainValue?.pressureMeasuring, Model.SecondValue?.pressureMeasuring);
+                            ValueRow("levelInPercent", Model.MainValue?.levelInPercent, Model.SecondValue?.levelInPercent);
+                            ValueRow("environmentVolume", Model.MainValue?.environmentVolume, Model.SecondValue?.environmentVolume);
+                            ValueRow("liquidEnvironmentLevel", Model.MainValue?.liquidEnvironmentLevel, Model.SecondValue?.liquidEnvironmentLevel);
+                            ValueRow("steamMass", Model.MainValue?.steamMass, Model.SecondValue?.steamMass);
+                            ValueRow("liquidDensity", Model.MainValue?.liquidDensity, Model.SecondValue?.liquidDensity);
+                            ValueRow("steamDensity", Model.MainValue?.steamDensity, Model.SecondValue?.steamDensity);
+                            ValueRow("dielectricPermeability", Model.MainValue?.dielectricPermeability, Model.SecondValue?.dielectricPermeability);
+                            ValueRow("dielectricPermeability2", Model.MainValue?.dielectricPermeability2, Model.SecondValue?.dielectricPermeability2);
+                            ValueRow("t1", Model.MainValue?.t1, Model.SecondValue?.t1);
+                            ValueRow("t2", Model.MainValue?.t2, Model.SecondValue?.t2);
+                            ValueRow("t3", Model.MainValue?.t3, Model.SecondValue?.t3);
+                            ValueRow("t4", Model.MainValue?.t4, Model.SecondValue?.t4);
+                            ValueRow("t5", Model.MainValue?.t5, Model.SecondValue?.t5);
+                            ValueRow("t6", Model.MainValue?.t6, Model.SecondValue?.t6);
+                            ValueRow("plateTemp", Model.MainValue?.plateTemp, Model.SecondValue?.plateTemp);
+                            ValueRow("period", Model.MainValue?.period, Model.SecondValue?.period);
+                            ValueRow("plateServiceParam", Model.MainValue?.plateServiceParam, Model.SecondValue?.plateServiceParam);
+                            ValueRow("environmentComposition", Model.MainValue?.environmentComposition, Model.SecondValue?.environmentComposition);
+                            ValueRow("cs1", Model.MainValue?.cs1, Model.SecondValue?.cs1);
+                            ValueRow("plateServiceParam2", Model.MainValue?.plateServiceParam2, Model.SecondValue?.plateServiceParam2);
+                            ValueRow("plateServiceParam3", Model.MainValue?.plateServiceParam3, Model.SecondValue?.plateServiceParam3);
+                            ValueRow("sensorWorkMode", Model.MainValue?.sensorWorkMode, Model.SecondValue?.sensorWorkMode);
+                            ValueRow("plateServiceParam4", Model.MainValue?.plateServiceParam4, Model.SecondValue?.plateServiceParam4);
+                            ValueRow("plateServiceParam5", Model.MainValue?.plateServiceParam5, Model.SecondValue?.plateServiceParam5);
+                            ValueRow("crc", Model.MainValue?.crc, Model.SecondValue?.crc);
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    new DatePicker('exportDateStart', {
+        allowTime: true
+    });
+    new DatePicker('exportDateEnd', {
+        allowTime: true 
+	});
+</script>

@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 using System;
+using System.Globalization;
+using System.Linq;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.ViewModels.Tank;
@@ -180,7 +183,7 @@ namespace TSensor.Web.Controllers
             if (ModelState.IsValid && viewModel.TankGuid.HasValue)
             {
                 var editResult = _tankRepository.Edit(
-                    viewModel.TankGuid.Value, viewModel.PointGuid.Value, viewModel.Name, 
+                    viewModel.TankGuid.Value, viewModel.PointGuid.Value, viewModel.Name,
                     viewModel.ProductGuid, viewModel.DualMode,
                     viewModel.MainDeviceGuid, viewModel.MainIZKId, viewModel.MainSensorId,
                     viewModel.SecondDeviceGuid, viewModel.SecondIZKId, viewModel.SecondSensorId,
@@ -235,6 +238,186 @@ namespace TSensor.Web.Controllers
             ViewBag.BackUrl = Url.ActionLink("List", "Point");
 
             return View("NotFound");
+        }
+
+        [Route("tank/{guid}")]
+        public IActionResult Details(string guid)
+        {
+            if (Guid.TryParse(guid, out var _tankGuid))
+            {
+                var tankInfo = _tankRepository.GetTankActualSensorValues(_tankGuid);
+                if (tankInfo?.Any() == true)
+                {
+                    var record = tankInfo.First();
+                    var viewModel = new TankDetailsViewModel
+                    {
+                        TankGuid = record.TankGuid,
+                        TankName = record.TankName,
+                        DualMode = record.DualMode,
+                        ProductName = record.ProductName
+                    };
+
+                    foreach (var sensorValue in tankInfo.Select(p => ActualSensorValue.Parse(p) as ActualSensorValue))
+                    {
+                        if (sensorValue.IsSecond == true)
+                        {
+                            viewModel.SecondValue = sensorValue;
+                        }
+                        else
+                        {
+                            viewModel.MainValue = sensorValue;
+                        }
+                    }
+
+                    return View(viewModel);
+                }
+            }
+
+            ViewBag.Title = "Резервуар не найден";
+            return View("NotFound");
+        }
+
+        private void FillExportHeaders(ExcelWorksheet sheet)
+        {
+            sheet.Cells[1, 1].Value = "Дата события";
+            sheet.Cells[1, 2].Value = "izkNumber";
+            sheet.Cells[1, 3].Value = "banderolType";
+            sheet.Cells[1, 4].Value = "sensorSerial";
+            sheet.Cells[1, 5].Value = "sensorChannel";
+            sheet.Cells[1, 6].Value = "pressureAndTempSensorState";
+            sheet.Cells[1, 7].Value = "sensorFirmwareVersionAndReserv";
+            sheet.Cells[1, 8].Value = "alarma";
+            sheet.Cells[1, 9].Value = "environmentLevel";
+            sheet.Cells[1, 10].Value = "pressureFilter";
+            sheet.Cells[1, 11].Value = "pressureMeasuring";
+            sheet.Cells[1, 12].Value = "levelInPercent";
+            sheet.Cells[1, 13].Value = "environmentVolume";
+            sheet.Cells[1, 14].Value = "liquidEnvironmentLevel";
+            sheet.Cells[1, 15].Value = "steamMass";
+            sheet.Cells[1, 16].Value = "liquidDensity";
+            sheet.Cells[1, 17].Value = "steamDensity";
+            sheet.Cells[1, 18].Value = "dielectricPermeability";
+            sheet.Cells[1, 19].Value = "dielectricPermeability2";
+            sheet.Cells[1, 20].Value = "t1";
+            sheet.Cells[1, 21].Value = "t2";
+            sheet.Cells[1, 22].Value = "t3";
+            sheet.Cells[1, 23].Value = "t4";
+            sheet.Cells[1, 24].Value = "t5";
+            sheet.Cells[1, 25].Value = "t6";
+            sheet.Cells[1, 26].Value = "plateTemp";
+            sheet.Cells[1, 27].Value = "period";
+            sheet.Cells[1, 28].Value = "plateServiceParam";
+            sheet.Cells[1, 29].Value = "environmentComposition";
+            sheet.Cells[1, 30].Value = "cs1";
+            sheet.Cells[1, 31].Value = "plateServiceParam2";
+            sheet.Cells[1, 32].Value = "plateServiceParam3";
+            sheet.Cells[1, 33].Value = "sensorWorkMode";
+            sheet.Cells[1, 34].Value = "plateServiceParam4";
+            sheet.Cells[1, 35].Value = "plateServiceParam5";
+            sheet.Cells[1, 36].Value = "crc";
+        }
+
+        private void FillExportValues(ExcelWorksheet sheet, ActualSensorValue value, int row)
+        {
+            sheet.Cells[row, 1].Value = value.EventUTCDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm");
+            sheet.Cells[row, 2].Value = value.izkNumber;
+            sheet.Cells[row, 3].Value = value.banderolType;
+            sheet.Cells[row, 4].Value = value.sensorSerial;
+            sheet.Cells[row, 5].Value = value.sensorChannel;
+            sheet.Cells[row, 6].Value = value.pressureAndTempSensorState;
+            sheet.Cells[row, 7].Value = value.sensorFirmwareVersionAndReserv;
+            sheet.Cells[row, 8].Value = value.alarma;
+            sheet.Cells[row, 9].Value = value.environmentLevel;
+            sheet.Cells[row, 10].Value = value.pressureFilter;
+            sheet.Cells[row, 11].Value = value.pressureMeasuring;
+            sheet.Cells[row, 12].Value = value.levelInPercent;
+            sheet.Cells[row, 13].Value = value.environmentVolume;
+            sheet.Cells[row, 14].Value = value.liquidEnvironmentLevel;
+            sheet.Cells[row, 15].Value = value.steamMass;
+            sheet.Cells[row, 16].Value = value.liquidDensity;
+            sheet.Cells[row, 17].Value = value.steamDensity;
+            sheet.Cells[row, 18].Value = value.dielectricPermeability;
+            sheet.Cells[row, 19].Value = value.dielectricPermeability2;
+            sheet.Cells[row, 20].Value = value.t1;
+            sheet.Cells[row, 21].Value = value.t2;
+            sheet.Cells[row, 22].Value = value.t3;
+            sheet.Cells[row, 23].Value = value.t4;
+            sheet.Cells[row, 24].Value = value.t5;
+            sheet.Cells[row, 25].Value = value.t6;
+            sheet.Cells[row, 26].Value = value.plateTemp;
+            sheet.Cells[row, 27].Value = value.period;
+            sheet.Cells[row, 28].Value = value.plateServiceParam;
+            sheet.Cells[row, 29].Value = value.environmentComposition;
+            sheet.Cells[row, 30].Value = value.cs1;
+            sheet.Cells[row, 31].Value = value.plateServiceParam2;
+            sheet.Cells[row, 32].Value = value.plateServiceParam3;
+            sheet.Cells[row, 33].Value = value.sensorWorkMode;
+            sheet.Cells[row, 34].Value = value.plateServiceParam4;
+            sheet.Cells[row, 35].Value = value.plateServiceParam5;
+            sheet.Cells[row, 36].Value = value.crc;
+        }
+
+        [Route("tank/values/export")]
+        [HttpPost]
+        public IActionResult Export(string tankGuid, string exportDateStart, string exportDateEnd)
+        {
+            Tank tank = null;
+            if (Guid.TryParse(tankGuid, out var _tankGuid))
+            {
+                tank = _tankRepository.GetByGuid(_tankGuid);
+            }
+
+            if (tank == null)
+            {
+                ViewBag.Title = "Резервуар не найден";
+                return View("NotFound");
+            }
+
+            if (
+                DateTime.TryParseExact(exportDateStart, new[] { "dd.MM.yyyy", "dd.MM.yyyy HH:mm", "dd.MM.yyyy H:mm" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out var _dateStart) &&
+                DateTime.TryParseExact(exportDateEnd, new[] { "dd.MM.yyyy", "dd.MM.yyyy HH:mm", "dd.MM.yyyy H:mm" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out var _dateEnd))
+            {
+                var data = _tankRepository.GetTankActualSensorValues(_tankGuid, _dateStart.ToUniversalTime(), _dateEnd.ToUniversalTime());
+
+                using var package = new ExcelPackage();
+
+                package.Workbook.Worksheets.Add("Показания основного датчика");
+                var sheet = package.Workbook.Worksheets[0];
+                sheet.Name = "Показания основного датчика";
+
+                FillExportHeaders(sheet);
+
+                var row = 2;
+                foreach (var value in data.Where(p => p.IsSecond != true))
+                {
+                    FillExportValues(sheet, value, row++);
+                }
+
+                if (tank.DualMode)
+                {
+                    package.Workbook.Worksheets.Add("Показания дополнительного датчика");
+                    var secondSheet = package.Workbook.Worksheets[1];
+                    secondSheet.Name = "Показания дополнительного датчика";
+
+                    FillExportHeaders(secondSheet);
+
+                    row = 2;
+                    foreach (var value in data.Where(p => p.IsSecond == true))
+                    {
+                        FillExportValues(sheet, value, row++);
+                    }
+                }
+
+                return new FileContentResult(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                {
+                    FileDownloadName = $"Экспорт {tank.Name} {tank.ProductName} с {_dateStart.ToString("dd.MM.yyyy HH.mm")} по {_dateEnd.ToString("dd.MM.yyyy HH.mm")}.xlsx"
+                };
+            }
+            else
+            {
+                ViewBag.Title = "Неверные значения дат при экспорте";
+                return View("NotFound");
+            }
         }
     }
 }

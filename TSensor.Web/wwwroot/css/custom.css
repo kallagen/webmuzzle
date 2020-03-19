@@ -125,6 +125,10 @@ span.form-control {
         margin-bottom: 0px;
     }
 
+        .t-cell h5 a {
+            color: #333;
+        }
+
     .t-cell h6 {
         text-align: center;
         margin-top: 6px;

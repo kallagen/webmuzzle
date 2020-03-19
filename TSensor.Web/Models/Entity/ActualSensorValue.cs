@@ -95,5 +95,48 @@ namespace TSensor.Web.Models.Entity
 
             return entity;
         }
+
+        public static ActualSensorValue Parse(dynamic entity)
+        {
+            return new ActualSensorValue
+            {
+                IsSecond = entity.IsSecond,
+                izkNumber = entity.izkNumber,
+                banderolType = entity.banderolType,
+                sensorSerial = entity.sensorSerial,
+                sensorChannel = entity.sensorChannel,
+                pressureAndTempSensorState = entity.pressureAndTempSensorState,
+                sensorFirmwareVersionAndReserv = entity.sensorFirmwareVersionAndReserv,
+                alarma = entity.alarma,
+                environmentLevel = entity.environmentLevel,
+                pressureFilter = entity.pressureFilter,
+                pressureMeasuring = entity.pressureMeasuring,
+                levelInPercent = entity.levelInPercent,
+                environmentVolume = entity.environmentVolume,
+                liquidEnvironmentLevel = entity.liquidEnvironmentLevel,
+                steamMass = entity.steamMass,
+                liquidDensity = entity.liquidDensity,
+                steamDensity = entity.steamDensity,
+                dielectricPermeability = entity.dielectricPermeability,
+                dielectricPermeability2 = entity.dielectricPermeability2,
+                t1 = entity.t1,
+                t2 = entity.t2,
+                t3 = entity.t3,
+                t4 = entity.t4,
+                t5 = entity.t5,
+                t6 = entity.t6,
+                plateTemp = entity.plateTemp,
+                period = entity.period,
+                plateServiceParam = entity.plateServiceParam,
+                environmentComposition = entity.environmentComposition,
+                cs1 = entity.cs1,
+                plateServiceParam2 = entity.plateServiceParam2,
+                plateServiceParam3 = entity.plateServiceParam3,
+                sensorWorkMode = entity.sensorWorkMode,
+                plateServiceParam4 = entity.plateServiceParam4,
+                plateServiceParam5 = entity.plateServiceParam5,
+                crc = entity.crc
+            };
+        }
     }
 }
