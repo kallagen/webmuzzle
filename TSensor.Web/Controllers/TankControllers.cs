@@ -249,7 +249,9 @@ namespace TSensor.Web.Controllers
                         ProductName = record.ProductName
                     };
 
-                    foreach (var sensorValue in tankInfo.Select(p => ActualSensorValue.Parse(p) as ActualSensorValue))
+                    foreach (var sensorValue in tankInfo
+                        .Where(p => p.InsertDate != null)
+                        .Select(p => ActualSensorValue.Parse(p) as ActualSensorValue))
                     {
                         if (sensorValue.IsSecond == true)
                         {
