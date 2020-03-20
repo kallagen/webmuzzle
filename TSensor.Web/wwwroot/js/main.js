@@ -101,8 +101,6 @@ function sensorUpdate(data, date) {
                     if (sensor.weightTimeout !== 0) {
                         sensor.weightExpire = date + sensor.weightTimeout * 1000;
                     }
-                    sensor.weightChangeExpire = date;
-                    sensor.weightChangeTime = date;
                 }
             }
 
@@ -172,6 +170,54 @@ function notAssignedSensorUpdate(data) {
     }
 }
 
+function tankSensorUpdate(data) {
+    listenSensors.forEach(function (sensor) {
+        var sensorGuid = sensor.guid;
+        if (data && data[sensorGuid] && data[sensorGuid].insertDate !== sensor.updateDate) {
+
+            var val = data[sensorGuid];
+
+            $('.izkNumber[data-sensorGuid="' + sensorGuid + '"]').html(val.izkNumber);
+            $('.banderolType[data-sensorGuid="' + sensorGuid + '"]').html(val.banderolType);
+            $('.sensorSerial[data-sensorGuid="' + sensorGuid + '"]').html(val.sensorSerial);
+            $('.sensorChannel[data-sensorGuid="' + sensorGuid + '"]').html(val.sensorChannel);
+            $('.pressureAndTempSensorState[data-sensorGuid="' + sensorGuid + '"]').html(val.pressureAndTempSensorState);
+            $('.sensorFirmwareVersionAndReserv[data-sensorGuid="' + sensorGuid + '"]').html(val.sensorFirmwareVersionAndReserv);
+            $('.alarma[data-sensorGuid="' + sensorGuid + '"]').html(val.alarma);
+            $('.environmentLevel[data-sensorGuid="' + sensorGuid + '"]').html(val.environmentLevel);
+            $('.pressureFilter[data-sensorGuid="' + sensorGuid + '"]').html(val.pressureFilter);
+            $('.pressureMeasuring[data-sensorGuid="' + sensorGuid + '"]').html(val.pressureMeasuring);
+            $('.levelInPercent[data-sensorGuid="' + sensorGuid + '"]').html(val.levelInPercent);
+            $('.environmentVolume[data-sensorGuid="' + sensorGuid + '"]').html(val.environmentVolume);
+            $('.liquidEnvironmentLevel[data-sensorGuid="' + sensorGuid + '"]').html(val.liquidEnvironmentLevel);
+            $('.steamMass[data-sensorGuid="' + sensorGuid + '"]').html(val.steamMass);
+            $('.liquidDensity[data-sensorGuid="' + sensorGuid + '"]').html(val.liquidDensity);
+            $('.steamDensity[data-sensorGuid="' + sensorGuid + '"]').html(val.steamDensity);
+            $('.dielectricPermeability[data-sensorGuid="' + sensorGuid + '"]').html(val.dielectricPermeability);
+            $('.dielectricPermeability2[data-sensorGuid="' + sensorGuid + '"]').html(val.dielectricPermeability2);
+            $('.t1[data-sensorGuid="' + sensorGuid + '"]').html(val.t1);
+            $('.t2[data-sensorGuid="' + sensorGuid + '"]').html(val.t2);
+            $('.t3[data-sensorGuid="' + sensorGuid + '"]').html(val.t3);
+            $('.t4[data-sensorGuid="' + sensorGuid + '"]').html(val.t4);
+            $('.t5[data-sensorGuid="' + sensorGuid + '"]').html(val.t5);
+            $('.t6[data-sensorGuid="' + sensorGuid + '"]').html(val.t6);
+            $('.plateTemp[data-sensorGuid="' + sensorGuid + '"]').html(val.plateTemp);
+            $('.period[data-sensorGuid="' + sensorGuid + '"]').html(val.period);
+            $('.plateServiceParam[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam);
+            $('.environmentComposition[data-sensorGuid="' + sensorGuid + '"]').html(val.environmentComposition);
+            $('.cs1[data-sensorGuid="' + sensorGuid + '"]').html(val.cs1);
+            $('.plateServiceParam2[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam2);
+            $('.plateServiceParam3[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam3);
+            $('.sensorWorkMode[data-sensorGuid="' + sensorGuid + '"]').html(val.sensorWorkMode);
+            $('.plateServiceParam4[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam4);
+            $('.plateServiceParam5[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam5);
+            $('.crc[data-sensorGuid="' + sensorGuid + '"]').html(val.crc);
+
+            sensor.updateDate = data[sensorGuid].insertDate;
+        }
+    });
+}
+
 var TogglePasswordButton = function (selector) {
     var TogglePasswordControl = function (el) {
         var that = this;
@@ -205,7 +251,7 @@ var DatePicker = function (selector, options) {
 
     options = options || {};
 
-    var format = options.allowTime == true ? 'DD.MM.YYYY HH:mm' : 'DD.MM.YYYY';
+    var format = options.allowTime === true ? 'DD.MM.YYYY HH:mm' : 'DD.MM.YYYY';
 
     this._control = new Pikaday({
         field: document.getElementById(selector),

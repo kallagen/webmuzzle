@@ -110,6 +110,8 @@ namespace TSensor.Web.Models.Entity
         {
             return new ActualSensorValue
             {
+                InsertDate = entity.InsertDate,
+                DeviceGuid = entity.DeviceGuid,
                 IsSecond = entity.IsSecond,
                 izkNumber = entity.izkNumber,
                 banderolType = entity.banderolType,

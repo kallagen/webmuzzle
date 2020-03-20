@@ -5,14 +5,20 @@
     var exportDateStart = DateTime.Now.AddDays(-1);
     var exportDateEnd = DateTime.Now;
 
+    var values = new[] { Model.MainValue, Model.SecondValue }.Where(p => p != null);
+    var listenSensors = values.Select(p => new { guid = p.SensorGuid, updateDate = p.InsertDate });
+
+    var mainSensorGuid = Model.MainValue?.SensorGuid;
+    var secondSensorGuid = Model.SecondValue?.SensorGuid;
+
     void ValueRow(string name, object mainValue, object secondValue)
     {
         <tr>
             <td>@name</td>
-            <td>@mainValue?.ToString()?.Replace(",", ".")</td>
+            <td class="@name" data-sensorGuid="@mainSensorGuid">@mainValue?.ToString()?.Replace(",", ".")</td>
             @if (Model.DualMode)
             {
-                <td>@secondValue?.ToString()?.Replace(",", ".")</td>
+                <td data-sensorGuid="@secondSensorGuid">@secondValue?.ToString()?.Replace(",", ".")</td>
             }
         </tr>
     }
@@ -102,11 +108,23 @@
     </div>
 </div>
 
+<script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
 <script>
     new DatePicker('exportDateStart', {
         allowTime: true
     });
     new DatePicker('exportDateEnd', {
-        allowTime: true 
-	});
+        allowTime: true
+    });
+
+    @if (listenSensors.Any())
+    {
+        <text>
+            const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
+            const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
+
+            connection.on('sensorupdate', tankSensorUpdate);
+            connection.start();
+        </text>
+    }
 </script>
