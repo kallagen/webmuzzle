@@ -148,7 +148,7 @@ namespace TSensor.Web.Models.Repository
         {
             return Query<ActualSensorValue>(@"
                 SELECT
-                    IsSecond,
+                    EventUTCDate, IsSecond,
                     izkNumber, banderolType, sensorSerial, sensorChannel, pressureAndTempSensorState,
                     sensorFirmwareVersionAndReserv, alarma, environmentLevel, pressureFilter, pressureMeasuring,
                     levelInPercent, environmentVolume, liquidEnvironmentLevel, steamMass, liquidDensity, steamDensity,
