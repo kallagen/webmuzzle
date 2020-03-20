@@ -21,7 +21,8 @@ namespace TSensor.Web.Models.Repository
                     period, plateServiceParam, environmentComposition, cs1, 
                     plateServiceParam2, plateServiceParam3, sensorWorkMode,
                     plateServiceParam4, plateServiceParam5, crc
-				FROM ActualSensorValue");
+				FROM ActualSensorValue
+                WHERE InsertDate >= DATEADD(HOUR, -1, GETDATE())");
         }
     }
 }
