@@ -5,49 +5,118 @@
 
 @section AdditionalHeader
 {
-    @Html.ActionLink("Обновить график", "Index", "Chart", null, new { @class = "btn bg-blue btn-block" })
+    <button id="chart-refresh" class="btn bg-blue btn-block">Обновить график</button>
 }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
 
-<div class="box box-solid">
-    <div class="box-body table-responsive">
-		<div class="col-md-3">
-			<div class="form-group">
-                 <label for="filterDateStart">Дата с</label>
-                 <input type="text" class="form-control" id="filterDateStart" placeholder="Начало периода">
-               </div>
-		</div>
-		<div class="col-md-3">
-			<div class="form-group">
-                 <label for="filterDateEnd">Дата по</label>
-                 <input type="text" class="form-control" id="filterDateEnd" placeholder="Конец периода">
-               </div>
-		</div>
-		<div class="col-md-3">
-			<div class="form-group">
-                 <label for="exampleInputEmail1">Основной параметр</label>
-				 <select class="form-control" id="param">
-					 <option></option>
-				 </select>
-               </div>
-		</div>
-		<div class="col-md-3">
-			<div class="form-group">
-                 <label for="exampleInputEmail1">Дополнительный параметр</label>
-                 <input type="email" class="form-control" id="exampleInputEmail1">
-               </div>
-		</div>
+@using (Html.BeginForm("Index", "Chart", FormMethod.Post, new { autocomplete = "off", id = "chart-form" }))
+{
+    foreach (var tankGuid in Model.TankGuidList)
+    {
+        @Html.Hidden("TankGuidList[]", tankGuid, new { id = $"tankGuidList{tankGuid}" })
+    }
+    <div class="box box-solid">
+        <div class="box-body table-responsive">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="DateStart">Дата с</label>
+                    @Html.TextBoxFor(m => m.DateStart, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="DateEnd">Дата по</label>
+                    @Html.TextBoxFor(m => m.DateEnd, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="MainParam">Основной параметр</label>
+                    @Html.DropDownListFor(m => m.MainParam, new SelectList(ChartViewModel.ParamList, "Key", "Value"), new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="AdditionalParam">Дополнительный параметр</label>
+                    @Html.DropDownListFor(m => m.AdditionalParam, new SelectList(ChartViewModel.ParamList, "Key", "Value"), string.Empty, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+}
 
-<canvas id="canvas"></canvas>
+@if (Model.Values?.Any() != true)
+{
+    <p>За указанный период нет данных</p>
+}
+else
+{
+    <canvas id="chart"></canvas>
 
+    <script>
+        var ctx = document.getElementById('chart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data:
+            {
+                datasets: @Html.Raw(JsonSerializer.Serialize(Model.Values))
+            },
+            options: {
+            title: {
+                display: false
+            },
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        displayFormats: {
+                            hour: 'DD.MM HH:mm'
+                        },
+                        tooltipFormat: 'DD.MM HH:mm:ss'
+                    }
+                }],
+                yAxes: [{
+                    type: 'linear',
+					display: true,
+					position: 'left',
+                    id: 'y-axis-main',
+                    ticks: {
+                        beginAtZero: false
+                    }
+                }
+
+                @if (Model.AdditionalParam != null)
+                {
+                    <text>
+                    ,{
+					    type: 'linear',
+					    display: true,
+						position: 'right',
+                        id: 'y-axis-additional',
+                        ticks: {
+                            beginAtZero: false
+                        }
+                    }
+                    </text>
+                }
+
+                ]
+            }
+        }
+        });
+    </script>
+}
 
 <script>
-	new DatePicker('filterDateStart', {
+    new DatePicker('DateStart', {
+        allowTime: true
     });
-	new DatePicker('filterDateEnd', {
+    new DatePicker('DateEnd', {
+        allowTime: true
+    });
 
-	});
+    $('#chart-refresh').click(function (e) {
+        $('#chart-form').submit();
+    });
 </script>

@@ -23,8 +23,10 @@ namespace TSensor.Web.Models.Repository
 					@findTankGuid uniqueidentifier,
 					@findIsSecond bit = 0
 					
-					SELECT TOP 1 @findTankGuid = TankGuid, @findIsSecond = CASE WHEN
-						DualMode = 1 AND SecondDeviceGuid = @DeviceGuid AND SecondIZKId = @izkNumber AND SecondSensorId = @sensorSerial THEN 1 ELSE 0 END
+					SELECT TOP 1 @findTankGuid = TankGuid, @findIsSecond = CASE 
+						WHEN DualMode = 0 THEN NULL
+						WHEN DualMode = 1 AND SecondDeviceGuid = @DeviceGuid AND SecondIZKId = @izkNumber AND SecondSensorId = @sensorSerial THEN 1 
+						ELSE 0 END
 					FROM Tank
 					WHERE 
 						(MainDeviceGuid = @DeviceGuid AND MainIZKId = @izkNumber AND MainSensorId = @sensorSerial) OR
@@ -101,11 +103,13 @@ namespace TSensor.Web.Models.Repository
 					var meta = QueryFirst<dynamic>(@"
 						SELECT TOP 1 
 							TankGuid, 
-							CAST(CASE WHEN
-								DualMode = 1 AND 
-								SecondDeviceGuid = @deviceGuid AND 
-								SecondIZKId = @izkNumber AND 
-								SecondSensorId = @sensorSerial THEN 1 ELSE 0 END AS bit) AS IsSecond 
+							CAST(CASE 
+								WHEN DualMode = 0 THEN NULL
+								WHEN DualMode = 1 AND 
+									SecondDeviceGuid = @deviceGuid AND 
+									SecondIZKId = @izkNumber AND 
+									SecondSensorId = @sensorSerial THEN 1 
+								ELSE 0 END AS bit) AS IsSecond 
 						FROM Tank
 						WHERE
 							(MainDeviceGuid = @deviceGuid AND MainIZKId = @izkNumber AND MainSensorId = @sensorSerial) OR

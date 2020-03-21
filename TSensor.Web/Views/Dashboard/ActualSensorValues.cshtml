@@ -46,7 +46,7 @@
         {
             foreach(var tankGuid in Model.ActualSensorValueList.Select(p => p.TankGuid))
             {
-                @Html.Hidden("guidList[]", tankGuid, new { id = $"guidList{tankGuid}" })
+                @Html.Hidden("TankGuidList[]", tankGuid, new { id = $"guidList{tankGuid}" })
             }
 
             <button class="btn bg-blue btn-block" type="submit">Графики</button>

@@ -68,7 +68,101 @@ namespace TSensor.Web.Models.Repository
                 FROM AggregatedSensorValue
                 WHERE TankGuid IN @tankGuidList AND
                     EventUTCDate >= @dateStart AND EventUTCDate < @dateEnd",
-                new { tankGuidList, dateStart, dateEnd = dateStart.AddDays(1) });
+                new { tankGuidList, dateStart, dateEnd });
+        }
+
+        private string ParamLabel(string paramName)
+        {
+            return ViewModels.Chart.ChartViewModel.ParamList.ContainsKey(paramName)
+                ? ViewModels.Chart.ChartViewModel.ParamList[paramName] : null;
+        }
+
+        private decimal? ParamValue(string paramName, dynamic row)
+        {
+            if (paramName == "WEIGHT")
+            {
+                return (decimal)row.liquidEnvironmentLevel;
+            }
+            else if (paramName == "VOLUME")
+            {
+                return (decimal)row.environmentVolume;
+            }
+            else if (paramName == "DENSITY")
+            {
+                return (decimal)row.liquidDensity;
+            }
+            else if (paramName == "TEMPERATURE")
+            {
+                return (decimal)row.avgT;
+            }
+            else if (paramName == "LEVEL")
+            {
+                return (decimal)row.environmentLevel;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public Dictionary<dynamic, IEnumerable<dynamic>> GetSensorValues(IEnumerable<Guid> tankGuidList,
+            DateTime dateStart, DateTime dateEnd, string paramName, string additionalParamName)
+        {
+            var tankDict = Query<Tank>(@"
+                SELECT t.TankGuid, t.Name, p.Name AS ProductName
+                FROM Tank t
+                    LEFT JOIN Product p ON t.ProductGuid = p.ProductGuid
+                WHERE TankGuid IN @tankGuidList", new { tankGuidList });
+
+            var data = Query<dynamic>(@"
+                SELECT
+                    TankGuid,
+                    EventUTCDate,
+                    liquidEnvironmentLevel,
+                    environmentVolume,
+                    liquidDensity,
+                    (t1 + t2 + t3 + t4 + t5 + t6) / 6 AS avgT,
+                    environmentLevel,
+                    IsSecond
+                FROM SensorValue sv
+                WHERE TankGuid IN @tankGuidList AND EventUTCDate >= @dateStart AND EventUTCDate < @dateEnd",
+                new { tankGuidList, dateStart, dateEnd });
+
+            var result = new Dictionary<dynamic, IEnumerable<dynamic>>();
+
+            FillValues(paramName, tankDict, data, result, false);
+
+            if (additionalParamName != null && additionalParamName != paramName)
+            {
+                FillValues(additionalParamName, tankDict, data, result, true);
+            }
+
+            return result;
+        }
+
+        private void FillValues(string paramName, IEnumerable<Tank> tankDict, IEnumerable<dynamic> data,
+            Dictionary<dynamic, IEnumerable<dynamic>> result, bool isSecond)
+        {
+            foreach (var group in data.GroupBy(p => (Guid)p.TankGuid))
+            {
+                var tank = tankDict.FirstOrDefault(p => p.TankGuid == group.Key);
+
+                var label = $"{(tank == null ? "Неизвестный резервуар" : $"{tank.Name} {tank.ProductName}")} {ParamLabel(paramName)}";
+
+                var paramValues = paramName == "Temperature" && group.Any(p => (bool?)p.IsSecond != null)
+                    ? group.Where(p => p.IsSecond == true) : group;
+
+                result.Add(
+                    new
+                    {
+                        label,
+                        isSecond
+                    }, 
+                    paramValues
+                        .Select(p => new { date = ((DateTime)p.EventUTCDate).ToLocalTime(), value = ParamValue(paramName, p) })
+                        .Where(p => p.value != null)
+                        .Select(p => new { Key = p.date, Value = (decimal)p.value }));
+            };
         }
     }
 }
