@@ -105,6 +105,10 @@ span.form-control {
     min-width: 80px;
 }
 
+.fixed-button-width {
+    width: 160px;
+}
+
 .info-box-text {
     text-transform: none;
 }

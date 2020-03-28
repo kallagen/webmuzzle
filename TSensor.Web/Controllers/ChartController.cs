@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.ViewModels.Chart;
@@ -15,6 +16,58 @@ namespace TSensor.Web.Controllers
         public ChartController(IOLAPRepository OLAPRepository)
         {
             _OLAPRepository = OLAPRepository;
+        }
+
+        [Route("chart/data")]
+        [HttpPost]
+        public IActionResult Data(ChartViewModel viewModel)
+        {
+            var datasets = 
+                (viewModel == null ||
+                !viewModel.DateStart.HasValue ||
+                !viewModel.DateEnd.HasValue ||
+                (viewModel.DateEnd.Value - viewModel.DateStart.Value).TotalDays > 15 ||
+                string.IsNullOrEmpty(viewModel.MainParam)
+                ? Enumerable.Empty<object>()
+                : GetData(viewModel.TankGuidList, viewModel.DateStart.Value, viewModel.DateEnd.Value,
+                    viewModel.MainParam, viewModel.AdditionalParam));
+
+            return Json(new { datasets });
+        }
+
+        private IEnumerable<object> GetData(IEnumerable<Guid> tankGuidList,
+            DateTime dateStart, DateTime dateEnd,
+            string mainParam, string additionalParam)
+        {
+            var data = _OLAPRepository.GetSensorValues(tankGuidList,
+                dateStart.ToUniversalTime(), dateEnd.ToUniversalTime(),
+                mainParam, additionalParam);
+
+            //период меньше 3 часов - показываем сырые значения
+            //период меньше суток - показываем минуты
+            //все остальное - показываем часы
+
+            var totalHours = (dateEnd- dateStart).TotalHours;
+            return data.Select(dataset =>
+            {
+                return new
+                {
+                    fill = "false",
+                    dataset.Key.label,
+                    data = dataset.Value
+                        .Select(p => new
+                        {
+                            x = totalHours > 24 ? new DateTime(p.Key.Year, p.Key.Month, p.Key.Day, p.Key.Hour, 0, 0) :
+                                (totalHours > 3 ? new DateTime(p.Key.Year, p.Key.Month, p.Key.Day, p.Key.Hour, p.Key.Minute, 0) : p.Key),
+                            y = p.Value
+                        })
+                        .GroupBy(p => p.x)
+                        .Select(p => new { x = p.Key, y = Math.Round(p.Average(v => (decimal)v.y), 3) }),
+                    backgroundColor = dataset.Key.isSecond ? "#4BC0C0" : "#36A2EB",
+                    borderColor = dataset.Key.isSecond ? "#4BC0C0" : "#36A2EB",
+                    yAxisID = dataset.Key.isSecond ? "y-axis-additional" : "y-axis-main"
+                };
+            });
         }
 
         [Route("chart")]
@@ -39,35 +92,17 @@ namespace TSensor.Web.Controllers
                 viewModel.DateEnd = DateTime.Now;
             }
 
-            var data = _OLAPRepository.GetSensorValues(viewModel.TankGuidList,
-                viewModel.DateStart.Value.ToUniversalTime(), viewModel.DateEnd.Value.ToUniversalTime(),
-                viewModel.MainParam, viewModel.AdditionalParam);
-
-            //период меньше 3 часов - показываем сырые значения
-            //период меньше суток - показываем минуты
-            //все остальное - показываем часы
-
-            var totalHours = (viewModel.DateEnd.Value - viewModel.DateStart.Value).TotalHours;
-            viewModel.Values = data.Select(dataset =>
+            if ((viewModel.DateEnd.Value - viewModel.DateStart.Value).TotalDays > 15)
             {
-                return new
-                {
-                    fill = "false",
-                    dataset.Key.label,
-                    data = dataset.Value
-                        .Select(p => new
-                        {
-                            x = totalHours > 24 ? new DateTime(p.Key.Year, p.Key.Month, p.Key.Day, p.Key.Hour, 0, 0) :
-                                (totalHours > 3 ? new DateTime(p.Key.Year, p.Key.Month, p.Key.Day, p.Key.Hour, p.Key.Minute, 0) : p.Key),
-                            y = p.Value
-                        })
-                        .GroupBy(p => p.x)
-                        .Select(p => new { x = p.Key, y = Math.Round(p.Average(v => (decimal)v.y), 3) }),
-                    backgroundColor = dataset.Key.isSecond ? "#4BC0C0" : "#36A2EB",
-                    borderColor = dataset.Key.isSecond ? "#4BC0C0" : "#36A2EB",
-                    yAxisID = dataset.Key.isSecond ? "y-axis-additional" : "y-axis-main"
-                };
-            });
+                viewModel.DateStart = viewModel.DateEnd.Value.AddDays(-15);
+                ModelState.Remove("DateStart");
+
+                viewModel.ErrorMessage = "Нельзя указать период больше 15 суток";
+            }
+
+            viewModel.Values = GetData(viewModel.TankGuidList,
+                viewModel.DateStart.Value, viewModel.DateEnd.Value,
+                viewModel.MainParam, viewModel.AdditionalParam);
 
             return View(viewModel);
         }

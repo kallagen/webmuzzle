@@ -1,14 +1,35 @@
 ﻿@model ChartViewModel
 @{
     ViewBag.Title = "Графики";
+
+    var baseRequestData = JsonSerializer.Serialize(new
+    {
+        Model.DateStart,
+        Model.DateEnd,
+        Model.MainParam,
+        Model.AdditionalParam,
+        Model.TankGuidList
+    });
 }
 
 @section AdditionalHeader
 {
-    <button id="chart-refresh" class="btn bg-blue btn-block">Обновить график</button>
+    <div class="right">
+        <button id="chart-unzoom" class="btn btn-default fixed-button-width pull-right hidden" style="margin-left: 14px;">Сбросить масштаб</button>
+        <button id="chart-refresh" class="btn bg-blue fixed-button-width pull-right">Обновить график</button>
+    </div>
 }
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-crosshair@1.1.2"></script>
+
+@if (Model.IsError)
+{
+    <div class="t-warning-message callout callout-warning">
+        <h4>Внимание!</h4>
+        <p>@Model.ErrorMessage</p>
+    </div>
+}
 
 @using (Html.BeginForm("Index", "Chart", FormMethod.Post, new { autocomplete = "off", id = "chart-form" }))
 {
@@ -52,11 +73,52 @@
 }
 else
 {
-    <canvas id="chart"></canvas>
+    <div class="box box-solid">
+        <canvas id="chart">
+        </canvas>
+        <div class="overlay hidden">
+            <i class="fa fa-refresh fa-spin"></i>
+        </div>
+    </div>
 
     <script>
-        var ctx = document.getElementById('chart').getContext('2d');
-        var myChart = new Chart(ctx, {
+        var baseRequestData = @Html.Raw(@baseRequestData);
+
+        var $loader = $('.overlay');
+        function loadStart() { $loader.removeClass('hidden'); }
+        function loadEnd() { $loader.addClass('hidden') }
+
+        var errorModal = new ErrorModal('При обновлении графика произошла ошибка');
+
+        var $unzoomButton = $('#chart-unzoom');
+        $unzoomButton.click(function () {
+            reloadChart();
+        });
+
+        function reloadChart() {
+            loadStart();
+
+            $.ajax({
+                url: '@Url.Action("Data", "Chart")',
+                type: 'POST',
+                data: baseRequestData,
+                success: function (data) {
+                    chart.data = data;
+                    chart.update();
+
+                    loadEnd();
+
+                    $unzoomButton.addClass('hidden');
+                },
+                error: function () {
+                    errorModal.show();
+                    loadEnd();
+                },
+                timeout: 30000
+            });
+        }
+
+        var chart = new Chart(document.getElementById('chart').getContext('2d'), {
             type: 'line',
             data:
             {
@@ -102,7 +164,45 @@ else
                 }
 
                 ]
-            }
+                },
+                plugins: {
+                    crosshair: {
+                        callbacks: {
+                            beforeZoom: function (start, end) {
+                                loadStart();
+
+                                var postData = {
+                                    DateStart: start.toISOString(),
+                                    DateEnd: end.toISOString(),
+                                    MainParam: baseRequestData.MainParam,
+                                    AdditionalParam: baseRequestData.AdditionalParam,
+                                    TankGuidList: baseRequestData.TankGuidList
+                                };
+
+                                $.ajax({
+                                    url: '@Url.Action("Data", "Chart")',
+                                    type: 'POST',
+                                    data: postData,
+                                    success: function (data) {
+                                        chart.data = data;
+                                        chart.update();
+
+                                        loadEnd();
+
+                                        $unzoomButton.removeClass('hidden');
+                                    },
+                                    error: function () {
+                                        errorModal.show();
+                                        loadEnd();
+                                    },
+                                    timeout: 30000
+                                });
+
+                                return false;
+                            }
+                        }
+                    }
+                }
         }
         });
     </script>
