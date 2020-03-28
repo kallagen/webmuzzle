@@ -181,7 +181,6 @@ function tankSensorUpdate(data) {
             $('.banderolType[data-sensorGuid="' + sensorGuid + '"]').html(val.banderolType);
             $('.sensorSerial[data-sensorGuid="' + sensorGuid + '"]').html(val.sensorSerial);
             $('.sensorChannel[data-sensorGuid="' + sensorGuid + '"]').html(val.sensorChannel);
-            $('.pressureAndTempSensorState[data-sensorGuid="' + sensorGuid + '"]').html(val.pressureAndTempSensorState);
             $('.sensorFirmwareVersionAndReserv[data-sensorGuid="' + sensorGuid + '"]').html(val.sensorFirmwareVersionAndReserv);
             $('.alarma[data-sensorGuid="' + sensorGuid + '"]').html(val.alarma);
             $('.environmentLevel[data-sensorGuid="' + sensorGuid + '"]').html(val.environmentLevel);
@@ -203,14 +202,8 @@ function tankSensorUpdate(data) {
             $('.t6[data-sensorGuid="' + sensorGuid + '"]').html(val.t6);
             $('.plateTemp[data-sensorGuid="' + sensorGuid + '"]').html(val.plateTemp);
             $('.period[data-sensorGuid="' + sensorGuid + '"]').html(val.period);
-            $('.plateServiceParam[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam);
             $('.environmentComposition[data-sensorGuid="' + sensorGuid + '"]').html(val.environmentComposition);
             $('.cs1[data-sensorGuid="' + sensorGuid + '"]').html(val.cs1);
-            $('.plateServiceParam2[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam2);
-            $('.plateServiceParam3[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam3);
-            $('.sensorWorkMode[data-sensorGuid="' + sensorGuid + '"]').html(val.sensorWorkMode);
-            $('.plateServiceParam4[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam4);
-            $('.plateServiceParam5[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam5);
             $('.crc[data-sensorGuid="' + sensorGuid + '"]').html(val.crc);
 
             sensor.updateDate = data[sensorGuid].insertDate;

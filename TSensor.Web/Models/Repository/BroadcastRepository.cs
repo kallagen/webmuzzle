@@ -13,14 +13,12 @@ namespace TSensor.Web.Models.Repository
 				SELECT 
 					InsertDate, DeviceGuid,
                     izkNumber, banderolType, sensorSerial, sensorChannel
-                    pressureAndTempSensorState, sensorFirmwareVersionAndReserv,
+                    sensorFirmwareVersionAndReserv,
                     alarma, environmentLevel, pressureFilter, pressureMeasuring,
                     levelInPercent, environmentVolume, liquidEnvironmentLevel,
                     steamMass, liquidDensity, steamDensity, dielectricPermeability,
                     dielectricPermeability2, t1, t2, t3, t4, t5, t6, plateTemp,
-                    period, plateServiceParam, environmentComposition, cs1, 
-                    plateServiceParam2, plateServiceParam3, sensorWorkMode,
-                    plateServiceParam4, plateServiceParam5, crc
+                    period, environmentComposition, cs1, crc
 				FROM ActualSensorValue
                 WHERE InsertDate >= DATEADD(HOUR, -1, GETDATE())");
         }
