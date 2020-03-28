@@ -177,6 +177,10 @@ else
                     crosshair: {
                         callbacks: {
                             beforeZoom: function (start, end) {
+                                if (end - start < 600000) {
+                                    return false;
+                                }
+
                                 loadStart();
 
                                 var postData = {
