@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TSensor.Proxy
+namespace TSensor.Proxy.Logger
 {
     public class Elapsed : IDisposable
     {
