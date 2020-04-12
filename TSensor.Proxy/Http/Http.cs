@@ -30,9 +30,12 @@ namespace TSensor.Proxy.Http
 
         public static async Task<HttpResult> PostAsync(string url, Dictionary<string, string> param)
         {
+            HttpWebRequest request;
+            HttpWebResponse response;
+
             try
             {
-                var request = WebRequest.Create(url) as HttpWebRequest;
+                request = WebRequest.Create(url) as HttpWebRequest;
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded";
                 request.Timeout = 10000;
@@ -49,20 +52,19 @@ namespace TSensor.Proxy.Http
                     stream.Close();
                 }
 
-                var response = await request.GetResponseAsync() as HttpWebResponse;
+                response = await request.GetResponseAsync() as HttpWebResponse;
 
                 if (IsConnectionError)
                 {
                     IsConnectionError = false;
                 }
 
-                using (var reader = new StreamReader(response.GetResponseStream()))
+                using var reader = new StreamReader(response.GetResponseStream());
+
+                return new HttpResult
                 {
-                    return new HttpResult
-                    {
-                        Content = reader.ReadToEnd()
-                    };
-                }
+                    Content = reader.ReadToEnd()
+                };
             }
             catch (Exception ex)
             {
@@ -75,6 +77,11 @@ namespace TSensor.Proxy.Http
                 {
                     Exception = ex
                 };
+            }
+            finally
+            {
+                request = null;
+                response = null;
             }
         }
     }
