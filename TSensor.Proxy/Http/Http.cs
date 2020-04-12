@@ -6,7 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TSensor.Proxy
+namespace TSensor.Proxy.Http
 {
     public static class Http
     {

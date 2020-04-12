@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TSensor.Proxy
+namespace TSensor.Proxy.Http
 {
     public class HttpResult
     {
