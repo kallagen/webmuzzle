@@ -1,11 +1,13 @@
-﻿namespace TSensor.Proxy
+﻿using TSensor.Proxy.Logger;
+
+namespace TSensor.Proxy
 {
     class Program
     {
         static void Main(string[] args)
         {
             var config = new Config();
-            var logger = new Logger();
+            ILogger logger = new ConsoleLogger();
 
             new SerialService(config, logger).Run();
         }

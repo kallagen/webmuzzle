@@ -1,49 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Ports;
+using TSensor.Proxy.Logger;
 
 namespace TSensor.Proxy
 {
-    public class PortListener : IDisposable
+    public class PortListener
     {
         private readonly Config _config;
-        private readonly ArchiveService _archiveService;        
-        private readonly Logger _logger;
+        private readonly ILogger _logger;
 
-        private string _portName;
-        private SerialPort port;
-
-        private bool IsRunning;
+        private readonly SerialPort port;
 
         private void Log(string message, Elapsed elapsed = null)
         {
-            _logger.Write(message, elapsed: elapsed, prefix: $"{_portName}:");
+            _logger.Log(message, prefix: port.PortName, elapsed);
         }
 
-        public PortListener(string portName, Config config, ArchiveService archiveService, Logger logger)
+        public PortListener(string portName, Config config, ILogger logger)
         {
             _config = config;
-            _archiveService = archiveService;
             _logger = logger;
 
-            _portName = portName;
-
-            using (var elapsed = Elapsed.Create)
+            port = new SerialPort(portName)
             {
-                port = new SerialPort(portName)
-                {
-                    BaudRate = 19200,
-                    Parity = Parity.None,
-                    StopBits = StopBits.One,
-                    DataBits = 8,
-                    Handshake = Handshake.None,
-                    RtsEnable = true
-                };
-                port.DataReceived += Port_DataReceived;
-                port.ErrorReceived += Port_ErrorReceived;
+                BaudRate = 19200,
+                Parity = Parity.None,
+                StopBits = StopBits.One,
+                DataBits = 8,
+                Handshake = Handshake.None,
+                RtsEnable = true
+            };
 
-                Log("initialized", elapsed);
-            }
+            port.DataReceived += Port_DataReceived;
+            port.ErrorReceived += Port_ErrorReceived;
         }
 
         private const int MESSAGE_SIZE = 128;
@@ -58,68 +48,50 @@ namespace TSensor.Proxy
             {
                 try
                 {
-                    using (var elapsed = Elapsed.Create)
-                    {
-                        var eventDate = elapsed.Start.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff");
+                    using var elapsed = Elapsed.Create;
 
-                        var result = await Http.PostAsync(_config.ApiUrlSendValue, new Dictionary<string, string>
+                    var eventDate = elapsed.Start.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff");
+
+                    var result = await Http.Http.PostAsync(_config.ApiUrlSendValue,
+                        new Dictionary<string, string>
                         {
                             { "v", strData },
                             { "d", eventDate },
                             { "g", _config.DeviceGuid }
                         });
 
-                        if (result.Exception != null)
-                        {
-                            Log("sending error");
-                            _logger.Write(result.Exception);
+                    if (result.Exception != null)
+                    {
+                        Log("sending error");
+                        Log(result.Exception.Message);
 
-                            //_archiveService.Write(_portName, $"{eventDate};{strData}");
-                        }
-                        else
-                        {
-                            Log("data sended", elapsed);
-                        }
+                        //_archiveService.Write(_portName, $"{eventDate};{strData}");
+                    }
+                    else
+                    {
+                        Log("data sended", elapsed);
                     }
                 }
                 catch (Exception ex)
                 {
                     Log("sending error");
-                    _logger.Write(ex);
+                    Log(ex.Message);
                 }
             }
         }
 
         private void Port_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
         {
-            Dispose();
-        }
-
-        public void Dispose()
-        {
-            port.DataReceived -= Port_DataReceived;
-            port.ErrorReceived -= Port_ErrorReceived;
-
-            if (port.IsOpen)
+            try
             {
-                try
-                {
-                    port.Close();
-                    Log("closed");
-                }
-                catch (Exception ex)
-                {
-                    Log("closing error");
-                    _logger.Write(ex);
-                }
-            }
-            else
-            {
-                Log("already closed");
-            }
+                var port = sender as SerialPort;
 
-            IsRunning = false;
-            Log("disposed");
+                port.DataReceived -= Port_DataReceived;
+                port.ErrorReceived -= Port_ErrorReceived;
+            }
+            catch { }
+
+            Log("error received");
         }
 
         public void Run()
@@ -127,19 +99,13 @@ namespace TSensor.Proxy
             try
             {
                 port.Open();
-                IsRunning = true;
-
                 Log("is open");
             }
             catch (Exception ex)
             {
                 Log("opening error");
-                _logger.Write(ex);
-
-                Dispose();
+                Log(ex.Message);
             }
-
-            while (IsRunning) { }
         }
     }
 }
