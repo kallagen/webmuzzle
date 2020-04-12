@@ -10,19 +10,25 @@ namespace TSensor.Proxy
         private readonly Config _config;
         private readonly ILogger _logger;
 
+        private readonly ArchiveService archiveService;
+
         public SerialService(Config config, ILogger logger)
         {
             _config = config;
             _logger = logger;
+
+            archiveService = new ArchiveService(_config, _logger);
         }
 
         public void Run()
         {
             foreach (var portName in SerialPort.GetPortNames().Where(p => p.Contains("USB")))
             {
-                var portListener = new PortListener(portName, _config, _logger);
+                var portListener = new PortListener(portName, _config, _logger, archiveService);
                 portListener.Run();
             }
+
+            archiveService.Run();
 
             Thread.Sleep(Timeout.Infinite);
         }

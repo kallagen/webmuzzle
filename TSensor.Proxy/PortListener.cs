@@ -9,6 +9,7 @@ namespace TSensor.Proxy
     {
         private readonly Config _config;
         private readonly ILogger _logger;
+        private readonly ArchiveService _archiveService;
 
         private readonly SerialPort port;
 
@@ -17,10 +18,11 @@ namespace TSensor.Proxy
             _logger.Log(message, prefix: port.PortName, elapsed);
         }
 
-        public PortListener(string portName, Config config, ILogger logger)
+        public PortListener(string portName, Config config, ILogger logger, ArchiveService archiveService)
         {
             _config = config;
             _logger = logger;
+            _archiveService = archiveService;
 
             port = new SerialPort(portName)
             {
@@ -46,36 +48,27 @@ namespace TSensor.Proxy
 
             if (strData.Length == MESSAGE_SIZE)
             {
-                try
-                {
-                    using var elapsed = Elapsed.Create;
+                using var elapsed = Elapsed.Create;
+                var eventDate = elapsed.Start.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff");
 
-                    var eventDate = elapsed.Start.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff");
-
-                    var result = await Http.Http.PostAsync(_config.ApiUrlSendValue,
-                        new Dictionary<string, string>
-                        {
+                var result = await Http.Http.PostAsync(_config.ApiUrlSendValue,
+                    new Dictionary<string, string>
+                    {
                             { "v", strData },
                             { "d", eventDate },
                             { "g", _config.DeviceGuid }
-                        });
+                    });
 
-                    if (result.Exception != null)
-                    {
-                        Log("sending error");
-                        Log(result.Exception.Message);
-
-                        //_archiveService.Write(_portName, $"{eventDate};{strData}");
-                    }
-                    else
-                    {
-                        Log("data sended", elapsed);
-                    }
-                }
-                catch (Exception ex)
+                if (result.Exception != null)
                 {
                     Log("sending error");
-                    Log(ex.Message);
+                    Log(result.Exception.Message);
+
+                    _archiveService.Write(port.PortName, $"{eventDate};{strData}");
+                }
+                else
+                {
+                    Log($"data sended({result.Content})", elapsed);
                 }
             }
         }
