@@ -65,7 +65,8 @@ namespace TSensor.Web.Controllers
                         .Select(p => new { x = p.Key, y = Math.Round(p.Average(v => (decimal)v.y), 3) }),
                     backgroundColor = dataset.Key.isSecond ? "#4BC0C0" : "#36A2EB",
                     borderColor = dataset.Key.isSecond ? "#4BC0C0" : "#36A2EB",
-                    yAxisID = dataset.Key.isSecond ? "y-axis-additional" : "y-axis-main"
+                    yAxisID = dataset.Key.isSecond ? "y-axis-additional" : "y-axis-main",
+                    cubicInterpolationMode = "monotone"
                 };
             });
         }
