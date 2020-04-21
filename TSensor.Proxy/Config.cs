@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Runtime.InteropServices;
 
 namespace TSensor.Proxy
 {
@@ -11,6 +12,9 @@ namespace TSensor.Proxy
         public int MaxArchiveFileSize { get; private set; }
         public int MaxErrorFileSize { get; private set; }
         public string LoggerType { get; private set; }
+
+        public bool IsLinux =>
+            RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
         public Config()
         {

@@ -7,8 +7,8 @@ namespace TSensor.Proxy
         static void Main(string[] args)
         {
             var config = new Config();
-            ILogger logger = 
-                config.LoggerType == LoggerType.DEBUG ? new ConsoleLogger() as ILogger : new ErrorFileLogger(config);
+            var logger = config.LoggerType == LoggerType.DEBUG 
+                ? new ConsoleLogger() as ILogger : new ErrorFileLogger(config);
 
             new SerialService(config, logger).Run();
         }
