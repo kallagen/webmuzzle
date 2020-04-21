@@ -13,9 +13,9 @@ namespace TSensor.Proxy
 
         private readonly SerialPort port;
 
-        private void Log(string message, Elapsed elapsed = null)
+        private void Log(string message, Elapsed elapsed = null, bool isError = false)
         {
-            _logger.Log(message, prefix: port.PortName, elapsed);
+            _logger.Log(message, prefix: port.PortName, elapsed, isError);
         }
 
         public PortListener(string portName, Config config, ILogger logger, ArchiveService archiveService)
@@ -61,8 +61,8 @@ namespace TSensor.Proxy
 
                 if (result.Exception != null)
                 {
-                    Log("sending error");
-                    Log(result.Exception.Message);
+                    Log("sending error", isError: true);
+                    Log(result.Exception.Message, isError: true);
 
                     _archiveService.Write(port.PortName, $"{eventDate};{strData}");
                 }
@@ -84,7 +84,7 @@ namespace TSensor.Proxy
             }
             catch { }
 
-            Log("error received");
+            Log("error received", isError: true);
         }
 
         public void Run()
@@ -96,8 +96,8 @@ namespace TSensor.Proxy
             }
             catch (Exception ex)
             {
-                Log("opening error");
-                Log(ex.Message);
+                Log("opening error", isError: true);
+                Log(ex.Message, isError: true);
             }
         }
     }

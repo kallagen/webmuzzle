@@ -60,8 +60,8 @@ namespace TSensor.Proxy
             }
             catch (Exception ex)
             {
-                _logger.Log("data archiving error", prefix: portName);
-                _logger.Log(ex.Message);
+                _logger.Log("data archiving error", prefix: portName, isError: true);
+                _logger.Log(ex.Message, isError: true);
             }
         }
 
@@ -85,8 +85,8 @@ namespace TSensor.Proxy
                 }
                 catch (Exception ex)
                 {
-                    _logger.Log($"current.archive moving error");
-                    _logger.Log(ex.Message);
+                    _logger.Log($"current.archive moving error", isError: true);
+                    _logger.Log(ex.Message, isError: true);
                 }
             }
         }
@@ -120,8 +120,8 @@ namespace TSensor.Proxy
 
                         if (result.Exception != null)
                         {
-                            _logger.Log($"sending archive {fileName} error");
-                            _logger.Log(result.Exception.Message);
+                            _logger.Log($"sending archive {fileName} error", isError: true);
+                            _logger.Log(result.Exception.Message, isError: true);
                         }
                         else
                         {
@@ -135,8 +135,8 @@ namespace TSensor.Proxy
                             }
                             catch (Exception ex)
                             {
-                                _logger.Log($"removing archive {fileName} error");
-                                _logger.Log(ex.Message);
+                                _logger.Log($"removing archive {fileName} error", isError: true);
+                                _logger.Log(ex.Message, isError: true);
                             }
                         }
                     }
@@ -144,8 +144,8 @@ namespace TSensor.Proxy
             }
             catch (Exception ex)
             {
-                _logger.Log($"archive service working error");
-                _logger.Log(ex.Message);
+                _logger.Log($"archive service working error", isError: true);
+                _logger.Log(ex.Message, isError: true);
             }
         }
     }
