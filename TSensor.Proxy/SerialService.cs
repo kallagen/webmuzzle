@@ -22,7 +22,8 @@ namespace TSensor.Proxy
 
         public void Run()
         {
-            foreach (var portName in SerialPort.GetPortNames().Where(p => p.Contains("USB")))
+            foreach (var portName in SerialPort.GetPortNames()
+                .Where(p => !_config.IsLinux || p.Contains("USB")))
             {
                 var portListener = new PortListener(portName, _config, _logger, archiveService);
                 portListener.Run();
