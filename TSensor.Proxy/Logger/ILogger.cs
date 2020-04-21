@@ -2,6 +2,6 @@
 {
     public interface ILogger
     {
-        public void Log(string message, string prefix = null, Elapsed elapsed = null, bool IsError = false);
+        public void Log(string message, string prefix = null, Elapsed elapsed = null, bool isError = false);
     }
 }
