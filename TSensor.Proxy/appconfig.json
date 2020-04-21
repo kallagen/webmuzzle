@@ -1,8 +1,12 @@
 {
   "apiHost": "80.76.40.56:8081",
   "deviceGuid": "00001",
-  //kilobytes
-  "maxArchiveFileSize": 10,
+  //kbytes
+  "maxArchiveFileSize": 100,
   //seconds
-  "archiveSendInterval": 300
+  "archiveSendInterval": 300,
+  //kbytes
+  "maxErrorFileSize": 1000,
+  //error  / debug
+  "loggerType":  "error"
 }

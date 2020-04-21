@@ -9,6 +9,8 @@ namespace TSensor.Proxy
         public string DeviceGuid { get; private set; }
         public int ArchiveSendInterval { get; private set; }
         public int MaxArchiveFileSize { get; private set; }
+        public int MaxErrorFileSize { get; private set; }
+        public string LoggerType { get; private set; }
 
         public Config()
         {
@@ -21,6 +23,8 @@ namespace TSensor.Proxy
             DeviceGuid = config["deviceGuid"];
             ArchiveSendInterval = int.Parse(config["archiveSendInterval"]) * 1000;
             MaxArchiveFileSize = int.Parse(config["maxArchiveFileSize"]) * 1024;
+            MaxErrorFileSize = int.Parse(config["maxErrorFileSize"]) * 1024;
+            LoggerType = config["loggerType"];
         }
     }
 }
