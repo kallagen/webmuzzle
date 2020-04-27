@@ -122,8 +122,8 @@ namespace TSensor.Web.Models.Repository
                 WHERE
                 	@userGuid IS NULL OR
                 	(
-                		(pg.PointGroupGuid IS NOT NULL AND upgr.UserGuid = @userGuid) OR
-                		(pg.PointGroupGuid IS NULL AND upr.UserGuid = @userGuid)
+                		(upgr.PointGroupGuid IS NOT NULL AND upgr.UserGuid = @userGuid) OR
+                		(upgr.PointGroupGuid IS NULL AND upr.UserGuid = @userGuid)
                 	)", new { userGuid });
 
             var tankList = Query<dynamic>(@"
