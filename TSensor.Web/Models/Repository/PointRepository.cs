@@ -107,7 +107,7 @@ namespace TSensor.Web.Models.Repository
 					WHERE 
 						(t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial) OR
 						(t.SecondDeviceGuid = asv.DeviceGuid AND t.SecondIZKId = asv.izkNumber AND t.SecondSensorId = asv.sensorSerial AND t.DualMode = 1)) AND
-						InsertDate >= DATEADD(HOUR, -1, GETDATE())");
+						InsertDate >= DATEADD(MINUTE, -1, GETDATE())");
 		}
 
 		public IEnumerable<TankSensorValue> GetSensorActualState(IEnumerable<Guid> tankGuidList)
