@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 
 namespace TSensor.Web.Models.Entity
 {
@@ -104,6 +105,49 @@ namespace TSensor.Web.Models.Entity
             }
 
             return entity;
+        }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+                
+            builder.AppendLine($"izkNumber:{izkNumber}");
+            builder.AppendLine($"banderolType:{banderolType}");
+            builder.AppendLine($"sensorSerial:{sensorSerial}");
+            builder.AppendLine($"sensorChannel:{sensorChannel}");
+            builder.AppendLine($"pressureAndTempSensorState:{pressureAndTempSensorState}");
+            builder.AppendLine($"sensorFirmwareVersionAndReserv:{sensorFirmwareVersionAndReserv}");
+            builder.AppendLine($"alarma:{alarma}");
+            builder.AppendLine($"environmentLevel:{environmentLevel}");
+            builder.AppendLine($"pressureFilter:{pressureFilter}");
+            builder.AppendLine($"pressureMeasuring:{pressureMeasuring}");
+            builder.AppendLine($"levelInPercent:{levelInPercent}");
+            builder.AppendLine($"environmentVolume:{environmentVolume}");
+            builder.AppendLine($"liquidEnvironmentLevel:{liquidEnvironmentLevel}");
+            builder.AppendLine($"steamMass:{steamMass}");
+            builder.AppendLine($"liquidDensity:{liquidDensity}");
+            builder.AppendLine($"steamDensity:{steamDensity}");
+            builder.AppendLine($"dielectricPermeability:{dielectricPermeability}");
+            builder.AppendLine($"dielectricPermeability2:{dielectricPermeability2}");
+            builder.AppendLine($"t1:{t1}");
+            builder.AppendLine($"t2:{t2}");
+            builder.AppendLine($"t3:{t3}");
+            builder.AppendLine($"t4:{t4}");
+            builder.AppendLine($"t5:{t5}");
+            builder.AppendLine($"t6:{t6}");
+            builder.AppendLine($"plateTemp:{plateTemp}");
+            builder.AppendLine($"period:{period}");
+            builder.AppendLine($"plateServiceParam:{plateServiceParam}");
+            builder.AppendLine($"environmentComposition:{environmentComposition}");
+            builder.AppendLine($"cs1:{cs1}");
+            builder.AppendLine($"plateServiceParam2:{plateServiceParam2}");
+            builder.AppendLine($"plateServiceParam3:{plateServiceParam3}");
+            builder.AppendLine($"sensorWorkMode:{sensorWorkMode}");
+            builder.AppendLine($"plateServiceParam4:{plateServiceParam4}");
+            builder.AppendLine($"plateServiceParam5:{plateServiceParam5}");
+            builder.AppendLine($"crc:{crc}");
+
+            return builder.ToString();
         }
 
         public static ActualSensorValue Parse(dynamic entity)
