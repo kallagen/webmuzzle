@@ -16,9 +16,9 @@ namespace TSensor.Web.ViewModels.Tank
         public bool DualMode { get; set; }
         [StringLength(5, ErrorMessage = "Значение должно быть не больше 5 символов")]
         public string MainDeviceGuid { get; set; }
-        [Range(0, 99, ErrorMessage = "Значение должно быть от 0 до 99")]
+        [Range(80, 255, ErrorMessage = "Значение должно быть от 80 до 255")]
         public int? MainIZKId { get; set; }
-        [Range(0, 99, ErrorMessage = "Значение должно быть от 0 до 99")]
+        [Range(1, 33, ErrorMessage = "Значение должно быть от 1 до 33")]
         public int? MainSensorId { get; set; }
         [StringLength(5, ErrorMessage = "Значение должно быть не больше 5 символов")]
         public string SecondDeviceGuid { get; set; }
