@@ -12,6 +12,8 @@
         @Html.Partial("SensorCard", sensor)
     }
 
+    <div class="clearfix"></div>
+
     <script src="/npm/@@microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script>
         const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
