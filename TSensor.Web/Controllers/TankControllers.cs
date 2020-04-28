@@ -285,11 +285,11 @@ namespace TSensor.Web.Controllers
             sheet.Cells[1, 10].Value = "Давление фильтр, атм";
             sheet.Cells[1, 11].Value = "Давление измер, атм";
             sheet.Cells[1, 12].Value = "Объем в процентах, %";
-            sheet.Cells[1, 13].Value = "Объем, м3";
+            sheet.Cells[1, 13].Value = "Объем, м³";
             sheet.Cells[1, 14].Value = "Масса жидкости, т";
             sheet.Cells[1, 15].Value = "Масса пара, т";
-            sheet.Cells[1, 16].Value = "Плотность жидкости, кг / м2";
-            sheet.Cells[1, 17].Value = "Плотность пара, кг/ м2";
+            sheet.Cells[1, 16].Value = "Плотность жидкости, кг/м³";
+            sheet.Cells[1, 17].Value = "Плотность пара, кг/м³";
             sheet.Cells[1, 18].Value = "Диэлектрическая проницаемость жидкости";
             sheet.Cells[1, 19].Value = "Диэлектрическая проницаемость пара";
             sheet.Cells[1, 20].Value = "Температура нижнего датчика ?, °C";
