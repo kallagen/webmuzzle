@@ -18,7 +18,7 @@ namespace TSensor.Web.Models.Repository
             decimal? weightChangeDelta, int? weightChangeTimeout);
         public bool Remove(Guid tankGuid, Guid pointGuid);
 
-        public IEnumerable<dynamic> GetTankActualSensorValues(Guid tankGuid);
-        public IEnumerable<ActualSensorValue> GetTankActualSensorValues(Guid tankGuid, DateTime dateStart, DateTime dateEnd);
+        public dynamic GetTankActualSensorValues(Guid tankGuid);
+        public IEnumerable<ActualSensorValue> GetTankSensorValuesHistory(Guid tankGuid, DateTime dateStart, DateTime dateEnd);
     }
 }
