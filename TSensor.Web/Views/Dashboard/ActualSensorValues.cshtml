@@ -55,51 +55,16 @@
     var hasError = Model.ActualSensorValueList.Any(t => t.IsError);
     var hasWarning = Model.ActualSensorValueList.Any(t => t.IsWarning);
 
-    var listenSensors = Model.ActualSensorValueList.SelectMany(t =>
-    {
-        if (t.DualMode == true)
+    var listenSensors = Model.ActualSensorValueList.Select(t =>
+        new
         {
-            return new[]
-            {
-                new
-                {
-                    guid = t.MainSensorGuid,
-                    updateDate = t.MainSensorInsertDate,
-                    warningDate = t.MainSensorWarningDateTicks,
-                    isSecond = 0,
-                    weightDelta = t.WeightChangeDelta ?? 0,
-                    weightTimeout = t.WeightChangeTimeout ?? 0,
-                    weight = t.LiquidEnvironmentLevel
-                },
-                new
-                {
-                    guid = t.SecondSensorGuid,
-                    updateDate = t.SecondSensorInsertDate,
-                    warningDate = t.SecondSensorWarningDateTicks,
-                    isSecond = 1,
-                    weightDelta = t.WeightChangeDelta ?? 0,
-                    weightTimeout = t.WeightChangeTimeout ?? 0,
-                    weight = t.LiquidEnvironmentLevel
-                }
-            };
-        }
-        else
-        {
-            return new[]
-            {
-                new
-                {
-                    guid = t.MainSensorGuid,
-                    updateDate = t.MainSensorInsertDate,
-                    warningDate = t.MainSensorWarningDateTicks,
-                    isSecond = 0,
-                    weightDelta = t.WeightChangeDelta ?? 0,
-                    weightTimeout = t.WeightChangeTimeout ?? 0,
-                    weight = t.LiquidEnvironmentLevel
-                }
-            };
-        }
-    });
+            guid = t.MainSensorGuid,
+            updateDate = t.MainSensorInsertDate,
+            warningDate = t.MainSensorWarningDateTicks,
+            weightDelta = t.WeightChangeDelta ?? 0,
+            weightTimeout = t.WeightChangeTimeout ?? 0,
+            weight = t.LiquidEnvironmentLevel
+        });
 
     <div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">
         <h4>Внимание!</h4>
