@@ -5,21 +5,17 @@
     var exportDateStart = DateTime.Now.AddDays(-1);
     var exportDateEnd = DateTime.Now;
 
-    var values = new[] { Model.MainValue, Model.SecondValue }.Where(p => p != null);
-    var listenSensors = values.Select(p => new { guid = p.SensorGuid, updateDate = p.InsertDate });
+    var listenSensors = new[] { Model.Value }
+        .Where(p => p != null)
+        .Select(p => new { guid = p.SensorGuid, updateDate = p.InsertDate });
 
-    var mainSensorGuid = Model.MainValue?.SensorGuid;
-    var secondSensorGuid = Model.SecondValue?.SensorGuid;
+    var sensorGuid = Model.Value?.SensorGuid;
 
-    void ValueRow(string sysname, string label, object mainValue, object secondValue)
+    void ValueRow(string sysname, string label, object value)
     {
         <tr>
             <td>@label</td>
-            <td class="@sysname" data-sensorGuid="@mainSensorGuid">@mainValue?.ToString()?.Replace(",", ".")</td>
-            @if (Model.DualMode)
-            {
-                <td data-sensorGuid="@secondSensorGuid">@secondValue?.ToString()?.Replace(",", ".")</td>
-            }
+            <td class="@sysname" data-sensorGuid="@sensorGuid">@value?.ToString()?.Replace(",", ".")</td>
         </tr>
     }
 }
@@ -57,42 +53,41 @@
                         <tr>
                             <th>Название параметра</th>
                             <th>Значение датчика</th>
-                            @if (Model.DualMode)
-                            {
-                                <th>Значение дополнительного датчика</th>
-                            }
                         </tr>
                     </thead>
                     <tbody>
                         @{
-                            ValueRow("izkNumber", "Адрес ИЗК", Model.MainValue?.izkNumber, Model.SecondValue?.izkNumber);
-                            ValueRow("banderolType", "Тип посылки", Model.MainValue?.banderolType, Model.SecondValue?.banderolType);
-                            ValueRow("sensorSerial", "Адрес датчика", Model.MainValue?.sensorSerial, Model.SecondValue?.sensorSerial);
-                            ValueRow("sensorChannel", "Номер канала", Model.MainValue?.sensorChannel, Model.SecondValue?.sensorChannel);
-                            ValueRow("sensorFirmwareVersionAndReserv", "версия ПО датчика", Model.MainValue?.sensorFirmwareVersionAndReserv, Model.SecondValue?.sensorFirmwareVersionAndReserv);
-                            ValueRow("alarma", "Бит сигнализации", Model.MainValue?.alarma, Model.SecondValue?.alarma);
-                            ValueRow("environmentLevel", "Уровень, мм", Model.MainValue?.environmentLevel, Model.SecondValue?.environmentLevel);
-                            ValueRow("pressureFilter", "Давление фильтр, атм", Model.MainValue?.pressureFilter, Model.SecondValue?.pressureFilter);
-                            ValueRow("pressureMeasuring", "Давление измер, атм", Model.MainValue?.pressureMeasuring, Model.SecondValue?.pressureMeasuring);
-                            ValueRow("levelInPercent", "Объем в процентах, %", Model.MainValue?.levelInPercent, Model.SecondValue?.levelInPercent);
-                            ValueRow("environmentVolume", "Объем, м³", Model.MainValue?.environmentVolume, Model.SecondValue?.environmentVolume);
-                            ValueRow("liquidEnvironmentLevel", "Масса жидкости, т", Model.MainValue?.liquidEnvironmentLevel, Model.SecondValue?.liquidEnvironmentLevel);
-                            ValueRow("steamMass", "Масса пара, т", Model.MainValue?.steamMass, Model.SecondValue?.steamMass);
-                            ValueRow("liquidDensity", "Плотность жидкости, кг/м³", Model.MainValue?.liquidDensity, Model.SecondValue?.liquidDensity);
-                            ValueRow("steamDensity", "Плотность пара, кг/м³", Model.MainValue?.steamDensity, Model.SecondValue?.steamDensity);
-                            ValueRow("dielectricPermeability", "Диэлектрическая проницаемость жидкости", Model.MainValue?.dielectricPermeability, Model.SecondValue?.dielectricPermeability);
-                            ValueRow("dielectricPermeability2", "Диэлектрическая проницаемость пара", Model.MainValue?.dielectricPermeability2, Model.SecondValue?.dielectricPermeability2);
-                            ValueRow("t1", "Температура нижнего датчика?, °C", Model.MainValue?.t1, Model.SecondValue?.t1);
-                            ValueRow("t2", "Температура, °C", Model.MainValue?.t2, Model.SecondValue?.t2);
-                            ValueRow("t3", "Температура, °C", Model.MainValue?.t3, Model.SecondValue?.t3);
-                            ValueRow("t4", "Температура, °C", Model.MainValue?.t4, Model.SecondValue?.t4);
-                            ValueRow("t5", "Температура, °C", Model.MainValue?.t5, Model.SecondValue?.t5);
-                            ValueRow("t6", "Температура верхнего датчика?, °C", Model.MainValue?.t6, Model.SecondValue?.t6);
-                            ValueRow("plateTemp", "Температура платы, °C", Model.MainValue?.plateTemp, Model.SecondValue?.plateTemp);
-                            ValueRow("period", "Период платы", Model.MainValue?.period, Model.SecondValue?.period);
-                            ValueRow("environmentComposition", "Состав среды, %", Model.MainValue?.environmentComposition, Model.SecondValue?.environmentComposition);
-                            ValueRow("cs1", "Измеренная емкость платы, Пф", Model.MainValue?.cs1, Model.SecondValue?.cs1);
-                            ValueRow("crc", "Контрольная сумма", Model.MainValue?.crc, Model.SecondValue?.crc);
+                            ValueRow("izkNumber", "Адрес ИЗК", Model.Value?.izkNumber);
+                            ValueRow("banderolType", "Тип посылки", Model.Value?.banderolType);
+                            ValueRow("sensorSerial", "Адрес датчика", Model.Value?.sensorSerial);
+                            ValueRow("sensorChannel", "Номер канала", Model.Value?.sensorChannel);
+                            ValueRow("sensorFirmwareVersionAndReserv", "версия ПО датчика", Model.Value?.sensorFirmwareVersionAndReserv);
+                            ValueRow("alarma", "Бит сигнализации", Model.Value?.alarma);
+                            ValueRow("environmentLevel", "Уровень, мм", Model.Value?.environmentLevel);
+                            if (Model.DualMode)
+                            {
+                                ValueRow("pressureFilter", "Сигнальный уровень, атм", Model.Value?.pressureFilter);
+                            }                            
+                            ValueRow("pressureMeasuring", "Давление измер, атм", Model.Value?.pressureMeasuring);
+                            ValueRow("levelInPercent", "Объем, %", Model.Value?.levelInPercent);
+                            ValueRow("environmentVolume", "Объем, м³", Model.Value?.environmentVolume);
+                            ValueRow("liquidEnvironmentLevel", "Масса жидкости, т", Model.Value?.liquidEnvironmentLevel);
+                            ValueRow("steamMass", "Масса пара, т", Model.Value?.steamMass);
+                            ValueRow("liquidDensity", "Плотность жидкости, кг/м³", Model.Value?.liquidDensity);
+                            ValueRow("steamDensity", "Плотность пара, кг/м³", Model.Value?.steamDensity);
+                            ValueRow("dielectricPermeability", "Диэлектрическая проницаемость жидкости", Model.Value?.dielectricPermeability);
+                            ValueRow("dielectricPermeability2", "Диэлектрическая проницаемость пара", Model.Value?.dielectricPermeability2);
+                            ValueRow("t1", "Температура нижнего датчика?, °C", Model.Value?.t1);
+                            ValueRow("t2", "Температура, °C", Model.Value?.t2);
+                            ValueRow("t3", "Температура, °C", Model.Value?.t3);
+                            ValueRow("t4", "Температура, °C", Model.Value?.t4);
+                            ValueRow("t5", "Температура, °C", Model.Value?.t5);
+                            ValueRow("t6", "Температура верхнего датчика?, °C", Model.Value?.t6);
+                            ValueRow("plateTemp", "Температура платы, °C", Model.Value?.plateTemp);
+                            ValueRow("period", "Период платы", Model.Value?.period);
+                            ValueRow("environmentComposition", "Состав среды, %", Model.Value?.environmentComposition);
+                            ValueRow("cs1", "Измеренная емкость платы, Пф", Model.Value?.cs1);
+                            ValueRow("crc", "Контрольная сумма", Model.Value?.crc);
                         }
                     </tbody>
                 </table>
