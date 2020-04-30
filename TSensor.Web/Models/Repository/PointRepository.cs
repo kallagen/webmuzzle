@@ -105,8 +105,7 @@ namespace TSensor.Web.Models.Repository
 					SELECT 1 
 					FROM Tank t
 					WHERE 
-						(t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial) OR
-						(t.SecondDeviceGuid = asv.DeviceGuid AND t.SecondIZKId = asv.izkNumber AND t.SecondSensorId = asv.sensorSerial AND t.DualMode = 1)) AND
+						t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial) AND
 						InsertDate >= DATEADD(MINUTE, -1, GETDATE())");
 		}
 
@@ -116,26 +115,24 @@ namespace TSensor.Web.Models.Repository
 				SELECT
 					p.Name AS PointName, t.TankGuid, t.Name AS TankName, t.DualMode AS DualMode, pr.Name AS ProductName,
 					t.MainDeviceGuid, t.MainIZKId, t.MainSensorId,
-					t.SecondDeviceGuid, t.SecondIZKId, t.SecondSensorId,
 					t.WeightChangeDelta, t.WeightChangeTimeout,
-					m.InsertDate AS MainSensorInsertDate, s.InsertDate AS SecondSensorInsertDate,
-
+					m.InsertDate AS MainSensorInsertDate,
 					m.environmentLevel AS EnvironmentLevel,
 					m.levelInPercent AS LevelInPercent,
 					m.environmentVolume AS EnvironmentVolume,
 					m.liquidEnvironmentLevel AS LiquidEnvironmentLevel,
 					m.liquidDensity AS LiquidDensity,
-					ISNULL(s.t1, m.t1) AS T1,
-					ISNULL(s.t2, m.t2) AS T2,
-					ISNULL(s.t3, m.t3) AS T3,
-					ISNULL(s.t4, m.t4) AS T4,
-					ISNULL(s.t5, m.t5) AS T5,
-					ISNULL(s.t6, m.t6) AS T6
+					m.pressureFilter AS PressureFilter,
+					m.t1,
+					m.t2,
+					m.t3,
+					m.t4,
+					m.t5,
+					m.t6
 				FROM Point p
 					JOIN Tank t ON p.PointGuid = t.PointGuid
 					LEFT JOIN Product pr ON t.ProductGuid = pr.ProductGuid
 					LEFT JOIN ActualSensorValue m ON t.MainDeviceGuid = m.DeviceGuid AND t.MainIZKId = m.izkNumber AND t.MainSensorId = m.sensorSerial
-					LEFT JOIN ActualSensorValue s ON t.DualMode = 1 AND t.SecondDeviceGuid = s.DeviceGuid AND t.SecondIZKId = s.izkNumber AND t.SecondSensorId = s.sensorSerial
 				WHERE
 					t.TankGuid in @tankGuidList", new { tankGuidList = tankGuidList.Where(p => p != null).Distinct() });
         }
