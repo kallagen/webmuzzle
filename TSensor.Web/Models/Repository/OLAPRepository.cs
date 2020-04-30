@@ -122,10 +122,10 @@ namespace TSensor.Web.Models.Repository
                     environmentVolume,
                     liquidDensity,
                     (t1 + t2 + t3 + t4 + t5 + t6) / 6 AS avgT,
-                    environmentLevel,
-                    IsSecond
+                    environmentLevel
                 FROM SensorValue sv
-                WHERE TankGuid IN @tankGuidList AND EventUTCDate >= @dateStart AND EventUTCDate < @dateEnd",
+                WHERE TankGuid IN @tankGuidList AND 
+                    EventUTCDate >= @dateStart AND EventUTCDate < @dateEnd AND ISNULL(IsSecond, 0) = 0",
                 new { tankGuidList, dateStart, dateEnd });
 
             var result = new Dictionary<dynamic, IEnumerable<dynamic>>();
@@ -149,16 +149,13 @@ namespace TSensor.Web.Models.Repository
 
                 var label = $"{(tank == null ? "Неизвестный резервуар" : $"{tank.Name} {tank.ProductName}")} {ParamLabel(paramName)}";
 
-                var paramValues = paramName == "Temperature" && group.Any(p => (bool?)p.IsSecond != null)
-                    ? group.Where(p => p.IsSecond == true) : group;
-
                 result.Add(
                     new
                     {
                         label,
                         isSecond
                     }, 
-                    paramValues
+                    group
                         .Select(p => new { date = ((DateTime)p.EventUTCDate).ToLocalTime(), value = ParamValue(paramName, p) })
                         .Where(p => p.value != null)
                         .Select(p => new { Key = p.date, Value = (decimal)p.value }));
