@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Services;
 using TSensor.Web.Models.Services.Security;
 using TSensor.Web.ViewModels.Dashboard;
 
@@ -30,29 +31,13 @@ namespace TSensor.Web.Controllers
         {
             //todo check user rights
 
+            var comparer = new AlphanumComparer();
+
             var viewModel = new ActualSensorValuesViewModel
             {
                 ActualSensorValueList = _pointRepository.GetSensorActualState(guidList)
-                    .OrderBy(t =>
-                    {
-                        if (t.IsError && t.IsWarning)
-                        {
-                            return 1;
-                        }
-                        else if (t.IsError)
-                        {
-                            return 2;
-                        }
-                        else if (t.IsWarning)
-                        {
-                            return 3;
-                        }
-                        else
-                        {
-                            return 4;
-                        }
-                    }).ThenBy(t => t.PointName).ThenBy(t => t.TankName),
-                Favorite = favorite,
+                    .OrderBy(t => t.PointName, comparer).ThenBy(t => t.TankName, comparer),
+                Favorite = favorite
             };
 
             ViewBag.SelectedMenuElements = guidList;
