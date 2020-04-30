@@ -9,7 +9,6 @@ namespace TSensor.Web.ViewModels.Tank
         public string TankName { get; set; }
         public bool DualMode { get; set; }
         public string ProductName { get; set; }
-        public ActualSensorValue MainValue { get; set; }
-        public ActualSensorValue SecondValue { get; set; }
+        public ActualSensorValue Value { get; set; }
     }
 }
