@@ -23,7 +23,11 @@
     @using (Html.BeginForm("Login", "Auth", FormMethod.Post, new { @id = "auth-form", autocomplete = "off" }))
     {
         <div class="login-box">
-            <div class="login-logo">УЧЕТ <b>СУ5Д</b></div>
+            <div class="login-logo">
+                <div class="t-logo"></div>
+                <div>РЕЗЕРВУАРНЫЕ ПАРКИ</div>
+                <div>УЧЕТ СВЕТЛЫХ НЕФТЕПРОДУКТОВ</div>
+            </div>
             <div class="login-box-body">
                 @if (Model?.IsError == true)
                 {

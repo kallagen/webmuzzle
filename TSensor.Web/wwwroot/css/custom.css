@@ -137,6 +137,7 @@ span.form-control {
         text-align: center;
         margin-top: 6px;
         margin-bottom: 4px;
+        min-height: 13px;
     }
 
     .t-cell i {
@@ -173,6 +174,10 @@ span.form-control {
     font-size: 14px;
     line-height: 22px;
     overflow: hidden;
+}
+
+.t-cell .bl3-1 > span {
+    line-height: 20px;
 }
 
 .t-cell > div {
@@ -246,6 +251,10 @@ span.form-control {
     padding-left: 4px;
     padding-top: 5px;
     width: 210px;
+}
+
+.bl3-1 {
+    padding-top: 0;
 }
 
 .t-error .bl2, .t-error .bl3 {
@@ -431,3 +440,23 @@ i.menu-point {
         display: inline-block; 
         width: 80px;
     }
+
+/**/
+
+.login-page {
+    background: none;
+}
+
+.t-logo {
+    height: 216px;
+    background: url('../img/logo.jpeg') center 0px no-repeat;
+}
+
+.login-logo {
+    font-size: 26px;
+    font-weight: bold;
+    line-height: 32px;
+    width: 460px;
+    margin-left: -50px;
+    margin-bottom: 0px;
+}
