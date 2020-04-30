@@ -10,6 +10,7 @@ namespace TSensor.Web.Models.Entity
         public DateTime EventUTCDate { get; set; }
         public string Raw { get; set; }
         public Guid? TankGuid { get; set; }
+
         public bool? IsSecond { get; set; }
 
         public DateTime InsertDate { get; set; }
@@ -29,8 +30,8 @@ namespace TSensor.Web.Models.Entity
         public string pressureAndTempSensorState { get; set; }
         public string sensorFirmwareVersionAndReserv { get; set; }
         public string alarma { get; set; }
-        public decimal environmentLevel { get; set; }
-        public string pressureFilter { get; set; }
+        public int environmentLevel { get; set; }
+        public int pressureFilter { get; set; }
         public string pressureMeasuring { get; set; }
         public decimal levelInPercent { get; set; }
         public decimal environmentVolume { get; set; }
@@ -69,8 +70,8 @@ namespace TSensor.Web.Models.Entity
                 pressureAndTempSensorState = raw.Substring(11, 2),
                 sensorFirmwareVersionAndReserv = raw.Substring(13, 2),
                 alarma = raw.Substring(15, 2),
-                environmentLevel = (decimal)int.Parse(raw.Substring(17, 4), NumberStyles.HexNumber) / 10,
-                pressureFilter = raw.Substring(21, 4),
+                environmentLevel = int.Parse(raw.Substring(17, 4), NumberStyles.HexNumber),
+                pressureFilter = int.Parse(raw.Substring(21, 4), NumberStyles.HexNumber),
                 pressureMeasuring = raw.Substring(25, 4),
                 levelInPercent = (decimal)int.Parse(raw.Substring(29, 4), NumberStyles.HexNumber) / 10,
                 environmentVolume = (decimal)int.Parse(raw.Substring(33, 6), NumberStyles.HexNumber) / 1000,
