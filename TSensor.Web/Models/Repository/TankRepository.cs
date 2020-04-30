@@ -122,12 +122,11 @@ namespace TSensor.Web.Models.Repository
                 new { tankGuid, pointGuid }) == 1;
         }
 
-        public IEnumerable<dynamic> GetTankActualSensorValues(Guid tankGuid)
+        public dynamic GetTankActualSensorValues(Guid tankGuid)
         {
-            return Query<dynamic>(@"
+            return QueryFirst<dynamic>(@"
 				SELECT
-                    t.TankGuid, t.Name AS TankName, t.DualMode, p.Name AS ProductName,
-                    CAST(CASE WHEN t.SecondDeviceGuid = asv.DeviceGuid AND t.SecondIZKId = asv.izkNumber AND t.SecondSensorId = asv.sensorSerial AND t.DualMode = 1 THEN 1 ELSE 0 END AS bit) AS IsSecond, InsertDate, DeviceGuid,
+                    t.TankGuid, t.Name AS TankName, t.DualMode, p.Name AS ProductName, InsertDate, DeviceGuid,
                     izkNumber, banderolType, sensorSerial, sensorChannel, pressureAndTempSensorState,
                     sensorFirmwareVersionAndReserv, alarma, environmentLevel, pressureFilter, pressureMeasuring,
                     levelInPercent, environmentVolume, liquidEnvironmentLevel, steamMass, liquidDensity, steamDensity,
@@ -137,14 +136,12 @@ namespace TSensor.Web.Models.Repository
 				FROM Tank t
                     LEFT JOIN Product p ON t.ProductGuid = p.ProductGuid
 					LEFT JOIN ActualSensorValue asv ON
-                        (t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial) OR
-                        (t.SecondDeviceGuid = asv.DeviceGuid AND t.SecondIZKId = asv.izkNumber AND t.SecondSensorId = asv.sensorSerial AND
-                            t.DualMode = 1)
+                        t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial
                 WHERE
 					t.TankGuid = @tankGuid", new { tankGuid });
         }
 
-        public IEnumerable<ActualSensorValue> GetTankActualSensorValues(Guid tankGuid, DateTime dateStart, DateTime dateEnd)
+        public IEnumerable<ActualSensorValue> GetTankSensorValuesHistory(Guid tankGuid, DateTime dateStart, DateTime dateEnd)
         {
             return Query<ActualSensorValue>(@"
                 SELECT
