@@ -1,9 +1,12 @@
 ﻿@using TSensor.Web.Models.Entity;
+@using TSensor.Web.Models.Services
 @using TSensor.Web.ViewComponents;
 @using TSensor.Web.ViewModels.Point;
 @model IEnumerable<PointGroup>
 @{
     Layout = null;
+
+    var comparer = new AlphanumComparer();
 }
 @if (Model?.Any() == true)
 {
@@ -14,11 +17,11 @@
     <li class="apply-button hidden"><a href="javascript:void(0)">ПРИМЕНИТЬ</a></li>
     <li><a>@Html.MenuElementCheckbox(PointGroup.RootGuid, null)Все объекты</a></li>
     foreach (var group in Model.Where(p => p.PointGroupGuid != PointGroupMenu.NotAssignedSensorGroupGuid)
-        .OrderBy(p => string.IsNullOrEmpty(p.Name)).ThenBy(p => p.Name))
+        .OrderBy(p => string.IsNullOrEmpty(p.Name)).ThenBy(p => p.Name, comparer))
     {
         if (string.IsNullOrEmpty(group.Name))
         {
-            foreach (var point in group.PointList.OrderBy(p => p.Name))
+            foreach (var point in group.PointList.OrderBy(p => p.Name, comparer))
             {
                 @Html.Partial("MenuElementPoint", new MenuElementViewModel { Point = point });
             }
@@ -33,7 +36,7 @@
                         <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                     </a>
                     <ul class="treeview-menu">
-                        @foreach (var point in group.PointList.OrderBy(p => p.Name))
+                        @foreach (var point in group.PointList.OrderBy(p => p.Name, comparer))
                         {
                             @Html.Partial("MenuElementPoint", new MenuElementViewModel { Point = point, GroupGuid = group.PointGroupGuid });
                         }

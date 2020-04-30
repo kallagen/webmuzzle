@@ -1,4 +1,5 @@
 ﻿@using TSensor.Web.Models.Entity;
+@using TSensor.Web.Models.Services; 
 @model TSensor.Web.ViewModels.Point.MenuElementViewModel
 @{ 
     var parentGuid = Model.GroupGuid ?? PointGroup.RootGuid;
@@ -9,7 +10,7 @@
     <li class="treeview">
         <a href="javascript:void(0)">@Html.MenuElementCheckbox(Model.Point.PointGuid, parentGuid)@Model.Point.Name<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
         <ul class="treeview-menu">
-            @foreach (var tank in Model.Point.TankList.OrderBy(t => t.Name))
+            @foreach (var tank in Model.Point.TankList.OrderBy(t => t.Name, new AlphanumComparer()))
             {
                 <li><a>@Html.MenuElementCheckbox(tank.TankGuid, Model.Point.PointGuid)@tank.Name</a></li>
             }

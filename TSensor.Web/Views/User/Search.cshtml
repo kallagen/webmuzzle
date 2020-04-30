@@ -1,4 +1,5 @@
-﻿@model UserSearchViewModel
+﻿@using TSensor.Web.Models.Services;
+@model UserSearchViewModel
 @{
     ViewBag.Title = "Пользователи";
 }
@@ -53,7 +54,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.Data.OrderBy(p => p.Name))
+                            @foreach (var item in Model.Data.OrderBy(p => p.Name, new AlphanumComparer()))
                             {
                             <tr @if (item.IsInactive) { <text> class="text-muted" </text> }>
                                 @if (Model.HasInactiveRecord)
