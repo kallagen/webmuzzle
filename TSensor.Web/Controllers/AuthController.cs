@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Services.Security;
@@ -66,7 +67,12 @@ namespace TSensor.Web.Controllers
                 else
                 {
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                        AuthService.CreateUserPrincipal(user.UserGuid, user.Name, user.Role));
+                        AuthService.CreateUserPrincipal(user.UserGuid, user.Name, user.Role),
+                        new AuthenticationProperties
+                        {
+                            IsPersistent = true,
+                            ExpiresUtc = DateTime.Now.AddDays(30)
+                        });
                     return StartPage();
                 }
             }
