@@ -1,9 +1,0 @@
-{
-    "version": "1.0.0",
-    "name": "asp.net",
-    "private": true,
-    "dependencies": {
-      "@microsoft/signalr": "3.1.0",
-      "jquery": "3.4.1"
-    }
-}
