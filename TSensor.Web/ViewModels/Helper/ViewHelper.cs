@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace TSensor.Web.ViewModels.Helper
 {
@@ -46,6 +47,60 @@ namespace TSensor.Web.ViewModels.Helper
 
             return new HtmlString(
                 $"<input type=\"checkbox\" {isChecked} data-parent=\"{parentGuid}\" data-guid=\"{guid}\" class=\"menu-checkbox\" />");
+        }
+
+        public static HtmlString TrimLabel(this IHtmlHelper html, string label, int maxLength)
+        {
+            string result;
+
+            var idx = 0;
+            var lexems = (label ?? string.Empty).ToUpper().Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .ToDictionary(p => idx++);
+
+            if (lexems.Sum(p => p.Value.Length) + lexems.Count() - 1 > maxLength)
+            {
+                var modified = lexems.Select(p =>
+                {
+                    var value = p.Value;
+                    var isModified = false;
+
+                    if (!Regex.IsMatch(p.Value, "[^А-ЯA-Z]"))
+                    {
+                        value = p.Value.Substring(0, 1);
+                        isModified = true;
+                    }
+
+                    return new { value, isModified };
+                });
+
+                result = string.Empty;
+                var isLastModified = false;
+
+                foreach (var item in modified)
+                {
+                    if (string.IsNullOrEmpty(result))
+                    {
+                        isLastModified = item.isModified;
+                        result = item.value;
+                    }
+                    else
+                    {
+                        if (isLastModified != item.isModified || (!isLastModified && !item.isModified))
+                        {
+                            result += " ";
+                        }
+
+                        isLastModified = item.isModified;
+                        result += item.value;
+                    }
+                }
+            }
+            else
+            {
+                result = string.Join(' ', lexems.Select(p => p.Value));
+            }
+
+            return new HtmlString($"<span title=\"{label}\">{result}</span>");
         }
     }
 }
