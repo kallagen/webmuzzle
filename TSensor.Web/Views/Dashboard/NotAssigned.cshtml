@@ -12,10 +12,63 @@
         @Html.Partial("SensorCard", sensor)
     }
 
+    @using (Html.BeginForm("SetSensor", "Tank", FormMethod.Post, new { id = "t-setsensor-form", @class = "hidden" }))
+    {
+        @Html.Hidden("tankGuid", null, new { id = "t-setsensor-form-tankGuid" })
+        @Html.Hidden("isSecondSensor", null, new { id = "t-setsensor-form-isSecondSensor" })
+        @Html.Hidden("deviceGuid", null, new { id = "t-setsensor-form-deviceGuid" })
+        @Html.Hidden("izkId", null, new { id = "t-setsensor-form-izkId" })
+        @Html.Hidden("sensorId", null, new { id = "t-setsensor-form-sensorId" })
+    }
+
     <div class="clearfix"></div>
 
     <script src="~/lib/signalr/signalr.min.js"></script>
     <script>
+        var isLoading = false;
+        $('.t-tank-setsensor').click(function () {
+            if (isLoading) {
+                return;
+            }
+
+            var sensorInfo = this.dataset;
+
+            isLoading = true;
+            $.ajax({
+                url: '@Url.Action("TankWithoutSensorList", "Tank")',
+                type: 'POST',
+                success: function (data) {
+                    isLoading = false;
+
+                    if (data.length == 0) {
+                        new InformModal('Нет доступных для привязки резервуаров').show();
+                    } else {
+                        var html = `<p>Выберите резервуар для привязки датчика ${sensorInfo.device} ${sensorInfo.izk} ${sensorInfo.sensor}</p><p><select class="form-control t-setsensor-tank">`;
+                        data.forEach((t) => {
+                            html += `<option data-tank="${t.guid}" data-isSecondSensor="${t.isSecondSensor}">${t.name}</option>`;
+                        });
+                        html += '</select>';
+
+                        new ConfirmModal(html, function () {
+                            var selected = $('.t-setsensor-tank option:selected').data();
+
+                            $('#t-setsensor-form-tankGuid').val(selected.tank);
+                            $('#t-setsensor-form-isSecondSensor').val(selected.issecondsensor);
+                            $('#t-setsensor-form-deviceGuid').val(sensorInfo.device);
+                            $('#t-setsensor-form-izkId').val(sensorInfo.izk);
+                            $('#t-setsensor-form-sensorId').val(sensorInfo.sensor);
+
+                            $('#t-setsensor-form').submit();
+                        }).show();
+                    }
+                },
+                error: function () {
+                    isLoading = false;
+                },
+                timeout: 30000
+            });
+        });
+
         const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
         const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
 

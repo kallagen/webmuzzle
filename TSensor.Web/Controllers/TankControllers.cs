@@ -321,7 +321,7 @@ namespace TSensor.Web.Controllers
             if (dualMode)
             {
                 sheet.Cells[row, idx++].Value = value.pressureFilter;
-            }            
+            }
             sheet.Cells[row, idx++].Value = value.pressureMeasuring;
             sheet.Cells[row, idx++].Value = value.levelInPercent;
             sheet.Cells[row, idx++].Value = value.environmentVolume;
@@ -411,6 +411,54 @@ namespace TSensor.Web.Controllers
                 ViewBag.Title = "Неверные значения дат при экспорте";
                 return View("NotFound");
             }
+        }
+
+        [Route("tank/emptysensor")]
+        [HttpPost]
+        public IActionResult TankWithoutSensorList()
+        {
+            var data = _tankRepository.GetTankWithoutSensorList()
+                .OrderBy(p => p.PointName).ThenBy(p => p.TankName).ThenBy(p => p.ProductName)
+                .SelectMany(p =>
+                {
+                    var name = string.Join(' ', new[] { p.PointName, p.TankName, p.ProductName }.Where(p => !string.IsNullOrEmpty(p)));
+
+                    switch (p.Mode)
+                    {
+                        case 0:
+                            return new[]
+                            {
+                                new { name, guid = p.TankGuid, isSecondSensor = false },
+                                new { name = $"{name}, дополнительный датчик", guid = p.TankGuid, isSecondSensor = true }
+                            };
+                        case 1:
+                            return new[]
+                            {
+                                new { name, guid = p.TankGuid, isSecondSensor = false }
+                            };
+                        case 2:
+                            return new[]
+                            {
+                                new { name = $"{name}, дополнительный датчик", guid = p.TankGuid, isSecondSensor = true }
+                            };
+                        default: return null;
+                    }
+                });
+
+            return Json(data);
+        }
+
+        [Route("tank/setsensor")]
+        [HttpPost]
+        public IActionResult SetSensor(string tankGuid, bool isSecondSensor, string deviceGuid, int izkId, int sensorId)
+        {
+            if (Guid.TryParse(tankGuid, out var _tankGuid))
+            {
+                _tankRepository.SetSensorValue(isSecondSensor, _tankGuid, deviceGuid, izkId, sensorId);
+                //todo result check
+            }
+
+            return RedirectToAction("NotAssigned", "Dashboard");
         }
     }
 }

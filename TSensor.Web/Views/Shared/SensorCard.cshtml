@@ -2,9 +2,11 @@
 
 <div class="t-cell" data-sensorguid="@Model.SensorGuid">
     <h5 class="t-info">
-        <span title="Идентификатор устройства">@Model.DeviceGuid</span>
-        <span title="Идентификатор ИЗК">@Model.IzkNumber</span>
-        <span title="Идентификатор датчика">@Model.SensorSerial</span>
+        <a href="javascript:void(0)" class="t-tank-setsensor" data-device="@Model.DeviceGuid" data-izk="@Model.IzkNumber" data-sensor="@Model.SensorSerial">
+            <span title="Идентификатор устройства">@Model.DeviceGuid</span>
+            <span title="Идентификатор ИЗК">@Model.IzkNumber</span>
+            <span title="Идентификатор датчика">@Model.SensorSerial</span>
+        </a>
     </h5>
     <h6><span class="t-date">@Model.InsertDateStr</span></h6>
     <div>
