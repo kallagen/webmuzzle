@@ -21,6 +21,10 @@ var SuccessModal = function (message) {
     return new Modal('alert-success', 'Успешно', message);
 };
 
+var InformModal = function (message) {
+    return new Modal('alert-info', 'Информация', message);
+}
+
 var ConfirmModal = function (message, callback) {
     function generateId() {
         return Math.random().toString().substr(2, 8);
