@@ -223,19 +223,19 @@ span.form-control {
     border-color: #F49200;
 }
 
-    .bl2 > div {
-        position: relative;
-        background: #A2E9F9;
-        height: 116px;
-    }
+.bl2 > div {
+    position: relative;
+    background: #A2E9F9;
+    height: 116px;
+}
 
-        .bl2 > div > div {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            background: #3C8DBC;
-            width: 100%;
-        }
+    .bl2 > div > div {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        background: #3C8DBC;
+        width: 100%;
+    }
 
 .t-warning .bl2 > div {
     background: #F7D199;
@@ -289,15 +289,19 @@ span.form-control {
 .t-cell .t-img-weight {
     background-image: url('../img/weight.png');
 }
+
 .t-cell .t-img-volume {
     background-image: url('../img/volume.png');
 }
+
 .t-cell .t-img-temperature {
     background-image: url('../img/temperature.png');
 }
+
 .t-cell .t-img-level {
     background-image: url('../img/level.png');
 }
+
 .t-cell .t-img-density {
     background-image: url('../img/density.png');
 }
@@ -368,7 +372,6 @@ i.menu-point {
     color: #fff;
 }
 
-
 .skin-blue .sidebar-menu > li.header {
     color: #69818C;
 }
@@ -437,7 +440,7 @@ i.menu-point {
 }
 
     .title-button-container .btn {
-        display: inline-block; 
+        display: inline-block;
         width: 80px;
     }
 
@@ -459,4 +462,9 @@ i.menu-point {
     width: 460px;
     margin-left: -50px;
     margin-bottom: 0px;
+}
+
+/**/
+.sidebar-menu.tree {
+    overflow-x: hidden;
 }

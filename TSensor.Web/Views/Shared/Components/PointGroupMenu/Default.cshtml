@@ -23,7 +23,7 @@
         {
             foreach (var point in group.PointList.OrderBy(p => p.Name, comparer))
             {
-                @Html.Partial("MenuElementPoint", new MenuElementViewModel { Point = point });
+                @Html.Partial("MenuElementPoint", new MenuElementViewModel { Point = point, MaxLabelLength = 20 });
             }
         }
         else
@@ -32,20 +32,20 @@
             {
                 <li class="treeview">
                     <a href="javascript:void(0)">
-                        @Html.MenuElementCheckbox(group.PointGroupGuid, PointGroup.RootGuid)@group.Name
+                        @Html.MenuElementCheckbox(group.PointGroupGuid, PointGroup.RootGuid)@Html.TrimLabel(group.Name, 20)
                         <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                     </a>
                     <ul class="treeview-menu">
                         @foreach (var point in group.PointList.OrderBy(p => p.Name, comparer))
                         {
-                            @Html.Partial("MenuElementPoint", new MenuElementViewModel { Point = point, GroupGuid = group.PointGroupGuid });
+                            @Html.Partial("MenuElementPoint", new MenuElementViewModel { Point = point, GroupGuid = group.PointGroupGuid, MaxLabelLength = 18 });
                         }
                     </ul>
                 </li>
             }
             else
             {
-                <li><a>@Html.MenuElementCheckbox(group.PointGroupGuid, PointGroup.RootGuid)@group.Name</a></li>
+                <li><a>@Html.MenuElementCheckbox(group.PointGroupGuid, PointGroup.RootGuid)@Html.TrimLabel(group.Name, 20)</a></li>
             }
         }
     }
