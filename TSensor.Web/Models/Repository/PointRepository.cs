@@ -105,7 +105,8 @@ namespace TSensor.Web.Models.Repository
 					SELECT 1 
 					FROM Tank t
 					WHERE 
-						t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial) AND
+						(t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial) OR
+						(t.DualMode = 1 AND t.SecondDeviceGuid = asv.DeviceGuid AND t.SecondIZKId = asv.izkNumber AND t.SecondSensorId = asv.sensorSerial)) AND
 						InsertDate >= DATEADD(MINUTE, -1, GETDATE())");
 		}
 
@@ -136,5 +137,5 @@ namespace TSensor.Web.Models.Repository
 				WHERE
 					t.TankGuid in @tankGuidList", new { tankGuidList = tankGuidList.Where(p => p != null).Distinct() });
         }
-    }
+	}
 }
