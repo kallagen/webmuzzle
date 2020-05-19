@@ -93,6 +93,15 @@ namespace TSensor.Web
                     name: "default",
                     pattern: "{controller=Dashboard}/{action=Default}/{id?}");
             });
+
+            app.UseFileServer(new FileServerOptions()
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(env.ContentRootPath, "Release")
+                ),
+                RequestPath = "/release",
+                EnableDirectoryBrowsing = false
+            });
         }
     }
 }
