@@ -71,9 +71,9 @@ namespace TSensor.Web.Models.Repository
                 });
         }
 
-        public bool Edit(Guid tankGuid, Guid pointGuid, string name, Guid? productGuid, 
+        public bool Edit(Guid tankGuid, Guid pointGuid, string name, Guid? productGuid,
             bool dualMode, string mainDeviceGuid, int? mainIZKId, int? mainSensorId,
-            string secondDeviceGuid, int? secondIZKId, int? secondSensorId, 
+            string secondDeviceGuid, int? secondIZKId, int? secondSensorId,
             string description, decimal? weightChangeDelta, int? weightChangeTimeout)
         {
             return QueryFirst<int?>(@"
@@ -156,6 +156,43 @@ namespace TSensor.Web.Models.Repository
                 WHERE TankGuid = @tankGuid AND EventUTCDate >= @dateStart AND EventUTCDate < @dateEnd
                 ORDER BY EventUTCDate",
                 new { tankGuid, dateStart, dateEnd });
+        }
+
+        public IEnumerable<dynamic> GetTankWithoutSensorList()
+        {
+            return Query<dynamic>(@"
+                SELECT p.Name AS PointName, t.TankGuid, t.Name AS TankName, pr.Name AS ProductName,
+	                CASE 
+                        WHEN
+		                    ISNULL(t.MainDeviceGuid, '') = '' AND ISNULL(t.MainIZKId, '') = '' AND ISNULL(MainSensorId, '') = '' AND
+		                    ISNULL(t.SecondDeviceGuid, '') = '' AND ISNULL(t.SecondIZKId, '') = '' AND ISNULL(SecondSensorId, '') = '' AND t.DualMode = 1 THEN 0
+		                WHEN
+		                    ISNULL(t.MainDeviceGuid, '') = '' AND ISNULL(t.MainIZKId, '') = '' AND ISNULL(MainSensorId, '') = '' THEN 1
+		                WHEN
+		                    ISNULL(t.SecondDeviceGuid, '') = '' AND ISNULL(t.SecondIZKId, '') = '' AND ISNULL(SecondSensorId, '') = '' AND t.DualMode = 1 THEN 2
+		                ELSE -1 END AS Mode
+                FROM Tank t
+                	LEFT JOIN Point p ON p.PointGuid = t.PointGuid
+                	LEFT JOIN Product pr ON pr.ProductGuid = t.ProductGuid
+                WHERE
+                	(ISNULL(t.MainDeviceGuid, '') = '' AND ISNULL(t.MainIZKId, '') = '' AND ISNULL(MainSensorId, '') = '') OR
+                	(ISNULL(t.SecondDeviceGuid, '') = '' AND ISNULL(t.SecondIZKId, '') = '' AND ISNULL(SecondSensorId, '') = '' AND t.DualMode = 1)");
+        }
+
+        public bool SetSensorValue(bool isSecondSensor, Guid tankGuid, string deviceGuid, int izkId, int sensorId)
+        {
+            return QueryFirst<int>(@"
+                UPDATE Tank SET
+                    MainDeviceGuid = CASE WHEN @isSecondSensor = 1 THEN MainDeviceGuid ELSE @deviceGuid END,
+                    MainIZKId = CASE WHEN @isSecondSensor = 1 THEN MainIZKId ELSE @izkId END,
+                    MainSensorId = CASE WHEN @isSecondSensor = 1 THEN MainSensorId ELSE @sensorId END,
+                    
+                    SecondDeviceGuid = CASE WHEN @isSecondSensor = 1 THEN @deviceGuid ELSE SecondDeviceGuid END,
+                    SecondIZKId = CASE WHEN @isSecondSensor = 1 THEN @izkId ELSE SecondIZKId END,
+                    SecondSensorId = CASE WHEN @isSecondSensor = 1 THEN @sensorId ELSE SecondSensorId END
+                WHERE TankGuid = @tankGuid
+
+                SELECT @@ROWCOUNT", new { isSecondSensor, tankGuid, deviceGuid, izkId, sensorId }) == 1;
         }
     }
 }

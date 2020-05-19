@@ -20,5 +20,8 @@ namespace TSensor.Web.Models.Repository
 
         public dynamic GetTankActualSensorValues(Guid tankGuid);
         public IEnumerable<ActualSensorValue> GetTankSensorValuesHistory(Guid tankGuid, DateTime dateStart, DateTime dateEnd);
+
+        public IEnumerable<dynamic> GetTankWithoutSensorList();
+        public bool SetSensorValue(bool isSecondSensor, Guid tankGuid, string deviceGuid, int izkId, int sensorId);
     }
 }
