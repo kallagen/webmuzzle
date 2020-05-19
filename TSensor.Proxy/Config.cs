@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace TSensor.Proxy
@@ -12,6 +14,7 @@ namespace TSensor.Proxy
         public int MaxArchiveFileSize { get; private set; }
         public int MaxErrorFileSize { get; private set; }
         public string LoggerType { get; private set; }
+        public IEnumerable<string> PortList { get; private set; }
 
         public bool IsLinux =>
             RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -29,6 +32,7 @@ namespace TSensor.Proxy
             MaxArchiveFileSize = int.Parse(config["maxArchiveFileSize"]) * 1024;
             MaxErrorFileSize = int.Parse(config["maxErrorFileSize"]) * 1024;
             LoggerType = config["loggerType"];
+            PortList = config.GetSection("portList").GetChildren().Select(p => p.Value?.ToUpper()).Distinct();
         }
     }
 }

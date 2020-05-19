@@ -8,5 +8,10 @@
   //kbytes
   "maxErrorFileSize": 1000,
   //error  / debug
-  "loggerType":  "error"
+  "loggerType": "error",
+  //список портов для получения данных, если необходимо использовать все доступные порты, то оставить пустой массив "portList": [ ]
+  "portList": [
+    "/dev/ttyUSB16",
+    "COM3"
+  ]
 }
