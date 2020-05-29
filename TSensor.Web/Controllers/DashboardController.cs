@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Security;
 using TSensor.Web.Models.Services;
 using TSensor.Web.Models.Services.Security;
 using TSensor.Web.ViewModels.Dashboard;
@@ -17,18 +18,25 @@ namespace TSensor.Web.Controllers
         private readonly IPointRepository _pointRepository;
         private readonly IFavoriteRepository _favoriteRepository;
         private readonly AuthService _authService;
+        private readonly LicenseManager _licenseManager;
 
         public DashboardController(IPointRepository pointRepository, IFavoriteRepository favoriteRepository,
-            AuthService authService)
+            AuthService authService, LicenseManager licenseManager)
         {
             _pointRepository = pointRepository;
             _favoriteRepository = favoriteRepository;
             _authService = authService;
+            _licenseManager = licenseManager;
         }
 
         private IActionResult ActualSensorValues(IEnumerable<Guid> guidList, Favorite favorite = null, 
             string errorMessage = null)
         {
+            if (!_licenseManager.IsValid())
+            {
+                return LicenseExpired();
+            }
+
             //todo check user rights
 
             var comparer = new AlphanumComparer();
@@ -139,9 +147,28 @@ namespace TSensor.Web.Controllers
         [Route("sensor/notassigned")]
         public IActionResult NotAssigned()
         {
+            if (!_licenseManager.IsValid())
+            {
+                return LicenseExpired();
+            }
+
             var notAssignedPointInfo = _pointRepository.GetNotAssignedSensorState();
 
             return View(notAssignedPointInfo);
+        }
+
+        private IActionResult LicenseExpired()
+        {
+            ViewBag.Title = "Срок лицензии истек";
+
+            return View("LicenseExpired");
+        }
+
+        [AllowAnonymous]
+        [Route("lic/info")]
+        public IActionResult LicenseInfo()
+        {
+            return Content(_licenseManager.Current.ToString());
         }
     }
 }
