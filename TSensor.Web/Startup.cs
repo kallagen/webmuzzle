@@ -10,6 +10,7 @@ using System.IO;
 using TSensor.Web.Models.Broadcast;
 using TSensor.Web.Models.Middleware;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Security;
 using TSensor.Web.Models.Services.Log;
 using TSensor.Web.Models.Services.Security;
 
@@ -48,6 +49,7 @@ namespace TSensor.Web
             services.AddScoped<UpdateAuthenticationEvents>();
             services.AddSingleton<AuthService>();
             services.AddSingleton<FileLogService>();
+            services.AddSingleton<LicenseManager>();
 
             var connectionString = Configuration.GetConnectionString("oltp");
             services.AddSingleton<IBroadcastRepository, BroadcastRepository>(p => new BroadcastRepository(connectionString));
@@ -61,6 +63,7 @@ namespace TSensor.Web
             services.AddSingleton<IOLAPRepository, OLAPRepository>(p => new OLAPRepository(connectionString));
 
             services.AddHostedService<BroadcastService>();
+            services.AddHostedService<LicenseService>();
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddSignalR();            
