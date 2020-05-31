@@ -36,7 +36,9 @@ namespace TSensor.Web.Models.Repository
 					INSERT SensorValue(
 						TankGuid, IsSecond, DeviceGuid, EventUTCDate,
 						izkNumber, banderolType, sensorSerial, sensorChannel, pressureAndTempSensorState,
-						sensorFirmwareVersionAndReserv, alarma, environmentLevel, pressureFilter, pressureMeasuring,
+						sensorFirmwareVersionAndReserv, alarma, 
+						environmentLevel, 
+						pressureFilter, pressureMeasuring,
 						levelInPercent, environmentVolume, liquidEnvironmentLevel, steamMass, liquidDensity, 
 						steamDensity, dielectricPermeability, dielectricPermeability2, t1, t2, t3, t4, t5, t6, 
 						plateTemp, [period], plateServiceParam, environmentComposition, cs1, plateServiceParam2,
@@ -44,7 +46,9 @@ namespace TSensor.Web.Models.Repository
 					VALUES(
 						@findTankGuid, @findIsSecond, @DeviceGuid, @EventUTCDate,
 						@izkNumber, @banderolType, @sensorSerial, @sensorChannel, @pressureAndTempSensorState,
-						@sensorFirmwareVersionAndReserv, @alarma, @environmentLevel, @pressureFilter, @pressureMeasuring,
+						@sensorFirmwareVersionAndReserv, @alarma,
+						CASE WHEN @findIsSecond IS NULL THEN @environmentLevel ELSE @environmentLevel * 10 END, 
+						@pressureFilter, @pressureMeasuring,
 						@levelInPercent, @environmentVolume, @liquidEnvironmentLevel, @steamMass, @liquidDensity,
 						@steamDensity, @dielectricPermeability, @dielectricPermeability2, @t1, @t2, @t3, @t4, @t5, @t6,
 						@plateTemp, @period, @plateServiceParam, @environmentComposition, @cs1, @plateServiceParam2,
@@ -135,21 +139,25 @@ namespace TSensor.Web.Models.Repository
 
 			await ExecuteAsync(@"
 				INSERT SensorValue(
-						TankGuid, IsSecond, DeviceGuid, EventUTCDate,
-						izkNumber, banderolType, sensorSerial, sensorChannel, pressureAndTempSensorState,
-						sensorFirmwareVersionAndReserv, alarma, environmentLevel, pressureFilter, pressureMeasuring,
-						levelInPercent, environmentVolume, liquidEnvironmentLevel, steamMass, liquidDensity, 
-						steamDensity, dielectricPermeability, dielectricPermeability2, t1, t2, t3, t4, t5, t6, 
-						plateTemp, [period], plateServiceParam, environmentComposition, cs1, plateServiceParam2,
-						plateServiceParam3, sensorWorkMode, plateServiceParam4, plateServiceParam5, crc)
-					VALUES (
-						@TankGuid, @IsSecond, @DeviceGuid, @EventUTCDate,
-						@izkNumber, @banderolType, @sensorSerial, @sensorChannel, @pressureAndTempSensorState,
-						@sensorFirmwareVersionAndReserv, @alarma, @environmentLevel, @pressureFilter, @pressureMeasuring,
-						@levelInPercent, @environmentVolume, @liquidEnvironmentLevel, @steamMass, @liquidDensity,
-						@steamDensity, @dielectricPermeability, @dielectricPermeability2, @t1, @t2, @t3, @t4, @t5, @t6,
-						@plateTemp, @period, @plateServiceParam, @environmentComposition, @cs1, @plateServiceParam2,
-						@plateServiceParam3, @sensorWorkMode, @plateServiceParam4, @plateServiceParam5, @crc)",
+					TankGuid, IsSecond, DeviceGuid, EventUTCDate,
+					izkNumber, banderolType, sensorSerial, sensorChannel, pressureAndTempSensorState,
+					sensorFirmwareVersionAndReserv, alarma, 
+					environmentLevel, 
+					pressureFilter, pressureMeasuring,
+					levelInPercent, environmentVolume, liquidEnvironmentLevel, steamMass, liquidDensity, 
+					steamDensity, dielectricPermeability, dielectricPermeability2, t1, t2, t3, t4, t5, t6, 
+					plateTemp, [period], plateServiceParam, environmentComposition, cs1, plateServiceParam2,
+					plateServiceParam3, sensorWorkMode, plateServiceParam4, plateServiceParam5, crc)
+				VALUES (
+					@TankGuid, @IsSecond, @DeviceGuid, @EventUTCDate,
+					@izkNumber, @banderolType, @sensorSerial, @sensorChannel, @pressureAndTempSensorState,
+					@sensorFirmwareVersionAndReserv, @alarma, 
+					CASE WHEN @IsSecond IS NULL THEN @environmentLevel ELSE @environmentLevel * 10 END,
+					@pressureFilter, @pressureMeasuring,
+					@levelInPercent, @environmentVolume, @liquidEnvironmentLevel, @steamMass, @liquidDensity,
+					@steamDensity, @dielectricPermeability, @dielectricPermeability2, @t1, @t2, @t3, @t4, @t5, @t6,
+					@plateTemp, @period, @plateServiceParam, @environmentComposition, @cs1, @plateServiceParam2,
+					@plateServiceParam3, @sensorWorkMode, @plateServiceParam4, @plateServiceParam5, @crc)",
 	 			valueList.Select(v =>
 				{
 					var meta = metaDict.FirstOrDefault(p => p.izkNumber == v.izkNumber && p.sensorSerial == v.sensorSerial);
