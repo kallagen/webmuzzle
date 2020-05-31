@@ -8,7 +8,7 @@ namespace TSensor.Web.Models.Entity
         public int IzkNumber { get; set; }
         public int SensorSerial { get; set; }
         public DateTime InsertDate { get; set; }
-        public int EnvironmentLevel { get; set; }
+        public decimal EnvironmentLevel { get; set; }
         public decimal LevelInPercent { get; set; }
         public decimal EnvironmentVolume { get; set; }
         public decimal LiquidEnvironmentLevel { get; set; }
