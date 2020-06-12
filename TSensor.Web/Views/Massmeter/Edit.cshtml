@@ -1,0 +1,95 @@
+﻿@model TankCreateEditViewModel
+@{
+    ViewBag.Title = $"Редактирование массомера \"{Model.Name}\"";
+}
+
+@section AdditionalHeader
+{
+    @Html.ActionLink("назад к списку массомеров", "List", "Massmeter", null, new { @class = "footer-link pull-right additional-header-link" })
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            @using (Html.BeginForm("Edit", "Massmeter", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
+            {
+                @Html.HiddenFor(m => m.TankGuid)
+                <div class="box-body">
+                    <div class="form-group @Html.ValidState("Name")">
+                        <label for="Name" class="col-sm-3 control-label">Название</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("MainDeviceGuid")">
+                        <label for="MainDeviceGuid" class="col-sm-3 control-label">Код устройства основного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.MainDeviceGuid, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.MainDeviceGuid, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("MainIZKId")">
+                        <label for="MainIZKId" class="col-sm-3 control-label">Код ИЗК основного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.MainIZKId, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.MainIZKId, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("MainSensorId")">
+                        <label for="MainSensorId" class="col-sm-3 control-label">Код основного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.MainSensorId, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.MainSensorId, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("SecondDeviceGuid")">
+                        <label for="SecondDeviceGuid" class="col-sm-3 control-label">Код устройства дополнительного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.SecondDeviceGuid, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.SecondDeviceGuid, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("SecondIZKId")">
+                        <label for="SecondIZKId" class="col-sm-3 control-label">Код ИЗК дополнительного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.SecondIZKId, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.SecondIZKId, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("SecondSensorId")">
+                        <label for="SecondSensorId" class="col-sm-3 control-label">Код дополнительного датчика</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.SecondSensorId, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.SecondSensorId, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="Description" class="col-sm-3 control-label">Примечание</label>
+                        <div class="col-sm-9">
+                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <a id="remove-massmeter-button" href="javascript:void(0)" class="btn bg-red">Удалить</a>
+                    <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("Remove", "Massmeter", FormMethod.Post, new { id = "remove-massmeter-form", @class = "hidden" }))
+{
+    @Html.Hidden("MassmeterGuid", Model.TankGuid, new { id = "remove-massmeter-guid" })
+}
+
+<script>
+    document.querySelector('#Name').focus();
+    $('#remove-massmeter-button').click(function () {
+        new ConfirmModal('Удалить массомер?', function () {
+            $('#remove-massmeter-form').submit();
+        }).show();
+    });
+</script>
+@Html.ViewModelWindow()
