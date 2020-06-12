@@ -26,12 +26,13 @@ namespace TSensor.Web.Models.Repository
 
             if (group != null)
             {
-                var pointList = Query<dynamic>(@"
+                var pointList = Query<dynamic>($@"
                     SELECT DISTINCT p.PointGuid, p.Name, p.[Address], p.Phone, p.Email,
                         p.Description, pgp.PointGroupGuid
                     FROM Point p
                         LEFT JOIN PointGroupPoint pgp ON pgp.PointGuid = p.PointGuid AND
-                            pgp.PointGroupGuid = @pointGroupGuid", new { pointGroupGuid });
+                            pgp.PointGroupGuid = @pointGroupGuid
+                    WHERE p.PointGuid != '{PointRepository.MASSMETER_POINT_GUID}'", new { pointGroupGuid });
 
                 group.PointList = pointList.Where(p => p.PointGroupGuid != null)
                     .Select(p => Point.From(p) as Point);
@@ -111,7 +112,7 @@ namespace TSensor.Web.Models.Repository
 
         public IEnumerable<PointGroup> GetPointGroupStructure(Guid? userGuid)
         {
-            var pointList = Query<dynamic>(@"
+            var pointList = Query<dynamic>($@"
                 SELECT DISTINCT p.PointGuid, p.Name AS PointName,
                 	pg.PointGroupGuid, pg.Name AS PointGroupName
                 FROM Point p
@@ -119,12 +120,12 @@ namespace TSensor.Web.Models.Repository
                 	FULL JOIN PointGroup pg ON pg.PointGroupGuid = pgp.PointGroupGuid
                 	LEFT JOIN UserPointGroupRights upgr ON upgr.PointGroupGuid = pg.PointGroupGuid
                 	LEFT JOIN UserPointRights upr ON upr.PointGuid = p.PointGuid
-                WHERE
-                	@userGuid IS NULL OR
+                WHERE (p.PointGuid IS NULL OR p.PointGuid != '{PointRepository.MASSMETER_POINT_GUID}') AND
+                	(@userGuid IS NULL OR
                 	(
                 		(upgr.PointGroupGuid IS NOT NULL AND upgr.UserGuid = @userGuid) OR
                 		(upgr.PointGroupGuid IS NULL AND upr.UserGuid = @userGuid)
-                	)", new { userGuid });
+                	))", new { userGuid });
 
             var tankList = Query<dynamic>(@"
                 SELECT TankGuid, PointGuid, Name 
