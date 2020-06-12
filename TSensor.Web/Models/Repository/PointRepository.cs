@@ -10,16 +10,24 @@ namespace TSensor.Web.Models.Repository
     {
         public PointRepository(string connectionString) : base(connectionString) { }
 
-        public IEnumerable<Point> List()
+		public static readonly Guid MASSMETER_POINT_GUID = new Guid("00000000-0000-0000-0000-999999999999");
+
+		public IEnumerable<Point> List()
         {
-            return Query<Point>(@"
+            return Query<Point>($@"
                 SELECT PointGuid, [Name], Address, Phone, Email, Description
                 FROM [Point]
-                ORDER BY [Name]");
+				WHERE PointGuid != '{MASSMETER_POINT_GUID}'
+				ORDER BY [Name]");
         }
 
         public Point GetByGuid(Guid pointGuid)
         {
+			if (pointGuid == MASSMETER_POINT_GUID)
+            {
+				return null;
+            }
+
 			var point = QueryFirst<Point>(@"
                 SELECT PointGuid, [Name], Address, Phone, Email, Description
                 FROM [Point] WHERE PointGuid = @pointGuid", new { pointGuid });
@@ -58,6 +66,11 @@ namespace TSensor.Web.Models.Repository
 
         public bool Edit(Guid pointGuid, string name, string address, string phone, string email, string description)
         {
+			if (pointGuid == MASSMETER_POINT_GUID)
+            {
+				return false;
+            }
+
             return QueryFirst<int?>(@"
                 UPDATE [Point] SET 
                     [Name] = @name,
@@ -73,7 +86,12 @@ namespace TSensor.Web.Models.Repository
 
         public bool Remove(Guid pointGuid)
         {
-            return QueryFirst<int?>(@"
+			if (pointGuid == MASSMETER_POINT_GUID)
+			{
+				return false;
+			}
+
+			return QueryFirst<int?>(@"
                 DELETE [Point] 
                 WHERE PointGuid = @pointGuid
                     
