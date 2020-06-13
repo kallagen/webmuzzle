@@ -8,7 +8,7 @@
 }
 
 <div class="t-cell @cellClass" data-sensorguid="@guid">
-    <h5><a href="@Url.Action("Details", "Tank", new { guid = Model.TankGuid })"><span>@Model.TankName<i class="fa fa-tint tank-neytral-icon"></i><i class="tank-header-icon fa fa-tint @mainClass" data-sensorguid="@guid"></i></span><span>@Model.ProductName</span></a></h5>
+    <h5><a href="@Url.Action("Details", "Tank", new { guid = Model.TankGuid })"><span>@Model.PointName @Model.TankName<i class="fa fa-tint tank-neytral-icon"></i><i class="tank-header-icon fa fa-tint @mainClass" data-sensorguid="@guid"></i></span><span>@Model.ProductName</span></a></h5>
     <h6><span data-sensorguid="@guid">@Model.MainSensorInsertDateStr</span></h6>
     <div>
         <div class="bl2">
