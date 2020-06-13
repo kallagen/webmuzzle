@@ -1,6 +1,6 @@
 ﻿@model TankDetailsViewModel
 @{
-    ViewBag.Title = $"Резервуар {Model.TankName} {Model.ProductName}";
+    ViewBag.Title = $"{Model.PointName} {Model.TankName} {Model.ProductName}".Trim();
 
     var exportDateStart = DateTime.Now.AddDays(-1);
     var exportDateEnd = DateTime.Now;
@@ -44,6 +44,25 @@
                 </div>
             </div>
         }
+
+        @using (Html.BeginForm("UploadCalibrationData", "Tank", FormMethod.Post, new { enctype = "multipart/form-data", autocomplete = "off", id = "upload-form" }))
+        {
+            var uploadDataLabel = Model.HasCalibrationData ? "Обновить" : "Загрузить";
+            @Html.Hidden("tankGuid", Model.TankGuid)
+            <div class="box box-solid">
+                <div class="box-header">
+                    <h4>Калибровочная характеристика</h4>
+                </div>
+                <div class="box-footer">
+                    @if (Model.HasCalibrationData)
+                    {
+                        @Html.ActionLink("Просмотреть", "CalibrationData", "Tank", new { tankGuid = Model.TankGuid }, new { @class = "btn btn-default" })
+                    }
+                    <input id="upload-input" class="hidden" type="file" name="file" />
+                    <button id="upload-button" type="button" class="btn bg-blue pull-right">@uploadDataLabel</button>
+                </div>
+            </div>
+        }
     </div>
     <div class="col-md-9">
         <div class="box box-solid">
@@ -67,7 +86,7 @@
                             if (Model.DualMode)
                             {
                                 ValueRow("pressureFilter", "Сигнальный уровень, атм", Model.Value?.pressureFilter);
-                            }                            
+                            }
                             ValueRow("pressureMeasuring", "Давление измер, атм", Model.Value?.pressureMeasuring);
                             ValueRow("levelInPercent", "Объем, %", Model.Value?.levelInPercent);
                             ValueRow("environmentVolume", "Объем, м³", Model.Value?.environmentVolume);
@@ -105,6 +124,14 @@
         allowTime: true
     });
 
+    var uploadInput = document.querySelector('#upload-input');
+    uploadInput.addEventListener('change', function () {
+        document.querySelector('#upload-form').submit();
+    });
+    document.querySelector('#upload-button').addEventListener('click', function () {
+        uploadInput.click();
+    });
+
     @if (listenSensors.Any())
     {
         <text>
@@ -116,3 +143,4 @@
         </text>
     }
 </script>
+@Html.ViewModelWindow()

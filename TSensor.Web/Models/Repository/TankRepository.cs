@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TSensor.Web.Models.Entity;
 
 namespace TSensor.Web.Models.Repository
@@ -126,7 +127,7 @@ namespace TSensor.Web.Models.Repository
         {
             return QueryFirst<dynamic>(@"
 				SELECT
-                    t.TankGuid, t.Name AS TankName, t.DualMode, p.Name AS ProductName, InsertDate, DeviceGuid,
+                    t.TankGuid, t.Name AS TankName, t.DualMode, p.Name AS PointName, pr.Name AS ProductName, InsertDate, DeviceGuid,
                     izkNumber, banderolType, sensorSerial, sensorChannel, pressureAndTempSensorState,
                     sensorFirmwareVersionAndReserv, alarma, environmentLevel, pressureFilter, pressureMeasuring,
                     levelInPercent, environmentVolume, liquidEnvironmentLevel, steamMass, liquidDensity, steamDensity,
@@ -134,7 +135,8 @@ namespace TSensor.Web.Models.Repository
                     period, plateServiceParam, environmentComposition, cs1, plateServiceParam2, plateServiceParam3,
                     sensorWorkMode, plateServiceParam4, plateServiceParam5, crc
 				FROM Tank t
-                    LEFT JOIN Product p ON t.ProductGuid = p.ProductGuid
+                    LEFT JOIN Point p ON p.PointGuid = t.PointGuid
+                    LEFT JOIN Product pr ON t.ProductGuid = pr.ProductGuid
 					LEFT JOIN ActualSensorValue asv ON
                         t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial
                 WHERE
@@ -194,5 +196,47 @@ namespace TSensor.Web.Models.Repository
 
                 SELECT @@ROWCOUNT", new { isSecondSensor, tankGuid, deviceGuid, izkId, sensorId }) == 1;
         }
+
+        #region CalibrationData
+        public bool HasTankCalibrationData(Guid tankGuid)
+        {
+            return QueryFirst<int?>(@"
+                SELECT TOP 1 1
+                FROM TankСalibrationData
+                WHERE TankGuid = @tankGuid", new { tankGuid }) == 1;
+        }
+
+        public Dictionary<int, decimal> GetTankCalibrationData(Guid tankGuid)
+        {
+            return Query<dynamic>(@"
+                SELECT [Level], [Value]
+                FROM TankСalibrationData
+                WHERE TankGuid = @tankGuid", new { tankGuid })
+                .Select(p => new KeyValuePair<int, decimal>(p.Level, p.Value))
+                .ToDictionary(p => p.Key, v => v.Value);
+        }
+
+        public bool UploadTankCalibrationData(Guid tankGuid, Dictionary<int, decimal> data)
+        {
+            QueryFirst<int?>(@"
+                DELETE TankСalibrationData
+                WHERE TankGuid = @tankGuid
+
+                SELECT @@ROWCOUNT",
+                new { tankGuid });
+
+            var result = true;
+            foreach (var item in data)
+            {
+                result = result && QueryFirst<int?>(@"
+                    INSERT TankСalibrationData(TankGuid, [Level], [Value])
+                    VALUES(@tankGuid, @level, @value)
+
+                    SELECT @@ROWCOUNT", new { tankGuid, level = item.Key, value = item.Value }) == 1;
+            }
+
+            return result;
+        }
+        #endregion
     }
 }

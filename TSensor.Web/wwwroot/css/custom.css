@@ -11,6 +11,10 @@ input[type="text"], select, textarea, input[type="password"] {
     text-transform: uppercase;
 }
 
+.form-group input[type="file"] {
+    width: 100%;
+}
+
 .content-wrapper.no-footer {
     min-height: calc(100vh - 50px);
 }

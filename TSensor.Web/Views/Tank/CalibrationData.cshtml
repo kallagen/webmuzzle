@@ -1,0 +1,35 @@
+﻿@model TankCalibrationDataViewModel
+@{
+    ViewBag.Title = $"{Model.PointName} {Model.TankName} {Model.ProductName}".Trim() + ", Калибровочная характеристика";
+}
+
+@section AdditionalHeader
+{
+    @Html.ActionLink("назад к резервуару", "Details", "Tank", new { guid = Model.TankGuid }, new { @class = "footer-link pull-right additional-header-link" })
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-solid">
+            <div class="box-body table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Уровень</th>
+                            <th>Значение</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.CalibrationData)
+                        {
+                            <tr>
+                                <td>@item.Key</td>
+                                <td>@item.Value</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

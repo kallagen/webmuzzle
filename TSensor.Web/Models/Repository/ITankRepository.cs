@@ -23,5 +23,11 @@ namespace TSensor.Web.Models.Repository
 
         public IEnumerable<dynamic> GetTankWithoutSensorList();
         public bool SetSensorValue(bool isSecondSensor, Guid tankGuid, string deviceGuid, int izkId, int sensorId);
+
+        #region CalibrationData
+        public bool HasTankCalibrationData(Guid tankGuid);
+        public Dictionary<int, decimal> GetTankCalibrationData(Guid tankGuid);
+        public bool UploadTankCalibrationData(Guid tankGuid, Dictionary<int, decimal> data);
+        #endregion
     }
 }

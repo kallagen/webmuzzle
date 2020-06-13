@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.ViewModels.Tank;
@@ -232,35 +235,6 @@ namespace TSensor.Web.Controllers
             return View("NotFound");
         }
 
-        [Route("tank/{guid}")]
-        public IActionResult Details(string guid)
-        {
-            if (Guid.TryParse(guid, out var _tankGuid))
-            {
-                var tankInfo = _tankRepository.GetTankActualSensorValues(_tankGuid);
-                if (tankInfo != null)
-                {
-                    var viewModel = new TankDetailsViewModel
-                    {
-                        TankGuid = tankInfo.TankGuid,
-                        TankName = tankInfo.TankName,
-                        DualMode = tankInfo.DualMode,
-                        ProductName = tankInfo.ProductName
-                    };
-
-                    if (tankInfo.InsertDate != null)
-                    {
-                        viewModel.Value = ActualSensorValue.Parse(tankInfo);
-                    }
-
-                    return View(viewModel);
-                }
-            }
-
-            ViewBag.Title = "Резервуар не найден";
-            return View("NotFound");
-        }
-
         private void FillExportHeaders(ExcelWorksheet sheet, bool dualMode)
         {
             var idx = 1;
@@ -362,8 +336,7 @@ namespace TSensor.Web.Controllers
 
             if (tank == null)
             {
-                ViewBag.Title = "Резервуар не найден";
-                return View("NotFound");
+                return TankNotFound();
             }
 
             if (
@@ -459,6 +432,140 @@ namespace TSensor.Web.Controllers
             }
 
             return RedirectToAction("NotAssigned", "Dashboard");
+        }
+
+        [Route("tank/{tankGuid}/calibration")]
+        public IActionResult CalibrationData(string tankGuid)
+        {
+            if (Guid.TryParse(tankGuid, out var _tankGuid))
+            {
+                var tankInfo = _tankRepository.GetTankActualSensorValues(_tankGuid);
+                if (tankInfo != null)
+                {
+                    var viewModel = new TankCalibrationDataViewModel
+                    {
+                        TankGuid = _tankGuid,
+                        TankName = tankInfo.TankName,
+                        PointName = tankInfo.PointName,
+                        ProductName = tankInfo.ProductName,
+                        CalibrationData = _tankRepository.GetTankCalibrationData(_tankGuid)
+                    };
+
+                    return View(viewModel);
+                }
+            }
+
+            return TankNotFound();
+        }
+
+        [Route("tank/calibration/upload")]
+        [HttpPost]
+        public IActionResult UploadCalibrationData(string tankGuid, IFormFile file)
+        {
+            if (Guid.TryParse(tankGuid, out var _tankGuid))
+            {
+                var tankInfo = _tankRepository.GetTankActualSensorValues(_tankGuid);
+                if (tankInfo != null)
+                {
+                    try
+                    {
+                        using var reader = new StreamReader(file.OpenReadStream());
+                        var data = (reader.ReadToEnd() ?? string.Empty).Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(p =>
+                            {
+                                var match = Regex.Match(p, $"^([0-9]+)\\s+([0-9,\\.]+)$");
+                                if (match.Groups.Count == 3)
+                                {
+                                    if (int.TryParse(match.Groups[1].Value, out var level) &&
+                                        decimal.TryParse(match.Groups[2].Value, out var value))
+                                    {
+                                        return new { level, value };
+                                    }
+                                }
+
+                                return null;
+                            })
+                            .Where(p => p != null)
+                            .GroupBy(p => p.level)
+                            .Select(p => p.First())
+                            .OrderBy(p => p.level)
+                            .ToDictionary(k => k.level, v => v.value);
+
+                        if (data.Any())
+                        {
+                            if (_tankRepository.UploadTankCalibrationData(_tankGuid, data))
+                            {
+                                TempData["Tank.Details.SuccessMessage"] = "Калибровочная характеристика загружена";
+                            }
+                            else
+                            {
+                                TempData["Tank.Details.ErrorMessage"] = "При загрузке калибровочной харакретистики произошла ошибка";
+                            }
+                        }
+                        else
+                        {
+                            TempData["Tank.Details.ErrorMessage"] = "Файл не содержит подходящих записей калибровочной характеристики";
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        TempData["Tank.Details.ErrorMessage"] = Program.GLOBAL_ERROR_MESSAGE; 
+                    }
+
+                    return RedirectToAction("Details", "Tank", new { guid = _tankGuid });
+                }
+            }
+
+            return TankNotFound();
+        }
+
+        [Route("tank/{guid}")]
+        public IActionResult Details(string guid)
+        {
+            if (Guid.TryParse(guid, out var _tankGuid))
+            {
+                var tankInfo = _tankRepository.GetTankActualSensorValues(_tankGuid);
+                if (tankInfo != null)
+                {
+                    var viewModel = new TankDetailsViewModel
+                    {
+                        TankGuid = _tankGuid,
+                        TankName = tankInfo.TankName,
+                        DualMode = tankInfo.DualMode,
+                        PointName = tankInfo.PointName,
+                        ProductName = tankInfo.ProductName,
+
+                        HasCalibrationData = _tankRepository.HasTankCalibrationData(_tankGuid)
+                    };
+
+                    if (tankInfo.InsertDate != null)
+                    {
+                        viewModel.Value = ActualSensorValue.Parse(tankInfo);
+                    }
+
+                    var successMessage = TempData["Tank.Details.SuccessMessage"] as string;
+                    if (!string.IsNullOrEmpty(successMessage))
+                    {
+                        viewModel.SuccessMessage = successMessage;
+                    }
+                    var errorMessage = TempData["Tank.Details.ErrorMessage"] as string;
+                    if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        viewModel.ErrorMessage = errorMessage;
+                    }
+
+                    return View(viewModel);
+                }
+            }
+
+            return TankNotFound();
+        }
+
+        [NonAction]
+        public IActionResult TankNotFound()
+        {
+            ViewBag.Title = "Резервуар не найден";
+            return View("NotFound");
         }
     }
 }
