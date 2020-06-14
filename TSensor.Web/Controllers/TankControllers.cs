@@ -13,7 +13,6 @@ using TSensor.Web.ViewModels.Tank;
 
 namespace TSensor.Web.Controllers
 {
-    [Authorize(Policy = "Admin")]
     public class TankController : Controller
     {
         private readonly IPointRepository _pointRepository;
@@ -28,6 +27,7 @@ namespace TSensor.Web.Controllers
             _productRepository = productRepository;
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("point/{pointGuid}/tank/new")]
         public IActionResult Create(string pointGuid)
         {
@@ -50,6 +50,7 @@ namespace TSensor.Web.Controllers
             return NotFound();
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("point/{pointGuid}/tank/new")]
         [HttpPost]
         public IActionResult Create(TankCreateEditViewModel viewModel)
@@ -102,6 +103,7 @@ namespace TSensor.Web.Controllers
             return View(viewModel);
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("point/{pointGuid}/tank/{tankGuid}")]
         public IActionResult Edit(string pointGuid, string tankGuid)
         {
@@ -149,6 +151,7 @@ namespace TSensor.Web.Controllers
             return View(viewModel);
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("point/{pointGuid}/tank/{tankGuid}")]
         [HttpPost]
         public IActionResult Edit(TankCreateEditViewModel viewModel)
@@ -202,6 +205,7 @@ namespace TSensor.Web.Controllers
             return View(viewModel);
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("tank/remove")]
         [HttpPost]
         public IActionResult Remove(string tankGuid, string pointGuid)
@@ -434,6 +438,7 @@ namespace TSensor.Web.Controllers
             return RedirectToAction("NotAssigned", "Dashboard");
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("tank/{tankGuid}/calibration")]
         public IActionResult CalibrationData(string tankGuid)
         {
@@ -458,6 +463,7 @@ namespace TSensor.Web.Controllers
             return TankNotFound();
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("tank/calibration/upload")]
         [HttpPost]
         public IActionResult UploadCalibrationData(string tankGuid, IFormFile file)
@@ -534,7 +540,7 @@ namespace TSensor.Web.Controllers
                         DualMode = tankInfo.DualMode,
                         PointName = tankInfo.PointName,
                         ProductName = tankInfo.ProductName,
-
+                        HasCalibrationRights = HttpContext.User.IsInRole("ADMIN"),
                         HasCalibrationData = _tankRepository.HasTankCalibrationData(_tankGuid)
                     };
 
