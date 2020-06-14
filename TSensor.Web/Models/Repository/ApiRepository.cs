@@ -16,9 +16,14 @@ namespace TSensor.Web.Models.Repository
                 VALUES (@ip, @rawValue, @EventUTCDate, @DeviceGuid)", 
 				new { ip, rawValue, value.EventUTCDate, value.DeviceGuid });
 
-            if (value.pressureAndTempSensorState != "00")
+			/*
+            if (value.pressureAndTempSensorState == "00")
             {
-                return QueryFirst<int>(@"
+				return true;
+            }
+			*/
+
+            return QueryFirst<int>(@"
 				DECLARE
 					@findTankGuid uniqueidentifier,
 					@findIsSecond bit = 0
@@ -88,11 +93,6 @@ namespace TSensor.Web.Models.Repository
 				END
 
 				SELECT @@ROWCOUNT", value) == 1;
-            }
-            else
-            {
-                return true;
-            }
         }
 
         public async Task PushArchivedValuesAsync(string ip, string deviceGuid, IEnumerable<ActualSensorValue> valueList)
