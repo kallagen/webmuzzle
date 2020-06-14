@@ -44,7 +44,8 @@ namespace TSensor.Web.Controllers
             var viewModel = new ActualSensorValuesViewModel
             {
                 ActualSensorValueList = _pointRepository.GetSensorActualState(guidList)
-                    .OrderBy(t => t.TankName, comparer),
+                    .OrderBy(t => t.PointName, comparer)
+                    .ThenBy(t => t.TankName, comparer),
                 Favorite = favorite
             };
 
