@@ -390,6 +390,7 @@ namespace TSensor.Web.Controllers
             }
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("tank/emptysensor")]
         [HttpPost]
         public IActionResult TankWithoutSensorList()
@@ -425,6 +426,7 @@ namespace TSensor.Web.Controllers
             return Json(data);
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("tank/setsensor")]
         [HttpPost]
         public IActionResult SetSensor(string tankGuid, bool isSecondSensor, string deviceGuid, int izkId, int sensorId)
