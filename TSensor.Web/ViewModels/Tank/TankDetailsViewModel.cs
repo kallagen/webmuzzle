@@ -11,7 +11,7 @@ namespace TSensor.Web.ViewModels.Tank
         public string PointName { get; set; }
         public string ProductName { get; set; }
         public ActualSensorValue Value { get; set; }
-
+        public bool HasCalibrationRights { get; set; }
         public bool HasCalibrationData { get; set; }
     }
 }

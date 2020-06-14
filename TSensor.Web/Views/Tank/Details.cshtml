@@ -45,23 +45,26 @@
             </div>
         }
 
-        @using (Html.BeginForm("UploadCalibrationData", "Tank", FormMethod.Post, new { enctype = "multipart/form-data", autocomplete = "off", id = "upload-form" }))
+        @if (Model.HasCalibrationRights)
         {
-            var uploadDataLabel = Model.HasCalibrationData ? "Обновить" : "Загрузить";
-            @Html.Hidden("tankGuid", Model.TankGuid)
-            <div class="box box-solid">
-                <div class="box-header">
-                    <h4>Калибровочная характеристика</h4>
+            using (Html.BeginForm("UploadCalibrationData", "Tank", FormMethod.Post, new { enctype = "multipart/form-data", autocomplete = "off", id = "upload-form" }))
+            {
+                var uploadDataLabel = Model.HasCalibrationData ? "Обновить" : "Загрузить";
+                @Html.Hidden("tankGuid", Model.TankGuid)
+                <div class="box box-solid">
+                    <div class="box-header">
+                        <h4>Калибровочная характеристика</h4>
+                    </div>
+                    <div class="box-footer">
+                        @if (Model.HasCalibrationData)
+                        {
+                            @Html.ActionLink("Просмотреть", "CalibrationData", "Tank", new { tankGuid = Model.TankGuid }, new { @class = "btn btn-default" })
+                        }
+                        <input id="upload-input" class="hidden" type="file" name="file" />
+                        <button id="upload-button" type="button" class="btn bg-blue pull-right">@uploadDataLabel</button>
+                    </div>
                 </div>
-                <div class="box-footer">
-                    @if (Model.HasCalibrationData)
-                    {
-                        @Html.ActionLink("Просмотреть", "CalibrationData", "Tank", new { tankGuid = Model.TankGuid }, new { @class = "btn btn-default" })
-                    }
-                    <input id="upload-input" class="hidden" type="file" name="file" />
-                    <button id="upload-button" type="button" class="btn bg-blue pull-right">@uploadDataLabel</button>
-                </div>
-            </div>
+            }
         }
     </div>
     <div class="col-md-9">
