@@ -1,0 +1,41 @@
+﻿@model IEnumerable<TankSensorValue>
+@{
+    ViewBag.Title = "Массомеры";
+}
+
+@if (Model?.Any() == true)
+{
+    var listenSensors = Model.Select(t =>
+        new
+        {
+            guid = t.MainSensorGuid,
+            updateDate = t.MainSensorInsertDate,
+            warningDate = t.MainSensorWarningDateTicks,
+            weightDelta = t.WeightChangeDelta ?? 0,
+            weightTimeout = t.WeightChangeTimeout ?? 0,
+            weight = t.LiquidEnvironmentLevel
+        });
+
+    @foreach (var massmeter in Model)
+    {
+        @Html.Partial("MassmeterCard", massmeter)
+    }
+
+    <div class="clearfix"></div>
+
+    <script src="~/lib/signalr/signalr.min.js"></script>
+    <script>
+        const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
+        const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
+
+        connection.on('sensorupdate', massmeterSensorUpdate);
+
+        connection.start();
+    </script>
+
+    @Html.ViewModelWindow()
+}
+else
+{
+    <p>Отсутствуют данные о массомерах</p>
+}

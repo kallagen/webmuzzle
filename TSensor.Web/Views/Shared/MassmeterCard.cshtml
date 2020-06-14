@@ -1,0 +1,19 @@
+﻿@model TSensor.Web.Models.Entity.TankSensorValue
+@{
+    var cellClass = Model.IsError ? "t-error" : (Model.IsWarning ? "t-warning" : "t-normal");
+    var guid = Model.MainSensorGuid;
+
+    var mainClass = Model.IsError ? "text-red" : (Model.IsWarning ? "text-yellow" : string.Empty);
+}
+
+<div class="t-cell m-cell @cellClass" data-sensorguid="@guid">
+    <h5><a href="@Url.Action("MassmeterDetails", "Tank", new { guid = Model.TankGuid })"><span>@Model.PointName @Model.TankName<i class="tank-header-icon fa fa-tint @mainClass" data-sensorguid="@guid"></i></span></a></h5>
+    <h6><span data-sensorguid="@guid">@Model.MainSensorInsertDateStr</span></h6>
+    <div>
+        <div class="bl3">
+            <span><span class="t-label t-img-weight">Масса жидкости</span><span class="t-liquidEnvironmentLevel">@Model.LiquidEnvironmentLevel.ToString().Replace(",", ".")</span> т<i class="hidden t-weightdown fa fa-arrow-down"></i><i class="hidden t-weightup fa fa-arrow-up"></i></span>
+            <span><span class="t-label t-img-volume">Объём</span><span class="t-environmentVolume">@Model.EnvironmentVolume.ToString().Replace(",", ".")</span> м³</span>
+        </div>
+        <div class="bl-error"></div>
+    </div>
+</div>

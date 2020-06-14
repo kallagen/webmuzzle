@@ -193,6 +193,10 @@ span.form-control {
     margin-bottom: 15px;
 }
 
+.t-cell.m-cell > div {
+    height: 54px;
+}
+
 .t-cell h5 span {
     display: inline-block;
     margin-right: 8px;
@@ -205,12 +209,16 @@ span.form-control {
 .bl-error {
     width: 100%;
     height: 100%;
-    padding: 30px 15px;
+    padding: 36px 15px;
     background: #DD4B39;
     color: #fff;
     text-align: center;
     vertical-align: middle;
     display: none;
+}
+
+.m-cell .bl-error {
+    padding: 6px 15px;
 }
 
 .t-error .bl-error {
@@ -257,6 +265,10 @@ span.form-control {
     width: 210px;
 }
 
+    .m-cell .bl3 {
+        width: 290px;
+    }
+
 .bl3-1 {
     padding-top: 0;
 }
@@ -267,11 +279,11 @@ span.form-control {
 
 .bl-error::before {
     display: block;
-    content: "Данные с датчика не поступают";
+    content: "Данные не поступают";
 }
 
 .bl-error::after {
-    content: "Вероятно, датчик неправильно внесен в систему";
+    content: "Проверьте правильность настройки";
     display: block;
 }
 
@@ -288,6 +300,10 @@ span.form-control {
     padding-left: 26px;
     background-position: 0 0;
     background-size: auto 100%;
+}
+
+.m-cell.t-cell .t-label {
+    width: 200px;
 }
 
 .t-cell .t-img-weight {

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Services;
 using TSensor.Web.ViewModels;
 using TSensor.Web.ViewModels.Tank;
 
@@ -12,12 +14,12 @@ namespace TSensor.Web.Controllers
     public class MassmeterController : Controller
     {
         private readonly ITankRepository _tankRepository;
+        private readonly IPointRepository _pointRepository;
 
-        
-
-        public MassmeterController(ITankRepository tankRepository)
+        public MassmeterController(ITankRepository tankRepository, IPointRepository pointRepository)
         {
             _tankRepository = tankRepository;
+            _pointRepository = pointRepository;
         }        
 
         [Authorize(Policy = "Admin")]
@@ -199,6 +201,20 @@ namespace TSensor.Web.Controllers
             ViewBag.BackUrl = Url.ActionLink("List", "Massmeter");
 
             return View("NotFound");
-        }        
+        }
+
+        [Authorize(Policy = "Admin")]
+        [Route("massmeter/state")]
+        public IActionResult ActualSensorValues()
+        {
+            var comparer = new AlphanumComparer();
+
+            var massmeterList = _tankRepository.GetListByPoint(PointRepository.MASSMETER_POINT_GUID);
+            var data = _pointRepository.GetSensorActualState(massmeterList.Select(p => p.TankGuid))
+                .OrderBy(t => t.PointName, comparer)
+                .ThenBy(t => t.TankName, comparer);
+
+            return View(data);
+        }
     }
 }

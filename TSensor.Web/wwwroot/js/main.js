@@ -147,6 +147,73 @@ function sensorUpdate(data, date) {
     });
 }
 
+function massmeterSensorUpdate(data, date) {
+    listenSensors.forEach(function (sensor) {
+        var sensorGuid = sensor.guid;
+
+        var container = $('.t-cell[data-sensorguid="' + sensorGuid + '"]');
+        var point = $('i[data-sensorguid="' + sensorGuid + '"]');
+
+        if (data && data[sensorGuid] && data[sensorGuid].insertDate !== sensor.updateDate) {
+
+            var val = data[sensorGuid];
+
+            if (point.hasClass('text-red')) {
+                point.removeClass('text-red');
+            }
+            if (point.hasClass('text-yellow')) {
+                point.removeClass('text-yellow');
+            }
+
+            if (container.hasClass('t-error') && !container.find('.text-red').length) {
+                container.removeClass('t-error');
+            }
+            if (container.hasClass('t-warning') && !container.find('.text-yellow').length) {
+                container.removeClass('t-warning');
+            }
+
+            container.find('span[data-sensorguid="' + sensorGuid + '"]').html(val.insertDateStr);
+
+            container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
+            container.find('.t-environmentVolume').html(val.environmentVolume);
+
+            if (val.liquidEnvironmentLevel > sensor.weight + sensor.weightDelta ||
+                val.liquidEnvironmentLevel < sensor.weight - sensor.weightDelta) {
+
+                if (val.liquidEnvironmentLevel > sensor.weight + sensor.weightDelta) {
+                    container.find('.t-weightdown').addClass('hidden');
+                    container.find('.t-weightup').removeClass('hidden');
+                }
+                if (val.liquidEnvironmentLevel < sensor.weight - sensor.weightDelta) {
+                    container.find('.t-weightdown').removeClass('hidden');
+                    container.find('.t-weightup').addClass('hidden');
+                }
+
+                sensor.weight = val.liquidEnvironmentLevel;
+                if (sensor.weightTimeout !== 0) {
+                    sensor.weightExpire = date + sensor.weightTimeout * 1000;
+                }
+            }
+
+            sensor.updateDate = data[sensorGuid].insertDate;
+            sensor.warningDate = date + 600000;
+        }
+
+        if (!point.hasClass('text-yellow') && sensor.warningDate && date > sensor.warningDate) {
+            point.addClass('text-yellow');
+
+            if (!container.hasClass('t-error') && !container.hasClass('t-warning')) {
+                container.addClass('t-warning');
+            }
+        }
+
+        if (sensor.weightExpire && sensor.weightExpire < date) {
+            container.find('.t-weightdown').addClass('hidden');
+            container.find('.t-weightup').addClass('hidden');
+        }
+    });
+}
+
 function notAssignedSensorUpdate(data) {
     for (sensorGuid in listenSensors) {
         var container = $('.t-cell[data-sensorguid="' + sensorGuid + '"]');
