@@ -380,7 +380,7 @@ namespace TSensor.Web.Controllers
 
                 return new FileContentResult(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 {
-                    FileDownloadName = $"Экспорт {tank.Name} {tank.ProductName} с {_dateStart:dd.MM.yyyy HH.mm)} по {_dateEnd:dd.MM.yyyy HH.mm}.xlsx"
+                    FileDownloadName = $"Экспорт {tank.Name} с {_dateStart:dd.MM.yyyy HH.mm} по {_dateEnd:dd.MM.yyyy HH.mm}.xlsx"
                 };
             }
             else
@@ -515,7 +515,7 @@ namespace TSensor.Web.Controllers
                             TempData["Tank.Details.ErrorMessage"] = "Файл не содержит подходящих записей калибровочной характеристики";
                         }
                     }
-                    catch(Exception e)
+                    catch
                     {
                         TempData["Tank.Details.ErrorMessage"] = Program.GLOBAL_ERROR_MESSAGE; 
                     }
@@ -527,8 +527,14 @@ namespace TSensor.Web.Controllers
             return TankNotFound();
         }
 
-        [Route("tank/{guid}")]
-        public IActionResult Details(string guid)
+        [Route("massmeter/{guid}/details")]
+        public IActionResult MassmeterDetails(string guid)
+        {
+            return Details(guid, isMassmeter: true);
+        }
+
+        [Route("tank/{guid}/details")]
+        public IActionResult Details(string guid, bool isMassmeter = false)
         {
             if (Guid.TryParse(guid, out var _tankGuid))
             {
@@ -543,7 +549,8 @@ namespace TSensor.Web.Controllers
                         PointName = tankInfo.PointName,
                         ProductName = tankInfo.ProductName,
                         HasCalibrationRights = HttpContext.User.IsInRole("ADMIN"),
-                        HasCalibrationData = _tankRepository.HasTankCalibrationData(_tankGuid)
+                        HasCalibrationData = _tankRepository.HasTankCalibrationData(_tankGuid),
+                        IsMassmeter = tankInfo.PointGuid == PointRepository.MASSMETER_POINT_GUID
                     };
 
                     if (tankInfo.InsertDate != null)
@@ -562,11 +569,12 @@ namespace TSensor.Web.Controllers
                         viewModel.ErrorMessage = errorMessage;
                     }
 
-                    return View(viewModel);
+                    return View("Details", viewModel);
                 }
             }
 
-            return TankNotFound();
+            ViewBag.Title = isMassmeter ? "Массомер" : "Резервуар" + " не найден";
+            return View("NotFound");
         }
 
         [NonAction]

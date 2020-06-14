@@ -45,7 +45,7 @@
             </div>
         }
 
-        @if (Model.HasCalibrationRights)
+        @if (Model.HasCalibrationRights && !Model.IsMassmeter)
         {
             using (Html.BeginForm("UploadCalibrationData", "Tank", FormMethod.Post, new { enctype = "multipart/form-data", autocomplete = "off", id = "upload-form" }))
             {
@@ -65,6 +65,15 @@
                     </div>
                 </div>
             }
+            <script>
+                var uploadInput = document.querySelector('#upload-input');
+                uploadInput.addEventListener('change', function () {
+                    document.querySelector('#upload-form').submit();
+                });
+                document.querySelector('#upload-button').addEventListener('click', function () {
+                    uploadInput.click();
+                });
+            </script>
         }
     </div>
     <div class="col-md-9">
@@ -125,14 +134,6 @@
     });
     new DatePicker('exportDateEnd', {
         allowTime: true
-    });
-
-    var uploadInput = document.querySelector('#upload-input');
-    uploadInput.addEventListener('change', function () {
-        document.querySelector('#upload-form').submit();
-    });
-    document.querySelector('#upload-button').addEventListener('click', function () {
-        uploadInput.click();
     });
 
     @if (listenSensors.Any())

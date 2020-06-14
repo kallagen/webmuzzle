@@ -13,5 +13,6 @@ namespace TSensor.Web.ViewModels.Tank
         public ActualSensorValue Value { get; set; }
         public bool HasCalibrationRights { get; set; }
         public bool HasCalibrationData { get; set; }
+        public bool IsMassmeter { get; set; }
     }
 }

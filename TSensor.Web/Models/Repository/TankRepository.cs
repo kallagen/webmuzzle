@@ -127,7 +127,7 @@ namespace TSensor.Web.Models.Repository
         {
             return QueryFirst<dynamic>(@"
 				SELECT
-                    t.TankGuid, t.Name AS TankName, t.DualMode, p.Name AS PointName, pr.Name AS ProductName, InsertDate, DeviceGuid,
+                    t.TankGuid, t.Name AS TankName, t.DualMode, p.PointGuid, p.Name AS PointName, pr.Name AS ProductName, InsertDate, DeviceGuid,
                     izkNumber, banderolType, sensorSerial, sensorChannel, pressureAndTempSensorState,
                     sensorFirmwareVersionAndReserv, alarma, environmentLevel, pressureFilter, pressureMeasuring,
                     levelInPercent, environmentVolume, liquidEnvironmentLevel, steamMass, liquidDensity, steamDensity,
