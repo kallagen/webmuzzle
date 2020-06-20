@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Services.Log;
+using TSensor.Web.ViewModels;
 
 namespace TSensor.Web.Controllers
 {
@@ -105,46 +109,9 @@ namespace TSensor.Web.Controllers
 
             try
             {
-                var valueList = a.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(p =>
-                    {
-                        var lexem = p.Split(";");
-
-                        var eventDateParseResult = DateTime.TryParseExact(lexem[0],
-                        new[]
-                        {
-                            "yyyy-MM-dd HH:mm:ss.fff",
-                            "yyyy-MM-dd HH:mm:ss.ff",
-                            "yyyy-MM-dd HH:mm:ss.f",
-                            "yyyy-MM-dd HH:mm:ss.",
-                            "yyyy-MM-dd HH:mm:ss"
-                        },
-                        CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
-
-                        if (!eventDateParseResult)
-                        {
-                            return null;
-                        }
-
-                        try
-                        {
-                            var value = ActualSensorValue.Parse(lexem[1], storeRaw: true);
-                            value.EventUTCDate = eventUTCDate;
-
-                            return value;
-                        }
-                        catch
-                        {
-                            return null;
-                        }
-                    }).Where(p => p != null);
-
-                if (valueList.Any())
+                var result = await ParseArchiveAsync(value, deviceGuid, legacySupport: true);
+                if (result.Parsed != 0)
                 {
-                    await _apiRepository.PushArchivedValuesAsync(
-                    Request.HttpContext.Connection.RemoteIpAddress.ToString(),
-                    deviceGuid, valueList);
-
                     return Json(new { success = true });
                 }
                 else
@@ -156,6 +123,130 @@ namespace TSensor.Web.Controllers
             {
                 return Error(ex.ToString(), value, null, deviceGuid);
             }
+        }
+
+        private async Task<dynamic> ParseArchiveAsync(string content, string deviceGuid = null, bool legacySupport = false)
+        {
+            var error = 0;
+
+            var valueList = (content ?? string.Empty).Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+                .Where(p => !string.IsNullOrEmpty(p))
+                .Select(p =>
+                {
+                    bool isLegacy;
+
+                    var lexem = p.Split(";");
+                    if (lexem.Length == 3)
+                    {
+                        isLegacy = false;
+                    }
+                    else if (legacySupport && lexem.Length == 2)
+                    {
+                        isLegacy = true;
+                    }
+                    else
+                    {
+                        error++;
+                        return null;
+                    }
+
+                    var eventDateParseResult = DateTime.TryParseExact(
+                        isLegacy ? lexem[0] : lexem[1],
+                        new[]
+                        {
+                            "yyyy-MM-dd HH:mm:ss.fff",
+                            "yyyy-MM-dd HH:mm:ss.ff",
+                            "yyyy-MM-dd HH:mm:ss.f",
+                            "yyyy-MM-dd HH:mm:ss.",
+                            "yyyy-MM-dd HH:mm:ss"
+                        }, CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
+                    if (eventDateParseResult)
+                    {
+                        try
+                        {
+                            var value = ActualSensorValue.Parse(
+                                isLegacy ? lexem[1] : lexem[2], storeRaw: true);
+                            value.EventUTCDate = eventUTCDate;
+                            value.DeviceGuid = isLegacy ? deviceGuid : lexem[0];
+
+                            return value;
+                        }
+                        catch { }
+                    }
+
+                    error++;
+                    return null;
+                }).Where(p => p != null);
+
+            if (valueList.Any())
+            {
+                await _apiRepository.PushArchivedValuesAsync(
+                    Request.HttpContext.Connection.RemoteIpAddress.ToString(), valueList);
+            }
+
+            return new
+            {
+                error,
+                parsed = valueList.Count()
+            };
+        }
+
+        [Authorize(Policy = "Admin")]
+        [Route("archive/upload")]
+        public IActionResult UploadArchive()
+        {
+            var viewModel = new ViewModelBase();
+
+            var successMessage = TempData["Api.UploadArchive.SuccessMessage"] as string;
+            if (!string.IsNullOrEmpty(successMessage))
+            {
+                viewModel.SuccessMessage = successMessage;
+            }
+            var errorMessage = TempData["Api.UploadArchive.ErrorMessage"] as string;
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                viewModel.ErrorMessage = errorMessage;
+            }
+
+            return View(viewModel);
+        }
+
+        [Authorize(Policy = "Admin")]
+        [Route("archive/upload")]
+        [HttpPost]
+        public async Task<IActionResult> UploadArchive(IFormFile file)
+        {
+            if (file != null)
+            {
+                try
+                {
+                    using var reader = new StreamReader(file.OpenReadStream());
+                    var result = await ParseArchiveAsync(reader.ReadToEnd());
+
+                    if (result.parsed != 0)
+                    {
+                        TempData["Api.UploadArchive.SuccessMessage"] =
+                            $"Загружено {result.parsed} показаний датчика";
+                        return RedirectToAction("UploadArchive", "Api");
+                    }
+                    else
+                    {
+                        TempData["Api.UploadArchive.ErrorMessage"] =
+                            "Файл не содержит подходящих показаний с датчиков";
+                    }
+                }
+                catch
+                {
+                    TempData["Api.UploadArchive.ErrorMessage"] = Program.GLOBAL_ERROR_MESSAGE;
+                }
+            }
+            else
+            {
+                TempData["Api.UploadArchive.ErrorMessage"] =
+                            "Файл не содержит подходящих показаний с датчиков";
+            }
+
+            return RedirectToAction("UploadArchive", "Api");
         }
     }
 }

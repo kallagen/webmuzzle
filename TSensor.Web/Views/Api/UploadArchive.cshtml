@@ -1,0 +1,29 @@
+﻿@model ViewModelBase
+@{
+    ViewBag.Title = "Загрузка значений датчиков из файла";
+}
+@section AdditionalHeader
+{
+    <button id="upload-button" type="button" class="btn bg-blue btn-block">Загрузить файл</button>
+}
+
+<div class="overlay hidden">
+    <i class="fa fa-refresh fa-spin"></i>
+    <span style="padding-left: 4px">Не закрывайте страницу, происходит загрузка файла</span>
+</div>
+@using (Html.BeginForm("UploadArchive", "Api", FormMethod.Post, new { enctype = "multipart/form-data", autocomplete = "off", id = "upload-form", @class = "hidden" }))
+{
+    <input type="file" name="file" id="upload-input" class="hidden" />
+}
+
+<script>
+    var uploadInput = document.querySelector('#upload-input');
+    uploadInput.addEventListener('change', function () {
+        document.querySelector('.overlay').classList.remove('hidden');
+        document.querySelector('#upload-form').submit();
+    });
+    document.querySelector('#upload-button').addEventListener('click', function () {
+        uploadInput.click();
+    });
+</script>
+@Html.ViewModelWindow()
