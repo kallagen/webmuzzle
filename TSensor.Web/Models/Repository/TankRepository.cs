@@ -216,6 +216,7 @@ namespace TSensor.Web.Models.Repository
                 .ToDictionary(p => p.Key, v => v.Value);
         }
 
+        //todo single connection with await ExecuteAsync
         public bool UploadTankCalibrationData(Guid tankGuid, Dictionary<int, decimal> data)
         {
             QueryFirst<int?>(@"
