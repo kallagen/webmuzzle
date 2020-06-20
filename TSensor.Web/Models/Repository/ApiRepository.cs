@@ -95,15 +95,15 @@ namespace TSensor.Web.Models.Repository
 				SELECT @@ROWCOUNT", value) == 1;
         }
 
-        public async Task PushArchivedValuesAsync(string ip, string deviceGuid, IEnumerable<ActualSensorValue> valueList)
+        public async Task PushArchivedValuesAsync(string ip, IEnumerable<ActualSensorValue> valueList)
         {
             await ExecuteAsync(@"
 				INSERT SensorValueRaw([Ip], [Value], EventUTCDate, DeviceGuid)
                 VALUES (@ip, @rawValue, @eventUTCDate, @deviceGuid)",
-                valueList.Select(p => new { ip, rawValue = p.Raw, eventUTCDate = p.EventUTCDate, deviceGuid }));
+                valueList.Select(p => new { ip, rawValue = p.Raw, eventUTCDate = p.EventUTCDate, deviceGuid = p.DeviceGuid }));
 
 			var metaDict = valueList
-				.Select(p => new { p.izkNumber, p.sensorSerial }).Distinct()
+				.Select(p => new { p.izkNumber, p.sensorSerial, p.DeviceGuid }).Distinct()
 				.Select(p =>
 				{
 					var meta = QueryFirst<dynamic>(@"
@@ -119,7 +119,7 @@ namespace TSensor.Web.Models.Repository
 						FROM Tank
 						WHERE
 							(MainDeviceGuid = @deviceGuid AND MainIZKId = @izkNumber AND MainSensorId = @sensorSerial) OR
-							(DualMode = 1 AND SecondDeviceGuid = @deviceGuid AND SecondIZKId = @izkNumber AND SecondSensorId = @sensorSerial)", new { deviceGuid, p.izkNumber, p.sensorSerial });
+							(DualMode = 1 AND SecondDeviceGuid = @deviceGuid AND SecondIZKId = @izkNumber AND SecondSensorId = @sensorSerial)", new { p.DeviceGuid, p.izkNumber, p.sensorSerial });
 
 					if (meta != null)
 					{
@@ -163,7 +163,7 @@ namespace TSensor.Web.Models.Repository
 					var meta = metaDict.FirstOrDefault(p => p.izkNumber == v.izkNumber && p.sensorSerial == v.sensorSerial);
 					if (meta != null)
 					{
-						v.DeviceGuid = deviceGuid;
+						v.DeviceGuid = v.DeviceGuid;
 	
 						v.TankGuid = meta.TankGuid;
 						v.IsSecond = meta.IsSecond;
