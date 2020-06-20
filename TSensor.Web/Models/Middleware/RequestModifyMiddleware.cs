@@ -21,7 +21,8 @@ namespace TSensor.Web.Models.Middleware
         {
             if (context.Request.Method?.ToUpperInvariant() == "POST" &&
                 !context.Request.Path.StartsWithSegments("/broadcast") &&
-                !context.Request.Path.StartsWithSegments("/tank/calibration/upload"))
+                !context.Request.Path.StartsWithSegments("/tank/calibration/upload") &&
+                !context.Request.Path.StartsWithSegments("/api/archive/upload"))
             {
                 using (var reader = new StreamReader(context.Request.Body))
                 {
