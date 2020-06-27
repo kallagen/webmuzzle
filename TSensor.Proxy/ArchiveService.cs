@@ -17,15 +17,21 @@ namespace TSensor.Proxy
 
         private readonly object Locker = new object();
         private const string FILE_NAME = "current.archived";
+        private readonly string FileName;
 
         public ArchiveService(Config config, ILogger logger)
         {
             _config = config;
             _logger = logger;
 
-            worker = new BackgroundWorker();
-            worker.DoWork += Worker_DoWork;
-            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+            FileName = FilePath(FILE_NAME);
+
+            if (config.IsApiOutputMode)
+            {
+                worker = new BackgroundWorker();
+                worker.DoWork += Worker_DoWork;
+                worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+            }
         }
 
         private async void Worker_DoWork(object sender, DoWorkEventArgs e)
@@ -45,13 +51,23 @@ namespace TSensor.Proxy
             worker.RunWorkerAsync();
         }
 
+        private string FilePath(string fileName)
+        {
+            return $"archived{(_config.IsLinux ? "/" : "\\")}{fileName}";
+        }
+
+        private string FolderPath(string folderName)
+        {
+            return $"{folderName}{(_config.IsLinux ? "/" : "\\")}archived";
+        }
+
         public void Write(string portName, string data)
         {
             try
             {
                 lock (Locker)
                 {
-                    File.AppendAllLines(FILE_NAME, new[] { data });
+                    File.AppendAllLines(FileName, new[] { data });
 
                     _logger.Log("data archived", prefix: portName);
                 }
@@ -71,12 +87,12 @@ namespace TSensor.Proxy
             {
                 try
                 {
-                    if (File.Exists(FILE_NAME))
+                    if (File.Exists(FileName))
                     {
-                        var file = new FileInfo(FILE_NAME);
+                        var file = new FileInfo(FileName);
                         if (file.Length > _config.MaxArchiveFileSize || forceMove)
                         {
-                            var newFileName = $"{DateTime.Now:yyyyMMddHHmmss}.archived";
+                            var newFileName = FilePath($"{DateTime.Now:yyyyMMddHHmmss}.archived");
                             file.MoveTo(newFileName);
 
                             _logger.Log($"archive moved to {newFileName}");
@@ -104,7 +120,7 @@ namespace TSensor.Proxy
 
             try
             {
-                foreach (var archive in Directory.GetFiles(Directory.GetCurrentDirectory(), "*.archived"))
+                foreach (var archive in Directory.GetFiles(FolderPath(Directory.GetCurrentDirectory()), "*.archived"))
                 {
                     var fileName = Path.GetFileName(archive);
                     if (fileName != FILE_NAME)
