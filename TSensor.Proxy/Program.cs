@@ -1,4 +1,6 @@
-﻿using TSensor.Proxy.Logger;
+﻿using TSensor.Proxy.Com;
+using TSensor.Proxy.Logger;
+using TSensor.Proxy.Tcp;
 
 namespace TSensor.Proxy
 {
@@ -10,7 +12,14 @@ namespace TSensor.Proxy
             var logger = config.LoggerType == LoggerType.DEBUG 
                 ? new ConsoleLogger() as ILogger : new ErrorFileLogger(config);
 
-            new SerialService(config, logger).Run();
+            if (config.IsComInputMode)
+            {
+                new SerialService(config, logger).Run();
+            }
+            else if (config.IsTcpInputMode)
+            {
+                new TcpService(config, logger).Run();
+            }            
         }
     }
 }
