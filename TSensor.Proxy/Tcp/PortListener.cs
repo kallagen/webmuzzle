@@ -20,14 +20,7 @@ namespace TSensor.Proxy.Tcp
             _logger.Log(message, prefix: _port.ToString(), elapsed, isError);
         }
 
-        private void LogDebug(string message)
-        {
-            Log(message);
-        }
-
-        private readonly ManualResetEventSlim acceptDoneEvent = new ManualResetEventSlim(false);
-
-        private Socket listener;
+        private readonly TcpListener listener;
 
         public PortListener(int port, Config config, ILogger logger, ArchiveService archiveService)
         {
@@ -36,54 +29,61 @@ namespace TSensor.Proxy.Tcp
 
             outputService = new OutputService(port.ToString(), config, logger, archiveService);
 
-            listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            listener.Bind(new IPEndPoint(IPAddress.Any, port));
+            listener = new TcpListener(IPAddress.Any, port);
         }
 
         public void Run()
         {
-            listener.Listen(20);
+            listener.Start();
 
-            while (true)
+            TcpClient client = null;
+
+            try
             {
-                Log("started listening");
+                while (true)
+                {
+                    Log("started listening");
+                    client = listener.AcceptTcpClient();
 
-                acceptDoneEvent.Reset();
+                    Log("connection established");
+                    var worker = new Thread(new ParameterizedThreadStart(ReadCallback));
+                    worker.Start(client);
+                }
+            }
+            catch (Exception e)
+            {
+                Log("accept error", isError: true);
+                Log(e.Message, isError: true);
 
-                listener.BeginAccept(new AsyncCallback(AcceptCallback), listener);
+                listener.Stop();
+            }
+            finally
+            {
+                if (client != null)
+                {
+                    client.Dispose();
+                }
 
-                acceptDoneEvent.Wait();
+                client = null;
             }
         }
 
-        public void AcceptCallback(IAsyncResult result)
-        {
-            Log("connection established");
-            acceptDoneEvent.Set();
-
-            var listener = (result.AsyncState as Socket).EndAccept(result);
-
-            var state = new PortReceiveState
-            {
-                Listener = listener
-            };
-            listener.BeginReceive(state.Buffer, 0, PortReceiveState.BUFFER_SIZE, 0,
-                new AsyncCallback(ReadCallback), state);
-        }
-
         private const int MESSAGE_SIZE = 129;
-        public async void ReadCallback(IAsyncResult result)
+        public async void ReadCallback(object client)
         {
+            var _client = client as TcpClient;
+
+            using var stream = _client.GetStream();
+
+            var buffer = new byte[MESSAGE_SIZE];
+            int bytesReceived;
+
             try
             {
-                var state = result.AsyncState as PortReceiveState;
-                var listener = state.Listener;
-
-                var bytesRead = listener.EndReceive(result);
-                if (bytesRead > 0)
+                while ((bytesReceived = stream.Read(buffer, 0, buffer.Length)) != 0)
                 {
-                    var content = Encoding.ASCII.GetString(state.Buffer, 0, bytesRead);
-                    LogDebug(content);
+                    var content = Encoding.ASCII.GetString(buffer, 0, bytesReceived);
+
                     Log($"{content.Length} bytes received");
 
                     if (content.Length == MESSAGE_SIZE)
@@ -91,14 +91,13 @@ namespace TSensor.Proxy.Tcp
                         await outputService.Process(content.Substring(0, 127));
                     }
                 }
-
-                listener.BeginReceive(state.Buffer, 0, PortReceiveState.BUFFER_SIZE, 0,
-                    new AsyncCallback(ReadCallback), state);
             }
             catch (Exception e)
             {
                 Log("receiving error", isError: true);
                 Log(e.Message, isError: true);
+
+                _client.Close();
             }
         }
     }
