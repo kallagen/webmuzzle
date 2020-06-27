@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using TSensor.Proxy.Logger;
 
-namespace TSensor.Proxy
+namespace TSensor.Proxy.Com
 {
     public class SerialService
     {
@@ -24,13 +24,16 @@ namespace TSensor.Proxy
         {
             foreach (var portName in SerialPort.GetPortNames()
                 .Where(p => !_config.IsLinux || p.Contains("USB"))
-                .Where(p => !_config.PortList.Any() || _config.PortList.Contains(p.ToUpper())))
+                .Where(p => !_config.COMPortList.Any() || _config.COMPortList.Contains(p.ToUpper())))
             {
                 var portListener = new PortListener(portName, _config, _logger, archiveService);
                 portListener.Run();
             }
 
-            archiveService.Run();
+            if (_config.IsApiOutputMode)
+            {
+                archiveService.Run();
+            }
 
             Thread.Sleep(Timeout.Infinite);
         }

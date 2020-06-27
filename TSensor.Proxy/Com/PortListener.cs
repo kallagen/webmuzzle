@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO.Ports;
 using TSensor.Proxy.Logger;
 
-namespace TSensor.Proxy
+namespace TSensor.Proxy.Com
 {
     public class PortListener
     {
-        private readonly Config _config;
         private readonly ILogger _logger;
-        private readonly ArchiveService _archiveService;
 
         private readonly SerialPort port;
+
+        private readonly OutputService outputService;
 
         private void Log(string message, Elapsed elapsed = null, bool isError = false)
         {
@@ -20,9 +19,9 @@ namespace TSensor.Proxy
 
         public PortListener(string portName, Config config, ILogger logger, ArchiveService archiveService)
         {
-            _config = config;
             _logger = logger;
-            _archiveService = archiveService;
+
+            outputService = new OutputService(portName, config, logger, archiveService);
 
             port = new SerialPort(portName)
             {
@@ -48,28 +47,7 @@ namespace TSensor.Proxy
 
             if (strData.Length == MESSAGE_SIZE)
             {
-                using var elapsed = Elapsed.Create;
-                var eventDate = elapsed.Start.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff");
-
-                var result = await Http.Http.PostAsync(_config.ApiUrlSendValue,
-                    new Dictionary<string, string>
-                    {
-                            { "v", strData },
-                            { "d", eventDate },
-                            { "g", _config.DeviceGuid }
-                    });
-
-                if (result.Exception != null)
-                {
-                    Log("sending error", isError: true);
-                    Log(result.Exception.Message, isError: true);
-
-                    _archiveService.Write(port.PortName, $"{eventDate};{strData}");
-                }
-                else
-                {
-                    Log($"data sended({result.Content})", elapsed);
-                }
+                await outputService.Process(strData);
             }
         }
 
