@@ -147,7 +147,9 @@ namespace TSensor.Web.Models.Repository
 					m.t3,
 					m.t4,
 					m.t5,
-					m.t6
+					m.t6,
+					m.steamMass AS SteamMass,
+					m.environmentComposition AS EnvironmentComposition
 				FROM Point p
 					JOIN Tank t ON p.PointGuid = t.PointGuid
 					LEFT JOIN Product pr ON t.ProductGuid = pr.ProductGuid
