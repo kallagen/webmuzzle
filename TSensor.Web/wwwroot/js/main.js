@@ -174,26 +174,13 @@ function massmeterSensorUpdate(data, date) {
 
             container.find('span[data-sensorguid="' + sensorGuid + '"]').html(val.insertDateStr);
 
-            container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
             container.find('.t-environmentVolume').html(val.environmentVolume);
+            container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
+            container.find('.t-steamMass').html(val.steamMass);
+            container.find('.t-liquidDensity').html(val.liquidDensity);
+            container.find('.t-t1').html(val.t1);
 
-            if (val.liquidEnvironmentLevel > sensor.weight + sensor.weightDelta ||
-                val.liquidEnvironmentLevel < sensor.weight - sensor.weightDelta) {
-
-                if (val.liquidEnvironmentLevel > sensor.weight + sensor.weightDelta) {
-                    container.find('.t-weightdown').addClass('hidden');
-                    container.find('.t-weightup').removeClass('hidden');
-                }
-                if (val.liquidEnvironmentLevel < sensor.weight - sensor.weightDelta) {
-                    container.find('.t-weightdown').removeClass('hidden');
-                    container.find('.t-weightup').addClass('hidden');
-                }
-
-                sensor.weight = val.liquidEnvironmentLevel;
-                if (sensor.weightTimeout !== 0) {
-                    sensor.weightExpire = date + sensor.weightTimeout * 1000;
-                }
-            }
+            container.find('.tank-level').css('height', val.environmentComposition + '%');
 
             sensor.updateDate = data[sensorGuid].insertDate;
             sensor.warningDate = date + 600000;
@@ -205,11 +192,6 @@ function massmeterSensorUpdate(data, date) {
             if (!container.hasClass('t-error') && !container.hasClass('t-warning')) {
                 container.addClass('t-warning');
             }
-        }
-
-        if (sensor.weightExpire && sensor.weightExpire < date) {
-            container.find('.t-weightdown').addClass('hidden');
-            container.find('.t-weightup').addClass('hidden');
         }
     });
 }
