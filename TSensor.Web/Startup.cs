@@ -71,7 +71,7 @@ namespace TSensor.Web
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() || Configuration["debug"] == "true")
             {
                 app.UseDeveloperExceptionPage();
             }
