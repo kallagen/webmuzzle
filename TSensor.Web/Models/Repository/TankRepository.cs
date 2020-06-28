@@ -26,7 +26,7 @@ namespace TSensor.Web.Models.Repository
         {
             return QueryFirst<Tank>(@"
                 SELECT TOP 1
-                    TankGuid, Name, ProductGuid, DualMode,
+                    TankGuid, Name, PointGuid, ProductGuid, DualMode,
                     MainDeviceGuid, MainIZKId, MainSensorId,
                     SecondDeviceGuid, SecondIZKId, SecondSensorId, Description,
                     WeightChangeDelta, WeightChangeTimeout
@@ -239,5 +239,73 @@ namespace TSensor.Web.Models.Repository
             return result;
         }
         #endregion
+
+        public IEnumerable<dynamic> GetCalibrationInterval(Guid tankGuid)
+        {
+            return Query<dynamic>(@"
+                DECLARE @startDate datetime, @lastDate datetime, @lastValue decimal(18,3)
+                DECLARE @date datetime, @value decimal(18,3)
+                DECLARE @hasSequence bit = 0
+
+                DECLARE @result table(startDate datetime, endDate datetime)
+
+                DECLARE cur CURSOR FOR
+                    SELECT InsertDate, liquidEnvironmentLevel
+                    FROM SensorValue
+                    WHERE TankGuid = @tankGuid AND IsSecond = 0 AND InsertDate >= DATEADD(DAY, -7, GETUTCDATE())
+                    ORDER BY InsertDate 
+  
+                    OPEN cur
+                    FETCH NEXT FROM cur INTO @date, @value
+                    
+                    WHILE @@FETCH_STATUS = 0 BEGIN
+                    	IF @startDate IS NULL BEGIN
+                    		SET @startDate = @date
+                    		SET @lastValue = @value
+                    	END ELSE BEGIN
+                    		IF @value > @lastValue BEGIN
+                    			SET @lastDate = @date
+                    			SET @lastValue = @value			
+                    
+                    			SET @hasSequence = 1
+                    		END ELSE BEGIN
+                    			IF @hasSequence = 1 BEGIN
+                    				INSERT @result(startDate, endDate) VALUES(@startDate, @lastDate)
+                    			END
+                    
+                    			SET @startDate = NULL
+                    			SET @lastValue = NULL
+                    
+                    			SET @hasSequence = 0
+                    		END
+                    	END
+                    
+                        FETCH NEXT FROM cur INTO @date, @value
+                    END   
+                    CLOSE cur
+                    DEALLOCATE cur  
+                    
+                    SELECT startDate, endDate FROM @result", new { tankGuid });
+        }
+
+        /*
+        public IEnumerable<SensorValue> GetTankSensorValueForCalibration()
+        {
+            return QueryFirst<SensorValue>(@"
+                SELECT InsertDate, 
+                    EnvironmentLevel, LiquidEnvironmentLevel, SteamMass, LiquidDensity
+                FROM SensorValue WHERE TankGuid = @tankGuid
+
+массомер
+liquidEnvironmentLevel, кг
+
+
+
+
+
+
+")
+        }
+        */
     }
 }

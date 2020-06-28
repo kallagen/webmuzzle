@@ -29,5 +29,7 @@ namespace TSensor.Web.Models.Repository
         public Dictionary<int, decimal> GetTankCalibrationData(Guid tankGuid);
         public bool UploadTankCalibrationData(Guid tankGuid, Dictionary<int, decimal> data);
         #endregion
+
+        public IEnumerable<dynamic> GetCalibrationInterval(Guid tankGuid);
     }
 }
