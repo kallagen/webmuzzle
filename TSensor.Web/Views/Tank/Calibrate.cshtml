@@ -1,0 +1,61 @@
+﻿@model TankCalibrateViewMode
+@{
+    ViewBag.Title = "Создание калибровочной характеристики";
+    var tankLabel = string.Join(" ", new[] { Model.PointName, Model.TankName, Model.ProductName }.Where(p => !string.IsNullOrWhiteSpace(p)));
+    var massmeterLabel = $"МАССОМЕР {Model.MassmeterName}";
+
+    var intervalList = Model.CalibrationIntervalList?.Select(p =>
+    {
+        var startDate = (DateTime)p.startDate;
+        var endDate = (DateTime)p.endDate;
+
+        return new
+        {
+            label = $"{startDate:dd.MM.yyyy HH:mm:ss}-{endDate:dd.MM.yyyy HH:mm:ss}",
+            value = $"{startDate:yyyy-MM-dd HH:mm:ss};{endDate:yyyy-MM-dd HH:mm:ss}"
+        };
+    });
+
+}
+@section AdditionalHeader
+{
+    @Html.ActionLink("назад к резервуару", "Details", "Tank", new { guid = Model.TankGuid }, new { @class = "footer-link pull-right additional-header-link" })
+}
+
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("CreateCalibration", "Tank", FormMethod.Post, new { autocomplete = "off" }))
+        {
+            @Html.Hidden("tankGuid", Model.TankGuid)
+            @Html.Hidden("massmeterGuid", Model.MassmeterGuid)
+            <div class="box box-solid">
+                <div class="box-header">
+                    <h4>Резервуар @tankLabel</h4>
+                    <h4>Массомер @massmeterLabel</h4>
+                </div>
+                <div class="box-body table-responsive">
+                    @if (Model.HasCalibrationInterval)
+                    {
+                        <p>Массомер не содержит подходящих данных за последнюю неделю</p>
+                    }
+                    else
+                    {
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label for="massmeterGuid">Массомер</label>
+                                @Html.DropDownList("interval", new SelectList(intervalList, "value", "label"), new { @class = "form-control" })
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="box-footer">
+                    @if (Model.HasCalibrationInterval)
+                    {
+                        <button type="submit" class="btn bg-blue">Создать</button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@Html.ViewModelWindow()

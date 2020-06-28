@@ -56,12 +56,12 @@
                         <h4>Калибровочная характеристика</h4>
                     </div>
                     <div class="box-footer">
+                        <button id="upload-button" type="button" class="btn bg-blue">@uploadDataLabel</button>
                         @if (Model.HasCalibrationData)
                         {
-                            @Html.ActionLink("Просмотреть", "CalibrationData", "Tank", new { tankGuid = Model.TankGuid }, new { @class = "btn btn-default" })
+                            @Html.ActionLink("Просмотреть", "CalibrationData", "Tank", new { tankGuid = Model.TankGuid }, new { @class = "btn btn-default pull-right" })
                         }
-                        <input id="upload-input" class="hidden" type="file" name="file" />
-                        <button id="upload-button" type="button" class="btn bg-blue pull-right">@uploadDataLabel</button>
+                        <input id="upload-input" class="hidden" type="file" name="file" />                        
                     </div>
                 </div>
             }
@@ -75,6 +75,28 @@
                 });
             </script>
         }
+
+        @if (Model.HasCalibrationRights && !Model.IsMassmeter && Model.MassmeterList.Any())
+        {
+            using (Html.BeginForm("Calibrate", "Tank", FormMethod.Post, new { autocomplete = "off" }))
+            {
+                @Html.Hidden("tankGuid", Model.TankGuid)
+                <div class="box box-solid">
+                    <div class="box-header">
+                        <h4>Создать калибровочную характеристику</h4>
+                    </div>
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="massmeterGuid">Массомер</label>
+                            @Html.DropDownList("massmeterGuid", new SelectList(Model.MassmeterList, "Key", "Value"), new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <button type="submit" class="btn bg-blue">Создать</button>
+                    </div>
+                </div>
+            }
+        }
     </div>
     <div class="col-md-9">
         <div class="box box-solid">
@@ -87,7 +109,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @{
+                        @if (Model.IsMassmeter)
+                        {
+                            ValueRow("izkNumber", "Адрес ИЗК", Model.Value?.izkNumber);
+                            ValueRow("sensorSerial", "Адрес датчика", Model.Value?.sensorSerial);
+                            ValueRow("environmentVolume", "Объем, л", Model.Value?.environmentVolume);
+                            ValueRow("liquidEnvironmentLevel", "Общий счетчик массы, кг", Model.Value?.liquidEnvironmentLevel);
+                            ValueRow("steamMass", "Текущий счетчик массы, кг", Model.Value?.steamMass);
+                            ValueRow("liquidDensity", "Текущая плотность, кг/м³", Model.Value?.liquidDensity);
+                            ValueRow("t1", "Температура массомера, °C", Model.Value?.t1);
+                            ValueRow("environmentComposition", "Положение задвижки, %", Model.Value?.environmentComposition);
+                        }
+                        else
+                        {
                             ValueRow("izkNumber", "Адрес ИЗК", Model.Value?.izkNumber);
                             ValueRow("banderolType", "Тип посылки", Model.Value?.banderolType);
                             ValueRow("sensorSerial", "Адрес датчика", Model.Value?.sensorSerial);

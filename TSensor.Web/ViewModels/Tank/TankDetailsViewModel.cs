@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TSensor.Web.Models.Entity;
 
 namespace TSensor.Web.ViewModels.Tank
@@ -14,5 +15,7 @@ namespace TSensor.Web.ViewModels.Tank
         public bool HasCalibrationRights { get; set; }
         public bool HasCalibrationData { get; set; }
         public bool IsMassmeter { get; set; }
+
+        public Dictionary<Guid, string> MassmeterList { get; set; }
     }
 }

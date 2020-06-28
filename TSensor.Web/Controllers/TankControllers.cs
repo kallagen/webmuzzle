@@ -239,93 +239,126 @@ namespace TSensor.Web.Controllers
             return View("NotFound");
         }
 
-        private void FillExportHeaders(ExcelWorksheet sheet, bool dualMode)
+        private void FillExportHeaders(ExcelWorksheet sheet, bool dualMode, bool isMassmeter = false)
         {
             var idx = 1;
 
-            sheet.Cells[1, idx++].Value = "Дата события";
-            sheet.Cells[1, idx++].Value = "Адрес ИЗК";
-            sheet.Cells[1, idx++].Value = "Тип посылки";
-            sheet.Cells[1, idx++].Value = "Адрес датчика";
-            sheet.Cells[1, idx++].Value = "Номер канала";
-            sheet.Cells[1, idx++].Value = "pressureAndTempSensorState";
-            sheet.Cells[1, idx++].Value = "Версия ПО датчика";
-            sheet.Cells[1, idx++].Value = "Бит сигнализации";
-            sheet.Cells[1, idx++].Value = "Уровень, мм";
-            if (dualMode)
+            if (isMassmeter)
             {
-                sheet.Cells[1, idx++].Value = "Сигнальный уровень, атм";
+                sheet.Cells[1, idx++].Value = "Дата события";
+                sheet.Cells[1, idx++].Value = "Адрес ИЗК";
+                sheet.Cells[1, idx++].Value = "Адрес датчика";
+                sheet.Cells[1, idx++].Value = "Объем, л";
+                sheet.Cells[1, idx++].Value = "Общий счетчик массы, кг";
+                sheet.Cells[1, idx++].Value = "Текущий счетчик массы, кг";
+                sheet.Cells[1, idx++].Value = "Текущая плотность, кг/м³";
+                sheet.Cells[1, idx++].Value = "Температура массомера, °C";
+                sheet.Cells[1, idx++].Value = "Положение задвижки, %";
             }
-            sheet.Cells[1, idx++].Value = "Давление измер, атм";
-            sheet.Cells[1, idx++].Value = "Объем, %";
-            sheet.Cells[1, idx++].Value = "Объем, м³";
-            sheet.Cells[1, idx++].Value = "Масса жидкости, т";
-            sheet.Cells[1, idx++].Value = "Масса пара, т";
-            sheet.Cells[1, idx++].Value = "Плотность жидкости, кг/м³";
-            sheet.Cells[1, idx++].Value = "Плотность пара, кг/м³";
-            sheet.Cells[1, idx++].Value = "Диэлектрическая проницаемость жидкости";
-            sheet.Cells[1, idx++].Value = "Диэлектрическая проницаемость пара";
-            sheet.Cells[1, idx++].Value = "Температура нижнего датчика ?, °C";
-            sheet.Cells[1, idx++].Value = "Температура, °C";
-            sheet.Cells[1, idx++].Value = "Температура, °C";
-            sheet.Cells[1, idx++].Value = "Температура, °C";
-            sheet.Cells[1, idx++].Value = "Температура, °C";
-            sheet.Cells[1, idx++].Value = "Температура верхнего датчика?, °C";
-            sheet.Cells[1, idx++].Value = "Температура платы, °C";
-            sheet.Cells[1, idx++].Value = "Период платы";
-            sheet.Cells[1, idx++].Value = "plateServiceParam";
-            sheet.Cells[1, idx++].Value = "Состав среды, %";
-            sheet.Cells[1, idx++].Value = "Измеренная емкость платы, Пф";
-            sheet.Cells[1, idx++].Value = "plateServiceParam2";
-            sheet.Cells[1, idx++].Value = "plateServiceParam3";
-            sheet.Cells[1, idx++].Value = "sensorWorkMode";
-            sheet.Cells[1, idx++].Value = "plateServiceParam4";
-            sheet.Cells[1, idx++].Value = "plateServiceParam5";
-            sheet.Cells[1, idx++].Value = "Контрольная сумма";
+            else
+            {
+                sheet.Cells[1, idx++].Value = "Дата события";
+                sheet.Cells[1, idx++].Value = "Адрес ИЗК";
+                sheet.Cells[1, idx++].Value = "Тип посылки";
+                sheet.Cells[1, idx++].Value = "Адрес датчика";
+                sheet.Cells[1, idx++].Value = "Номер канала";
+                sheet.Cells[1, idx++].Value = "pressureAndTempSensorState";
+                sheet.Cells[1, idx++].Value = "Версия ПО датчика";
+                sheet.Cells[1, idx++].Value = "Бит сигнализации";
+                sheet.Cells[1, idx++].Value = "Уровень, мм";
+                if (dualMode)
+                {
+                    sheet.Cells[1, idx++].Value = "Сигнальный уровень, атм";
+                }
+                sheet.Cells[1, idx++].Value = "Давление измер, атм";
+                sheet.Cells[1, idx++].Value = "Объем, %";
+                sheet.Cells[1, idx++].Value = "Объем, м³";
+                sheet.Cells[1, idx++].Value = "Масса жидкости, т";
+                sheet.Cells[1, idx++].Value = "Масса пара, т";
+                sheet.Cells[1, idx++].Value = "Плотность жидкости, кг/м³";
+                sheet.Cells[1, idx++].Value = "Плотность пара, кг/м³";
+                sheet.Cells[1, idx++].Value = "Диэлектрическая проницаемость жидкости";
+                sheet.Cells[1, idx++].Value = "Диэлектрическая проницаемость пара";
+                sheet.Cells[1, idx++].Value = "Температура нижнего датчика ?, °C";
+                sheet.Cells[1, idx++].Value = "Температура, °C";
+                sheet.Cells[1, idx++].Value = "Температура, °C";
+                sheet.Cells[1, idx++].Value = "Температура, °C";
+                sheet.Cells[1, idx++].Value = "Температура, °C";
+                sheet.Cells[1, idx++].Value = "Температура верхнего датчика?, °C";
+                sheet.Cells[1, idx++].Value = "Температура платы, °C";
+                sheet.Cells[1, idx++].Value = "Период платы";
+                sheet.Cells[1, idx++].Value = "plateServiceParam";
+                sheet.Cells[1, idx++].Value = "Состав среды, %";
+                sheet.Cells[1, idx++].Value = "Измеренная емкость платы, Пф";
+                sheet.Cells[1, idx++].Value = "plateServiceParam2";
+                sheet.Cells[1, idx++].Value = "plateServiceParam3";
+                sheet.Cells[1, idx++].Value = "sensorWorkMode";
+                sheet.Cells[1, idx++].Value = "plateServiceParam4";
+                sheet.Cells[1, idx++].Value = "plateServiceParam5";
+                sheet.Cells[1, idx++].Value = "Контрольная сумма";
+            }
         }
 
-        private void FillExportValues(ExcelWorksheet sheet, ActualSensorValue value, int row, bool dualMode)
+        private void FillExportValues(ExcelWorksheet sheet, ActualSensorValue value, int row, bool dualMode,
+            bool isMassmeter = false)
         {
             var idx = 1;
-            sheet.Cells[row, idx++].Value = value.EventUTCDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm");
-            sheet.Cells[row, idx++].Value = value.izkNumber;
-            sheet.Cells[row, idx++].Value = value.banderolType;
-            sheet.Cells[row, idx++].Value = value.sensorSerial;
-            sheet.Cells[row, idx++].Value = value.sensorChannel;
-            sheet.Cells[row, idx++].Value = value.pressureAndTempSensorState;
-            sheet.Cells[row, idx++].Value = value.sensorFirmwareVersionAndReserv;
-            sheet.Cells[row, idx++].Value = value.alarma;
-            sheet.Cells[row, idx++].Value = value.environmentLevel;
-            if (dualMode)
+
+            if (isMassmeter)
             {
-                sheet.Cells[row, idx++].Value = value.pressureFilter;
+                sheet.Cells[row, idx++].Value = value.EventUTCDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm");
+                sheet.Cells[row, idx++].Value = value.izkNumber;
+                sheet.Cells[row, idx++].Value = value.sensorSerial;
+
+                sheet.Cells[row, idx++].Value = value.environmentVolume;
+                sheet.Cells[row, idx++].Value = value.liquidEnvironmentLevel;
+                sheet.Cells[row, idx++].Value = value.steamMass;
+                sheet.Cells[row, idx++].Value = value.liquidDensity;
+                sheet.Cells[row, idx++].Value = value.t1;
+                sheet.Cells[row, idx++].Value = value.environmentComposition;
             }
-            sheet.Cells[row, idx++].Value = value.pressureMeasuring;
-            sheet.Cells[row, idx++].Value = value.levelInPercent;
-            sheet.Cells[row, idx++].Value = value.environmentVolume;
-            sheet.Cells[row, idx++].Value = value.liquidEnvironmentLevel;
-            sheet.Cells[row, idx++].Value = value.steamMass;
-            sheet.Cells[row, idx++].Value = value.liquidDensity;
-            sheet.Cells[row, idx++].Value = value.steamDensity;
-            sheet.Cells[row, idx++].Value = value.dielectricPermeability;
-            sheet.Cells[row, idx++].Value = value.dielectricPermeability2;
-            sheet.Cells[row, idx++].Value = value.t1;
-            sheet.Cells[row, idx++].Value = value.t2;
-            sheet.Cells[row, idx++].Value = value.t3;
-            sheet.Cells[row, idx++].Value = value.t4;
-            sheet.Cells[row, idx++].Value = value.t5;
-            sheet.Cells[row, idx++].Value = value.t6;
-            sheet.Cells[row, idx++].Value = value.plateTemp;
-            sheet.Cells[row, idx++].Value = value.period;
-            sheet.Cells[row, idx++].Value = value.plateServiceParam;
-            sheet.Cells[row, idx++].Value = value.environmentComposition;
-            sheet.Cells[row, idx++].Value = value.cs1;
-            sheet.Cells[row, idx++].Value = value.plateServiceParam2;
-            sheet.Cells[row, idx++].Value = value.plateServiceParam3;
-            sheet.Cells[row, idx++].Value = value.sensorWorkMode;
-            sheet.Cells[row, idx++].Value = value.plateServiceParam4;
-            sheet.Cells[row, idx++].Value = value.plateServiceParam5;
-            sheet.Cells[row, idx++].Value = value.crc;
+            else
+            {
+                sheet.Cells[row, idx++].Value = value.EventUTCDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm");
+                sheet.Cells[row, idx++].Value = value.izkNumber;
+                sheet.Cells[row, idx++].Value = value.banderolType;
+                sheet.Cells[row, idx++].Value = value.sensorSerial;
+                sheet.Cells[row, idx++].Value = value.sensorChannel;
+                sheet.Cells[row, idx++].Value = value.pressureAndTempSensorState;
+                sheet.Cells[row, idx++].Value = value.sensorFirmwareVersionAndReserv;
+                sheet.Cells[row, idx++].Value = value.alarma;
+                sheet.Cells[row, idx++].Value = value.environmentLevel;
+                if (dualMode)
+                {
+                    sheet.Cells[row, idx++].Value = value.pressureFilter;
+                }
+                sheet.Cells[row, idx++].Value = value.pressureMeasuring;
+                sheet.Cells[row, idx++].Value = value.levelInPercent;
+                sheet.Cells[row, idx++].Value = value.environmentVolume;
+                sheet.Cells[row, idx++].Value = value.liquidEnvironmentLevel;
+                sheet.Cells[row, idx++].Value = value.steamMass;
+                sheet.Cells[row, idx++].Value = value.liquidDensity;
+                sheet.Cells[row, idx++].Value = value.steamDensity;
+                sheet.Cells[row, idx++].Value = value.dielectricPermeability;
+                sheet.Cells[row, idx++].Value = value.dielectricPermeability2;
+                sheet.Cells[row, idx++].Value = value.t1;
+                sheet.Cells[row, idx++].Value = value.t2;
+                sheet.Cells[row, idx++].Value = value.t3;
+                sheet.Cells[row, idx++].Value = value.t4;
+                sheet.Cells[row, idx++].Value = value.t5;
+                sheet.Cells[row, idx++].Value = value.t6;
+                sheet.Cells[row, idx++].Value = value.plateTemp;
+                sheet.Cells[row, idx++].Value = value.period;
+                sheet.Cells[row, idx++].Value = value.plateServiceParam;
+                sheet.Cells[row, idx++].Value = value.environmentComposition;
+                sheet.Cells[row, idx++].Value = value.cs1;
+                sheet.Cells[row, idx++].Value = value.plateServiceParam2;
+                sheet.Cells[row, idx++].Value = value.plateServiceParam3;
+                sheet.Cells[row, idx++].Value = value.sensorWorkMode;
+                sheet.Cells[row, idx++].Value = value.plateServiceParam4;
+                sheet.Cells[row, idx++].Value = value.plateServiceParam5;
+                sheet.Cells[row, idx++].Value = value.crc;
+            }
         }
 
         [Route("tank/values/export")]
@@ -355,15 +388,17 @@ namespace TSensor.Web.Controllers
                 var sheet = package.Workbook.Worksheets[0];
                 sheet.Name = "Показания основного датчика";
 
-                FillExportHeaders(sheet, tank.DualMode);
+                var isMassmeter = tank.ProductGuid == PointRepository.MASSMETER_POINT_GUID;
+
+                FillExportHeaders(sheet, tank.DualMode, isMassmeter);
 
                 var row = 2;
                 foreach (var value in data.Where(p => p.IsSecond != true))
                 {
-                    FillExportValues(sheet, value, row++, tank.DualMode);
+                    FillExportValues(sheet, value, row++, tank.DualMode, isMassmeter);
                 }
 
-                if (tank.DualMode)
+                if (tank.DualMode && !isMassmeter)
                 {
                     package.Workbook.Worksheets.Add("Показания дополнительного датчика");
                     var secondSheet = package.Workbook.Worksheets[1];
@@ -517,7 +552,7 @@ namespace TSensor.Web.Controllers
                     }
                     catch
                     {
-                        TempData["Tank.Details.ErrorMessage"] = Program.GLOBAL_ERROR_MESSAGE; 
+                        TempData["Tank.Details.ErrorMessage"] = Program.GLOBAL_ERROR_MESSAGE;
                     }
 
                     return RedirectToAction("Details", "Tank", new { guid = _tankGuid });
@@ -527,6 +562,7 @@ namespace TSensor.Web.Controllers
             return TankNotFound();
         }
 
+        [Authorize(Policy = "Admin")]
         [Route("massmeter/{guid}/details")]
         public IActionResult MassmeterDetails(string guid)
         {
@@ -552,6 +588,12 @@ namespace TSensor.Web.Controllers
                         HasCalibrationData = _tankRepository.HasTankCalibrationData(_tankGuid),
                         IsMassmeter = tankInfo.PointGuid == PointRepository.MASSMETER_POINT_GUID
                     };
+
+                    if (viewModel.HasCalibrationRights && !isMassmeter)
+                    {
+                        viewModel.MassmeterList = _tankRepository.GetListByPoint(PointRepository.MASSMETER_POINT_GUID)
+                            .ToDictionary(p => p.TankGuid, p => p.Name);
+                    }
 
                     if (tankInfo.InsertDate != null)
                     {
@@ -582,6 +624,59 @@ namespace TSensor.Web.Controllers
         {
             ViewBag.Title = "Резервуар не найден";
             return View("NotFound");
+        }
+
+        [Authorize(Policy = "Admin")]
+        [HttpPost]
+        public IActionResult Calibrate(string tankGuid, string massmeterGuid)
+        {
+            if (Guid.TryParse(tankGuid, out var _tankGuid) && Guid.TryParse(massmeterGuid, out var _massmeterGuid))
+            {
+                var tank = _tankRepository.GetByGuid(_tankGuid);
+                var massmeter = _tankRepository.GetByGuid(_massmeterGuid);
+
+                if (tank != null && massmeter != null)
+                {
+                    var viewModel = new TankCalibrateViewMode
+                    {
+                        TankGuid = tank.TankGuid,
+                        TankName = tank.Name,
+                        MassmeterGuid = massmeter.TankGuid,
+                        MassmeterName = massmeter.Name,
+                        CalibrationIntervalList = _tankRepository.GetCalibrationInterval(_massmeterGuid)
+                    };
+
+                    return View(viewModel);
+                }
+            }
+
+            return TankNotFound();
+        }
+
+        [Authorize(Policy = "Admin")]
+        [HttpPost]
+        public IActionResult CreateCalibration(string tankGuid, string massmeterGuid, string interval)
+        {
+            if (Guid.TryParse(tankGuid, out var _tankGuid) && Guid.TryParse(massmeterGuid, out var _massmeterGuid))
+            {
+                var tank = _tankRepository.GetByGuid(_tankGuid);
+                var massmeter = _tankRepository.GetByGuid(_massmeterGuid);
+
+                if (tank != null && massmeter != null && interval != null)
+                {
+                    var dates = interval.Split(";");
+                    if (dates.Length == 2 &&
+                        DateTime.TryParseExact(dates[0], "yyyy-MM-dd HH:mm:ss",
+                            CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateStart) &&
+                            DateTime.TryParseExact(dates[1], "yyyy-MM-dd HH:mm:ss",
+                            CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateEnd))
+                    {
+
+                    }
+                }
+            }
+
+            throw new Exception();
         }
     }
 }
