@@ -21,6 +21,9 @@ namespace TSensor.Web.Models.Entity
         public decimal T5 { get; set; }
         public decimal T6 { get; set; }
 
+        public decimal SteamMass { get; set; }
+        public int EnvironmentComposition { get; set; }
+
         public string SensorGuid =>
             string.Join("_", new[] { DeviceGuid, IzkNumber.ToString(), SensorSerial.ToString() });
         public string InsertDateStr =>
