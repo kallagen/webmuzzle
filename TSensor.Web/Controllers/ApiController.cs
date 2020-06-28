@@ -91,6 +91,7 @@ namespace TSensor.Web.Controllers
             }
         }
 
+
         [Route("sensorvalue/archive/push")]
         [HttpPost]
         public async Task<IActionResult> PushArchivedSensorValues(string d, string a)
@@ -110,7 +111,7 @@ namespace TSensor.Web.Controllers
             try
             {
                 var result = await ParseArchiveAsync(value, deviceGuid, legacySupport: true);
-                if (result.Parsed != 0)
+                if (result.parsed != 0)
                 {
                     return Json(new { success = true });
                 }
