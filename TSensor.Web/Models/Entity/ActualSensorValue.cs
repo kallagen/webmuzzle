@@ -50,7 +50,7 @@ namespace TSensor.Web.Models.Entity
         public decimal plateTemp { get; set; }
         public int period { get; set; }
         public string plateServiceParam { get; set; }
-        public string environmentComposition { get; set; }
+        public int environmentComposition { get; set; }
         public decimal cs1 { get; set; }
         public decimal plateServiceParam2 { get; set; }
         public decimal plateServiceParam3 { get; set; }
@@ -74,14 +74,14 @@ namespace TSensor.Web.Models.Entity
                 pressureFilter = int.Parse(raw.Substring(21, 4), NumberStyles.HexNumber),
                 pressureMeasuring = raw.Substring(25, 4),
                 levelInPercent = (decimal)int.Parse(raw.Substring(29, 4), NumberStyles.HexNumber) / 10,
-                environmentVolume = (decimal)int.Parse(raw.Substring(33, 6), NumberStyles.HexNumber) / 1000,
-                liquidEnvironmentLevel = (decimal)int.Parse(raw.Substring(39, 6), NumberStyles.HexNumber) / 1000,
-                steamMass = (decimal)int.Parse(raw.Substring(45, 4), NumberStyles.HexNumber) / 1000,
-                liquidDensity = (decimal)int.Parse(raw.Substring(49, 4), NumberStyles.HexNumber) / 10,
+                environmentVolume = (decimal)int.Parse(raw.Substring(33, 6), NumberStyles.HexNumber) / 1000,            //
+                liquidEnvironmentLevel = (decimal)int.Parse(raw.Substring(39, 6), NumberStyles.HexNumber) / 1000,       //
+                steamMass = (decimal)int.Parse(raw.Substring(45, 4), NumberStyles.HexNumber) / 1000,                    //
+                liquidDensity = (decimal)int.Parse(raw.Substring(49, 4), NumberStyles.HexNumber) / 10,                  //
                 steamDensity = (decimal)int.Parse(raw.Substring(53, 4), NumberStyles.HexNumber) / 10,
                 dielectricPermeability = (decimal)int.Parse(raw.Substring(57, 4), NumberStyles.HexNumber) / 1000,
                 dielectricPermeability2 = raw.Substring(61, 4),
-                t1 = (decimal)short.Parse(raw.Substring(65, 4), NumberStyles.HexNumber) / 10,
+                t1 = (decimal)short.Parse(raw.Substring(65, 4), NumberStyles.HexNumber) / 10,                           //
                 t2 = (decimal)short.Parse(raw.Substring(69, 4), NumberStyles.HexNumber) / 10,
                 t3 = (decimal)short.Parse(raw.Substring(73, 4), NumberStyles.HexNumber) / 10,
                 t4 = (decimal)short.Parse(raw.Substring(77, 4), NumberStyles.HexNumber) / 10,
@@ -90,7 +90,7 @@ namespace TSensor.Web.Models.Entity
                 plateTemp = (decimal)short.Parse(raw.Substring(89, 4), NumberStyles.HexNumber) / 10,
                 period = int.Parse(raw.Substring(93, 4), NumberStyles.HexNumber),
                 plateServiceParam = raw.Substring(97, 4),
-                environmentComposition = raw.Substring(103, 2),
+                environmentComposition = int.Parse(raw.Substring(103, 2), NumberStyles.HexNumber),                       //
                 cs1 = (decimal)int.Parse(raw.Substring(105, 4), NumberStyles.HexNumber) / 100,
                 plateServiceParam2 = (decimal)int.Parse(raw.Substring(109, 4), NumberStyles.HexNumber) / 10,
                 plateServiceParam3 = (decimal)(int.Parse(raw.Substring(113, 4), NumberStyles.HexNumber) - 65536) / 100,
