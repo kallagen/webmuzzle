@@ -11,6 +11,7 @@ namespace TSensor.Web.Models.Services.Log
         private static ReaderWriterLock InputErrorLocker = new ReaderWriterLock();
         private static ReaderWriterLock RawInputLocker = new ReaderWriterLock();
         private static ReaderWriterLock ExceptionLocker = new ReaderWriterLock();
+        private static ReaderWriterLock SystemExceptionLocker = new ReaderWriterLock();
 
         private readonly string LogFilePath;
 
@@ -31,6 +32,9 @@ namespace TSensor.Web.Models.Services.Log
                     break;
                 case "exception":
                     Write(header, message, ExceptionLocker);
+                    break;
+                case "systemexception":
+                    Write(header, message, SystemExceptionLocker);
                     break;
                 default: break;
             }
