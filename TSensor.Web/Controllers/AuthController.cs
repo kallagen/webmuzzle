@@ -99,5 +99,11 @@ namespace TSensor.Web.Controllers
                 return View("AccessDenied");
             }
         }
+
+        [Route("ver")]
+        public IActionResult Version()
+        {
+            return Content("1.14");
+        }
     }
 }
