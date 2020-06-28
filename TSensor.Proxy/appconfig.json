@@ -3,7 +3,7 @@
   "deviceGuid": "00001",
 
   // режим логирования error или debug
-  "loggerType": "error",
+  "loggerType": "debug",
   // максимальный размер файла с логами, кбайты
   "maxErrorFileSize": 1000,
 
