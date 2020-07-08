@@ -1,0 +1,53 @@
+﻿@model LicenseCreateViewModel
+@{
+    ViewBag.Title = "Создание лицензии";
+}
+
+@section AdditionalHeader
+{
+    @Html.ActionLink("назад к списку лицензий", "List", "License", null, new { @class = "footer-link pull-right additional-header-link" })
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            @using (Html.BeginForm("Create", "License", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
+            {
+            <div class="box-body">
+                <div class="form-group @Html.ValidState("Name")">
+                    <label for="Name" class="col-sm-3 control-label">Название</label>
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
+                    </div>
+                </div>
+                <div class="form-group @Html.ValidState("ExpireDate")">
+                    <label for="ExpireDate" class="col-sm-3 control-label">Дата окончания лицензии</label>
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.ExpireDate, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.ExpireDate, null, new { @class = "help-block" })
+                    </div>
+                </div>
+                <div class="form-group @Html.ValidState("SensorCount")">
+                    <label for="SensorCount" class="col-sm-3 control-label">Максимальное кол-во датчиков</label>
+                    <div class="col-sm-9">
+                        @Html.TextBoxFor(m => m.SensorCount, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.SensorCount, null, new { @class = "help-block" })
+                    </div>
+                </div>
+            </div>
+                <div class="box-footer">
+                    <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelector('#Name').focus();
+
+    new DatePicker('ExpireDate', {
+        allowTime: false
+    });
+</script>
+@Html.ViewModelWindow()

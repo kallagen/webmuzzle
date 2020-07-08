@@ -1,0 +1,67 @@
+﻿@{
+    var hasTitle = !string.IsNullOrWhiteSpace(ViewBag.Title as string);
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>техносенсор - онлайн @if (hasTitle)
+    {<text> @ViewBag.Title</text>}</title>
+    <title></title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/lib/adminlte/dist/css/AdminLTE.min.css" />
+    <link rel="stylesheet" href="~/lib/adminlte/dist/css/skins/skin-blue.min.css" />
+    <link rel="stylesheet" href="~/css/fonts/stylesheet.css" />
+    <link rel="stylesheet" href="~/lib/iCheck/square/blue.css" />
+    <link rel="stylesheet" href="~/lib/pikaday/pikaday.css" />
+    <link rel="stylesheet" href="~/lib/pikaday/pikaday.theme.css" />
+    <link rel="stylesheet" href="~/css/custom.css" />
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="~/lib/fastclick/lib/fastclick.js"></script>
+    <script src="~/lib/adminlte/dist/js/adminlte.min.js"></script>
+    <script src="~/lib/iCheck/icheck.min.js"></script>
+    <script src="~/lib/pikaday/moment.js"></script>
+    <script src="~/lib/pikaday/pikaday.js"></script>
+    <script src="~/js/main.js"></script>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+        <header class="main-header">
+            <span class="logo">
+                <span class="logo-lg"></span>
+            </span>
+            <nav class="navbar navbar-static-top">
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown user user-menu">
+                            <a class="dropdown-toggle">
+                                <span class="hidden-xs">@User.Identity.Name</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Logout", "Auth")"><i class="fa fa-sign-out"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="row">
+                    <div class="col-md-7"><h3 class="no-margin">@ViewBag.Title</h3>@RenderSection("TitleButtons", false)</div>
+                    <div class="col-md-5">@RenderSection("AdditionalHeader", false)</div>
+                </div>
+            </section>
+            <section class="content">
+                @RenderBody()
+            </section>
+        </div>
+    </div>
+</body>
+</html>

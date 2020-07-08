@@ -1,0 +1,69 @@
+﻿@model AuthLoginViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>техносенсор - онлайн, лицензирование</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/lib/adminlte/dist/css/AdminLTE.min.css" />
+    <link rel="stylesheet" href="~/lib/adminlte/dist/css/skins/skin-blue.min.css" />
+    <link rel="stylesheet" href="~/css/fonts/stylesheet.css" />
+    <link rel="stylesheet" href="~/css/custom.css" />
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/main.js"></script>
+</head>
+<body class="hold-transition login-page">
+    @using (Html.BeginForm("Login", "Auth", FormMethod.Post, new { @id = "auth-form", autocomplete = "off" }))
+    {
+        <div class="login-box">
+            <div class="login-logo">
+                <div>техносенсор - онлайн</div>
+                <div>лицензирование</div>
+            </div>
+            <div class="login-box-body">
+                @if (Model?.IsError == true)
+                {
+                    <p class="login-box-msg text-red">@Model.ErrorMessage</p>
+                }
+                else
+                {
+                    <p class="login-box-msg">Укажите данные для входа в систему</p>
+                }
+                <div class="form-group has-feedback">
+                    @Html.TextBoxFor(m => m.Login, new { @class = "form-control", placeholder = "Логин" })
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Пароль" })
+                    <span data-for="Password" class="glyphicon glyphicon-eye-open form-control-feedback toggle-password-icon"></span>
+                </div>
+                <div class="text-center">
+                    <div class="row">
+                        <button type="submit" class="btn btn-primary btn-flat">Войти</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <script>
+        document.querySelector('#auth-form').addEventListener('submit', function (e) {
+            if (!document.querySelector('#Login').value ||
+                !document.querySelector('#Password').value) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        document.querySelector('#@(Model?.IsError == true ? "Password" : "Login")').focus();
+
+        new TogglePasswordButton('.toggle-password-icon');
+    </script>
+</body>
+</html> 
