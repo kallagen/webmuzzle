@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using TSensor.License.Models;
 
 namespace TSensor.License.Controllers
@@ -16,17 +17,18 @@ namespace TSensor.License.Controllers
 
         [Route("api/activate")]
         [HttpPost]
-        public IActionResult Activate(string d, string s)
+        public IActionResult Activate(string data)
         {
             try
             {
-                var licenseGuid = _encodeService.DecryptLicenseGuid(d);
+                var licenseInfo = JsonSerializer.Deserialize<LicenseInfo>(data);
+                var licenseGuid = _encodeService.DecryptLicenseGuid(licenseInfo.Data);
 
                 _repository.Activate(licenseGuid, Request.HttpContext.Connection.RemoteIpAddress.ToString());
             }
             catch { }
 
-            return Json(new { d, s });
+            return Content(data, "application/json");
         }
     }
 }
