@@ -22,7 +22,7 @@ namespace TSensor.Web.Controllers
         [HttpPost]
         public IActionResult Data(ChartViewModel viewModel)
         {
-            var datasets = 
+            var datasets =
                 (viewModel == null ||
                 !viewModel.DateStart.HasValue ||
                 !viewModel.DateEnd.HasValue ||
@@ -39,6 +39,11 @@ namespace TSensor.Web.Controllers
             DateTime dateStart, DateTime dateEnd,
             string mainParam, string additionalParam)
         {
+            if (dateEnd > DateTime.Now)
+            {
+                dateEnd = DateTime.Now;
+            }
+
             var data = _OLAPRepository.GetSensorValues(tankGuidList,
                 dateStart.ToUniversalTime(), dateEnd.ToUniversalTime(),
                 mainParam, additionalParam);
@@ -47,7 +52,7 @@ namespace TSensor.Web.Controllers
             //период меньше суток - показываем минуты
             //все остальное - показываем часы
 
-            var totalHours = (dateEnd- dateStart).TotalHours;
+            var totalHours = (dateEnd - dateStart).TotalHours;
             return data.Select(dataset =>
             {
                 return new
@@ -92,6 +97,13 @@ namespace TSensor.Web.Controllers
             if (viewModel.DateEnd == null)
             {
                 viewModel.DateEnd = DateTime.Now;
+            }
+            else
+            {
+                if (viewModel.DateEnd > DateTime.Now)
+                {
+                    viewModel.DateEnd = DateTime.Now;
+                }
             }
 
             if ((viewModel.DateEnd.Value - viewModel.DateStart.Value).TotalDays > 15)
