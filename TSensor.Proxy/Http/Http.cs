@@ -43,7 +43,7 @@ namespace TSensor.Proxy.Http
                 request.AllowAutoRedirect = true;
                 request.Headers.Add("Upgrade-Insecure-Requests", "1");
 
-                var body = string.Join("&", param.Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}"));
+                var body = string.Join("&", param.Select(p => $"{p.Key}={WebUtility.UrlEncode(p.Value)}"));
                 var postBytes = Encoding.ASCII.GetBytes(body);
                 request.ContentLength = postBytes.Length;
                 using (var stream = request.GetRequestStream())
