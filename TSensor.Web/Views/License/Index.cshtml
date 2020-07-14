@@ -1,0 +1,38 @@
+﻿@model EntityViewModel<TSensor.Web.Models.Security.License>
+@{
+    ViewBag.Title = "Информация о лицензии";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-solid">
+            <div class="box-body table-responsive">
+                @if (Model.Data == null)
+                {
+                    <div>Информация о лицензии отсутствует</div>
+                }
+                else
+                {
+                    <div>Текущая лицензия на @Model.Data.SensorCount датчиков действует до @Model.Data.ExpireDate.ToString("dd.MM.yyyy")</div>
+                }
+            </div>
+            <div class="box-footer">
+                @using (Html.BeginForm("Upload", "License", FormMethod.Post, new { enctype = "multipart/form-data", autocomplete = "off", id = "upload-form" }))
+                {
+                    <button id="upload-button" type="button" class="btn bg-blue">Загрузить новую лицензию</button>
+                    <input id="upload-input" class="hidden" type="file" name="file" accept=".lic" />
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var uploadInput = document.querySelector('#upload-input');
+    uploadInput.addEventListener('change', function () {
+        document.querySelector('#upload-form').submit();
+    });
+    document.querySelector('#upload-button').addEventListener('click', function () {
+        uploadInput.click();
+    });
+</script>
+@Html.ViewModelWindow()
