@@ -33,6 +33,7 @@
                     <div class="col-sm-9">
                         @Html.TextBoxFor(m => m.SensorCount, new { @class = "form-control" })
                         @Html.ValidationMessageFor(m => m.SensorCount, null, new { @class = "help-block" })
+                        <div style="margin-top: 2px;">Для неограниченного количества укажите 0</div>
                     </div>
                 </div>
             </div>
