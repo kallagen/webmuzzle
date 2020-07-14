@@ -28,6 +28,8 @@ namespace TSensor.Proxy
         public string ApiUrlSendValue { get; private set; }
         public string ApiUrlSendArchive { get; private set; }
 
+        public string ArchiveFolder { get; private set; }
+
         public int MaxArchiveFileSize { get; private set; }
         public int ArchiveSendInterval { get; private set; }
         
@@ -93,6 +95,8 @@ namespace TSensor.Proxy
             OutputMode = config["outputMode"];
             ApiUrlSendValue = $"http://{config["apiHost"]}/api/sensorvalue/push";
             ApiUrlSendArchive = $"http://{config["apiHost"]}/api/sensorvalue/archive/push";
+
+            ArchiveFolder = config["archiveFolder"];
 
             MaxArchiveFileSize = int.Parse(config["maxArchiveFileSize"]) * 1024;
             ArchiveSendInterval = int.Parse(config["archiveSendInterval"]) * 1000;

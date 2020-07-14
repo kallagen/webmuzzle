@@ -17,6 +17,8 @@ namespace TSensor.Proxy
 
         private readonly object Locker = new object();
         private const string FILE_NAME = "current.archived";
+
+        private readonly string Delimiter;
         private readonly string FileName;
 
         public ArchiveService(Config config, ILogger logger)
@@ -24,6 +26,12 @@ namespace TSensor.Proxy
             _config = config;
             _logger = logger;
 
+            if (!Directory.Exists(_config.ArchiveFolder))
+            {
+                Directory.CreateDirectory(_config.ArchiveFolder);
+            }
+
+            Delimiter =  _config.IsLinux ? "/" : "\\";
             FileName = FilePath(FILE_NAME);
 
             if (config.IsApiOutputMode)
@@ -53,12 +61,7 @@ namespace TSensor.Proxy
 
         private string FilePath(string fileName)
         {
-            return $"archived{(_config.IsLinux ? "/" : "\\")}{fileName}";
-        }
-
-        private string FolderPath(string folderName)
-        {
-            return $"{folderName}{(_config.IsLinux ? "/" : "\\")}archived";
+            return $"{_config.ArchiveFolder}{Delimiter}{fileName}";
         }
 
         public void Write(string portName, string data)
@@ -120,7 +123,7 @@ namespace TSensor.Proxy
 
             try
             {
-                foreach (var archive in Directory.GetFiles(FolderPath(Directory.GetCurrentDirectory()), "*.archived"))
+                foreach (var archive in Directory.GetFiles(_config.ArchiveFolder, "*.archived"))
                 {
                     var fileName = Path.GetFileName(archive);
                     if (fileName != FILE_NAME)
