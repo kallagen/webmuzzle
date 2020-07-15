@@ -124,7 +124,7 @@ span.form-control {
 /*sensor card*/
 .t-cell {
     float: left;
-    width: 320px;
+    width: 340px;
     padding: 0 15px;
 }
 
@@ -254,7 +254,7 @@ span.form-control {
     vertical-align: top;
     padding-left: 4px;
     padding-top: 5px;
-    width: 210px;
+    width: 230px;
 }
 
 .bl3-1 {
@@ -283,7 +283,7 @@ span.form-control {
 
 .t-cell .t-label {
     display: inline-block;
-    width: 120px;
+    width: 150px;
     background-repeat: no-repeat;
     padding-left: 26px;
     background-position: 0 0;

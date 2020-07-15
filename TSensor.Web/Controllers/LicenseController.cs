@@ -55,7 +55,7 @@ namespace TSensor.Web.Controllers
                     return RedirectToAction("Index", "License");
                 }
             }
-            catch{ }
+            catch { }
 
             TempData["License.Index.ErrorMessage"] = "При активации лицензии произошла ошибка, вероятнее всего неправильный файл лицензии";
 
