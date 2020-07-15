@@ -22,25 +22,25 @@ namespace TSensor.Web.Models.Middleware
             if (context.Request.Method?.ToUpperInvariant() == "POST" &&
                 !context.Request.Path.StartsWithSegments("/broadcast") &&
                 !context.Request.Path.StartsWithSegments("/tank/calibration/upload") &&
-                !context.Request.Path.StartsWithSegments("/api/archive/upload"))
+                !context.Request.Path.StartsWithSegments("/api/archive/upload") &&
+                !context.Request.Path.StartsWithSegments("/api/sensorvalue/archive/push") &&
+                !context.Request.Path.StartsWithSegments("/license/upload"))
             {
-                using (var reader = new StreamReader(context.Request.Body))
+                using var reader = new StreamReader(context.Request.Body);
+                var content = await reader.ReadToEndAsync();
+                var query = QueryHelpers.ParseNullableQuery(content);
+
+                if (query != null)
                 {
-                    var content = await reader.ReadToEndAsync();
-                    var query = QueryHelpers.ParseNullableQuery(content);
-
-                    if (query != null)
+                    var modifiedQuery = new QueryBuilder();
+                    foreach (var item in query.SelectMany(p => p.Value, (k, v) => new { key = k.Key, value = v }))
                     {
-                        var modifiedQuery = new QueryBuilder();
-                        foreach (var item in query.SelectMany(p => p.Value, (k, v) => new { key = k.Key, value = v }))
-                        {
-                            modifiedQuery.Add(item.key,
-                                item.key == "__RequestVerificationToken" ? item.value : item.value.ToUpperInvariant());
-                        }
-
-                        var modifiedContent = new StringContent(modifiedQuery.ToQueryString().ToString().Substring(1));
-                        context.Request.Body = await modifiedContent.ReadAsStreamAsync();
+                        modifiedQuery.Add(item.key,
+                            item.key == "__RequestVerificationToken" ? item.value : item.value.ToUpperInvariant());
                     }
+
+                    var modifiedContent = new StringContent(modifiedQuery.ToQueryString().ToString().Substring(1));
+                    context.Request.Body = await modifiedContent.ReadAsStreamAsync();
                 }
             }
 
