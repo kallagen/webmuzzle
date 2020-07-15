@@ -28,6 +28,9 @@ namespace TSensor.Web.Models.Security
             aPublicKey = configuration["aPublicKey"];
 
             licenseServiceUrl = configuration["licenseServiceUrl"];
+            licenseServiceUrl +=
+                (licenseServiceUrl.EndsWith("/") ? string.Empty : "/") +
+                "api/activate";
 
             _repository = repository;
         }
@@ -154,7 +157,7 @@ namespace TSensor.Web.Models.Security
         {
             try
             {
-                var request = WebRequest.Create($"{licenseServiceUrl}/api/activate") as HttpWebRequest;
+                var request = WebRequest.Create(licenseServiceUrl) as HttpWebRequest;
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
                 request.Timeout = 10000;
@@ -162,7 +165,7 @@ namespace TSensor.Web.Models.Security
                 request.AllowAutoRedirect = true;
                 request.Headers.Add("Upgrade-Insecure-Requests", "1");
 
-                var postBytes = Encoding.UTF8.GetBytes($"data={data}");
+                var postBytes = Encoding.UTF8.GetBytes($"data={WebUtility.UrlEncode(data)}");
                 request.ContentLength = postBytes.Length;
                 using (var stream = request.GetRequestStream())
                 {
