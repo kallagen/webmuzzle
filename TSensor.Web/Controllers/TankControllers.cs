@@ -380,6 +380,11 @@ namespace TSensor.Web.Controllers
                 DateTime.TryParseExact(exportDateStart, new[] { "dd.MM.yyyy", "dd.MM.yyyy HH:mm", "dd.MM.yyyy H:mm" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out var _dateStart) &&
                 DateTime.TryParseExact(exportDateEnd, new[] { "dd.MM.yyyy", "dd.MM.yyyy HH:mm", "dd.MM.yyyy H:mm" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out var _dateEnd))
             {
+                if (_dateEnd > DateTime.Now)
+                {
+                    _dateEnd = DateTime.Now;
+                }
+
                 var data = _tankRepository.GetTankSensorValuesHistory(_tankGuid, _dateStart.ToUniversalTime(), _dateEnd.ToUniversalTime());
 
                 using var package = new ExcelPackage();
@@ -644,6 +649,17 @@ namespace TSensor.Web.Controllers
                         MassmeterGuid = massmeter.TankGuid,
                         MassmeterName = massmeter.Name,
                         CalibrationIntervalList = _tankRepository.GetCalibrationInterval(_massmeterGuid)
+                            .Select(p =>
+                            {
+                                var startDate = (DateTime)p.startDate;
+                                var endDate = (DateTime)p.endDate;
+
+                                return new
+                                {
+                                    label = $"{startDate.ToLocalTime():dd.MM.yyyy HH:mm:ss}-{endDate.ToLocalTime():dd.MM.yyyy HH:mm:ss}",
+                                    value = $"{startDate:yyyy-MM-dd HH:mm:ss};{endDate:yyyy-MM-dd HH:mm:ss}"
+                                };
+                            })
                     };
 
                     return View(viewModel);
@@ -653,6 +669,7 @@ namespace TSensor.Web.Controllers
             return TankNotFound();
         }
 
+        //interval already utc
         [Authorize(Policy = "Admin")]
         [HttpPost]
         public IActionResult CreateCalibration(string tankGuid, string massmeterGuid, string interval)
@@ -671,7 +688,7 @@ namespace TSensor.Web.Controllers
                             DateTime.TryParseExact(dates[1], "yyyy-MM-dd HH:mm:ss",
                             CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateEnd))
                     {
-
+ 
                     }
                 }
             }
