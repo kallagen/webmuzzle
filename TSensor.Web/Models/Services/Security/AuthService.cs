@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using System;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 
@@ -11,11 +13,14 @@ namespace TSensor.Web.Models.Services.Security
     {
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContext;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public AuthService(IConfiguration configuration, IHttpContextAccessor httpContext)
+        public AuthService(IConfiguration configuration, IHttpContextAccessor httpContext,
+            IWebHostEnvironment webHostEnvironment)
         {
             _configuration = configuration;
             _httpContext = httpContext;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public string EncryptPassword(string password)
@@ -48,5 +53,20 @@ namespace TSensor.Web.Models.Services.Security
         }
 
         public static readonly RoleCollection Roles = new RoleCollection();
+
+        private string version = null;
+        public string Version
+        {
+            get
+            {
+                if (version == null)
+                {
+                    version = File.ReadAllText(
+                        Path.Combine(_webHostEnvironment.ContentRootPath, "version.current"));
+                }
+
+                return version;
+            }
+        }
     }
 }

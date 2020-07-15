@@ -100,10 +100,10 @@ namespace TSensor.Web.Controllers
             }
         }
 
-        [Route("ver")]
+        [Route("version")]
         public IActionResult Version()
         {
-            return Content("1.14");
+            return Content(_authService.Version);
         }
     }
 }
