@@ -59,53 +59,60 @@ namespace TSensor.Web.Models.Entity
         public int plateServiceParam5 { get; set; }
         public string crc { get; set; }
 
-        public static ActualSensorValue Parse(string raw, bool storeRaw = false)
+        public static ActualSensorValue TryParse(string raw, bool storeRaw = false)
         {
-            var entity = new ActualSensorValue
+            try
             {
-                izkNumber = int.Parse(raw.Substring(1, 2), NumberStyles.HexNumber),
-                banderolType = int.Parse(raw.Substring(3, 2), NumberStyles.HexNumber),
-                sensorSerial = int.Parse(raw.Substring(5, 2), NumberStyles.HexNumber),
-                sensorChannel = int.Parse(raw.Substring(9, 2), NumberStyles.HexNumber),
-                pressureAndTempSensorState = raw.Substring(11, 2),
-                sensorFirmwareVersionAndReserv = raw.Substring(13, 2),
-                alarma = raw.Substring(15, 2),
-                environmentLevel = (decimal)int.Parse(raw.Substring(17, 4), NumberStyles.HexNumber) / 10,
-                pressureFilter = int.Parse(raw.Substring(21, 4), NumberStyles.HexNumber),
-                pressureMeasuring = raw.Substring(25, 4),
-                levelInPercent = (decimal)int.Parse(raw.Substring(29, 4), NumberStyles.HexNumber) / 10,
-                environmentVolume = (decimal)int.Parse(raw.Substring(33, 6), NumberStyles.HexNumber) / 1000,            //
-                liquidEnvironmentLevel = (decimal)int.Parse(raw.Substring(39, 6), NumberStyles.HexNumber) / 1000,       //
-                steamMass = (decimal)int.Parse(raw.Substring(45, 4), NumberStyles.HexNumber) / 1000,                    //
-                liquidDensity = (decimal)int.Parse(raw.Substring(49, 4), NumberStyles.HexNumber) / 10,                  //
-                steamDensity = (decimal)int.Parse(raw.Substring(53, 4), NumberStyles.HexNumber) / 10,
-                dielectricPermeability = (decimal)int.Parse(raw.Substring(57, 4), NumberStyles.HexNumber) / 1000,
-                dielectricPermeability2 = raw.Substring(61, 4),
-                t1 = (decimal)short.Parse(raw.Substring(65, 4), NumberStyles.HexNumber) / 10,                           //
-                t2 = (decimal)short.Parse(raw.Substring(69, 4), NumberStyles.HexNumber) / 10,
-                t3 = (decimal)short.Parse(raw.Substring(73, 4), NumberStyles.HexNumber) / 10,
-                t4 = (decimal)short.Parse(raw.Substring(77, 4), NumberStyles.HexNumber) / 10,
-                t5 = (decimal)short.Parse(raw.Substring(81, 4), NumberStyles.HexNumber) / 10,
-                t6 = (decimal)short.Parse(raw.Substring(85, 4), NumberStyles.HexNumber) / 10,
-                plateTemp = (decimal)short.Parse(raw.Substring(89, 4), NumberStyles.HexNumber) / 10,
-                period = int.Parse(raw.Substring(93, 4), NumberStyles.HexNumber),
-                plateServiceParam = raw.Substring(97, 4),
-                environmentComposition = int.Parse(raw.Substring(103, 2), NumberStyles.HexNumber),                       //
-                cs1 = (decimal)int.Parse(raw.Substring(105, 4), NumberStyles.HexNumber) / 100,
-                plateServiceParam2 = (decimal)int.Parse(raw.Substring(109, 4), NumberStyles.HexNumber) / 10,
-                plateServiceParam3 = (decimal)(int.Parse(raw.Substring(113, 4), NumberStyles.HexNumber) - 65536) / 100,
-                sensorWorkMode = (decimal)int.Parse(raw.Substring(117, 2), NumberStyles.HexNumber) / 10,
-                plateServiceParam4 = (decimal)int.Parse(raw.Substring(119, 2), NumberStyles.HexNumber) / 10,
-                plateServiceParam5 = int.Parse(raw.Substring(121, 4), NumberStyles.HexNumber),
-                crc = raw.Substring(125, 2)
-            };
+                var entity = new ActualSensorValue
+                {
+                    izkNumber = int.Parse(raw.Substring(1, 2), NumberStyles.HexNumber),
+                    banderolType = int.Parse(raw.Substring(3, 2), NumberStyles.HexNumber),
+                    sensorSerial = int.Parse(raw.Substring(5, 2), NumberStyles.HexNumber),
+                    sensorChannel = int.Parse(raw.Substring(9, 2), NumberStyles.HexNumber),
+                    pressureAndTempSensorState = raw.Substring(11, 2),
+                    sensorFirmwareVersionAndReserv = raw.Substring(13, 2),
+                    alarma = raw.Substring(15, 2),
+                    environmentLevel = (decimal)int.Parse(raw.Substring(17, 4), NumberStyles.HexNumber) / 10,
+                    pressureFilter = int.Parse(raw.Substring(21, 4), NumberStyles.HexNumber),
+                    pressureMeasuring = raw.Substring(25, 4),
+                    levelInPercent = (decimal)int.Parse(raw.Substring(29, 4), NumberStyles.HexNumber) / 10,
+                    environmentVolume = (decimal)int.Parse(raw.Substring(33, 6), NumberStyles.HexNumber) / 1000,            //
+                    liquidEnvironmentLevel = (decimal)int.Parse(raw.Substring(39, 6), NumberStyles.HexNumber) / 1000,       //
+                    steamMass = (decimal)int.Parse(raw.Substring(45, 4), NumberStyles.HexNumber) / 1000,                    //
+                    liquidDensity = (decimal)int.Parse(raw.Substring(49, 4), NumberStyles.HexNumber) / 10,                  //
+                    steamDensity = (decimal)int.Parse(raw.Substring(53, 4), NumberStyles.HexNumber) / 10,
+                    dielectricPermeability = (decimal)int.Parse(raw.Substring(57, 4), NumberStyles.HexNumber) / 1000,
+                    dielectricPermeability2 = raw.Substring(61, 4),
+                    t1 = (decimal)short.Parse(raw.Substring(65, 4), NumberStyles.HexNumber) / 10,                           //
+                    t2 = (decimal)short.Parse(raw.Substring(69, 4), NumberStyles.HexNumber) / 10,
+                    t3 = (decimal)short.Parse(raw.Substring(73, 4), NumberStyles.HexNumber) / 10,
+                    t4 = (decimal)short.Parse(raw.Substring(77, 4), NumberStyles.HexNumber) / 10,
+                    t5 = (decimal)short.Parse(raw.Substring(81, 4), NumberStyles.HexNumber) / 10,
+                    t6 = (decimal)short.Parse(raw.Substring(85, 4), NumberStyles.HexNumber) / 10,
+                    plateTemp = (decimal)short.Parse(raw.Substring(89, 4), NumberStyles.HexNumber) / 10,
+                    period = int.Parse(raw.Substring(93, 4), NumberStyles.HexNumber),
+                    plateServiceParam = raw.Substring(97, 4),
+                    environmentComposition = int.Parse(raw.Substring(103, 2), NumberStyles.HexNumber),                       //
+                    cs1 = (decimal)int.Parse(raw.Substring(105, 4), NumberStyles.HexNumber) / 100,
+                    plateServiceParam2 = (decimal)int.Parse(raw.Substring(109, 4), NumberStyles.HexNumber) / 10,
+                    plateServiceParam3 = (decimal)(int.Parse(raw.Substring(113, 4), NumberStyles.HexNumber) - 65536) / 100,
+                    sensorWorkMode = (decimal)int.Parse(raw.Substring(117, 2), NumberStyles.HexNumber) / 10,
+                    plateServiceParam4 = (decimal)int.Parse(raw.Substring(119, 2), NumberStyles.HexNumber) / 10,
+                    plateServiceParam5 = int.Parse(raw.Substring(121, 4), NumberStyles.HexNumber),
+                    crc = raw.Substring(125, 2)
+                };
 
-            if (storeRaw)
-            {
-                entity.Raw = raw;
+                if (storeRaw)
+                {
+                    entity.Raw = raw;
+                }
+
+                return entity;
             }
-
-            return entity;
+            catch
+            {
+                return null;
+            }
         }
 
         public override string ToString()

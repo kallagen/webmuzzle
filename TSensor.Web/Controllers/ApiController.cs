@@ -70,7 +70,12 @@ namespace TSensor.Web.Controllers
                     return Error("missing device guid", value, date, guid);
                 }
 
-                var sensorValue = ActualSensorValue.Parse(value);
+                var sensorValue = ActualSensorValue.TryParse(value);
+                if (sensorValue == null)
+                {
+                    return Error("wrong value format", value, date, guid);
+                }
+
                 sensorValue.DeviceGuid = guid;
                 sensorValue.EventUTCDate = eventUTCDate;
 
@@ -90,7 +95,6 @@ namespace TSensor.Web.Controllers
                 return Error(exception.ToString(), value, date, guid);
             }
         }
-
 
         [Route("sensorvalue/archive/push")]
         [HttpPost]
@@ -163,16 +167,16 @@ namespace TSensor.Web.Controllers
                         }, CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
                     if (eventDateParseResult)
                     {
-                        try
+                        var value = ActualSensorValue.TryParse(
+                            isLegacy ? lexem[1] : lexem[2], storeRaw: true);
+
+                        if (value != null)
                         {
-                            var value = ActualSensorValue.Parse(
-                                isLegacy ? lexem[1] : lexem[2], storeRaw: true);
                             value.EventUTCDate = eventUTCDate;
                             value.DeviceGuid = isLegacy ? deviceGuid : lexem[0];
-
-                            return value;
                         }
-                        catch { }
+
+                        return value;
                     }
 
                     error++;
