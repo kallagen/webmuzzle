@@ -17,3 +17,7 @@ TSensor.Web/package-lock.json
 /TSensor.License/bin/Debug/netcoreapp3.1
 /TSensor.License/obj
 /TSensor.License/Properties
+/TSensor.License/bin/Release/netcoreapp3.1
+/TSensor.License/.config
+/TSensor.License/TSensor.License.csproj.user
+/TSensor.Web/TSensor.Web.pdb
