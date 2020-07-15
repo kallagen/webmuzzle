@@ -29,12 +29,12 @@ namespace TSensor.Web.Controllers
             _licenseManager = licenseManager;
         }
 
-        private IActionResult ActualSensorValues(IEnumerable<Guid> guidList, Favorite favorite = null, 
+        private IActionResult ActualSensorValues(IEnumerable<Guid> guidList, Favorite favorite = null,
             string errorMessage = null)
         {
-            if (!_licenseManager.IsValid())
+            if (!_licenseManager.IsValid(out var reason))
             {
-                return LicenseExpired();
+                return LicenseExpired(reason);
             }
 
             //todo check user rights
@@ -50,7 +50,7 @@ namespace TSensor.Web.Controllers
             };
 
             ViewBag.SelectedMenuElements = guidList;
-            
+
             if (errorMessage != null)
             {
                 viewModel.ErrorMessage = errorMessage;
@@ -148,9 +148,9 @@ namespace TSensor.Web.Controllers
         [Route("sensor/notassigned")]
         public IActionResult NotAssigned()
         {
-            if (!_licenseManager.IsValid())
+            if (!_licenseManager.IsValid(out var reason))
             {
-                return LicenseExpired();
+                return LicenseExpired(reason);
             }
 
             var notAssignedPointInfo = _pointRepository.GetNotAssignedSensorState();
@@ -158,18 +158,26 @@ namespace TSensor.Web.Controllers
             return View(notAssignedPointInfo);
         }
 
-        private IActionResult LicenseExpired()
+        private IActionResult LicenseExpired(InvalidLicenseReason reason)
         {
-            ViewBag.Title = "Срок лицензии истек";
+            switch (reason)
+            {
+                case InvalidLicenseReason.NotFound:
+                    ViewBag.Title = "Лицензия отсутствует";
+                    break;
+                case InvalidLicenseReason.Corrupted:
+                    ViewBag.Title = "Лицензия неправильная или повреждена";
+                    break;
+                case InvalidLicenseReason.Expired:
+                    ViewBag.Title = "Срок действия лицензии истек";
+                    break;
+                case InvalidLicenseReason.MaxSensorCount:
+                    ViewBag.Title = "Количество резервуаров больше, чем позволяет использовать текущая лицензия";
+                    break;
+                default: break;
+            }
 
             return View("LicenseExpired");
-        }
-
-        [AllowAnonymous]
-        [Route("lic/info")]
-        public IActionResult LicenseInfo()
-        {
-            return Content(_licenseManager.Current.ToString());
         }
     }
 }
