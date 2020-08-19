@@ -21,3 +21,6 @@ TSensor.Web/package-lock.json
 /TSensor.License/.config
 /TSensor.License/TSensor.License.csproj.user
 /TSensor.Web/TSensor.Web.pdb
+/TSensor.Web/.vscode
+/TSensor.FakeSensor/bin
+/TSensor.FakeSensor/obj
