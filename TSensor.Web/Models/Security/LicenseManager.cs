@@ -49,7 +49,7 @@ namespace TSensor.Web.Models.Security
             {
                 reason = InvalidLicenseReason.Expired;
             }
-            else if (_repository.GetTankCount() > Current.SensorCount)
+            else if (Current.SensorCount != 0 && _repository.GetTankCount() > Current.SensorCount)
             {
                 reason = InvalidLicenseReason.MaxSensorCount;
             }
