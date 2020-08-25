@@ -1,5 +1,9 @@
 ﻿@{
     var hasTitle = !string.IsNullOrWhiteSpace(ViewBag.Title as string);
+
+    var isEmbedded = bool.TryParse(
+        User?.Claims?.FirstOrDefault(p => p.Type == "IsEmbedded")?.Value,
+        out var _isEmbedded) && _isEmbedded;
 }
 <!DOCTYPE html>
 <html>
@@ -7,8 +11,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>техносенсор - онлайн @if (hasTitle)
-    {<text> @ViewBag.Title</text>}</title>
+    <title>
+        техносенсор - онлайн @if (hasTitle)
+        {<text> @ViewBag.Title</text>}
+    </title>
     <title></title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" />
@@ -45,9 +51,12 @@
                                 <span class="hidden-xs">@User.Identity.Name</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="@Url.Action("Logout", "Auth")"><i class="fa fa-sign-out"></i></a>
-                        </li>
+                        @if (!isEmbedded)
+                        {
+                            <li>
+                                <a href="@Url.Action("Logout", "Auth")"><i class="fa fa-sign-out"></i></a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </nav>
@@ -56,6 +65,7 @@
             <section class="sidebar">
                 <ul class="sidebar-menu" data-widget="tree" data-accordion="false">
                     <li class="header">ИЗМЕРЕНИЯ ПО СИСТЕМЕ</li>
+                    <li><a href="@Url.Action("Map", "Dashboard")">Объекты на карте</a></li>
                     @await Component.InvokeAsync("FavoriteMenu")
                     @await Component.InvokeAsync("PointGroupMenu")
                     @if (User.IsInRole("ADMIN"))
