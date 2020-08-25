@@ -63,7 +63,8 @@
             warningDate = t.MainSensorWarningDateTicks,
             weightDelta = t.WeightChangeDelta ?? 0,
             weightTimeout = t.WeightChangeTimeout ?? 0,
-            weight = t.LiquidEnvironmentLevel
+            weight = t.LiquidEnvironmentLevel,
+            isGas = t.IsGas
         });
 
     <div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">

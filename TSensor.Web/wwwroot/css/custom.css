@@ -310,6 +310,14 @@ span.form-control {
     background-image: url('../img/density.png');
 }
 
+.t-cell .t-img-pressure {
+    background-image: url('../img/pressure.png');
+}
+
+.t-cell .t-img-сomposition {
+    background-image: url('../img/composition.png');
+}
+
 .t-cell .t-weightdown, .t-cell .t-weightup {
     color: #454545 !important;
 }

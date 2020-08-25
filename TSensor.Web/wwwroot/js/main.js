@@ -80,28 +80,43 @@ function sensorUpdate(data, date) {
 
             container.find('span[data-sensorguid="' + sensorGuid + '"]').html(val.insertDateStr);
 
-            container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
-            container.find('.t-environmentVolume').html(val.environmentVolume);
-            container.find('.t-liquidDensity').html(val.liquidDensity);
-            container.find('.t-avgT').html(val.avgT);
-            container.find('.t-environmentLevel').html(val.environmentLevel);
-            container.find('.t-pressureFilter').html(val.pressureFilter);
+            if (sensor.isGas) {
+                container.find('.t-gasMass').html(val.gasMass);
+                container.find('.t-environmentVolume').html(val.environmentVolume);
+                container.find('.t-liquidDensity').html(val.liquidDensity);
+                container.find('.t-pressureMeasuring').html(val.pressureMeasuring);
+                container.find('.t-environmentComposition').html(val.environmentComposition);
+                container.find('.t-avgT').html(val.avgT);
 
-            container.find('.tank-level').css('height', val.percentLevel + '%');
+                container.find('.tank-level').css('height', val.percentLevel + '%');
 
-            if (val.liquidEnvironmentLevel > sensor.weight + sensor.weightDelta ||
-                val.liquidEnvironmentLevel < sensor.weight - sensor.weightDelta) {
+                var newWeight = val.gasMass;
+            } else {
+                container.find('.t-liquidEnvironmentLevel').html(val.liquidEnvironmentLevel);
+                container.find('.t-environmentVolume').html(val.environmentVolume);
+                container.find('.t-liquidDensity').html(val.liquidDensity);
+                container.find('.t-avgT').html(val.avgT);
+                container.find('.t-environmentLevel').html(val.environmentLevel);
+                container.find('.t-pressureFilter').html(val.pressureFilter);
 
-                if (val.liquidEnvironmentLevel > sensor.weight + sensor.weightDelta) {
+                container.find('.tank-level').css('height', val.percentLevel + '%');
+
+                var newWeight = val.liquidEnvironmentLevel;
+            }
+
+            if (newWeight > sensor.weight + sensor.weightDelta ||
+                newWeight < sensor.weight - sensor.weightDelta) {
+
+                if (newWeight > sensor.weight + sensor.weightDelta) {
                     container.find('.t-weightdown').addClass('hidden');
                     container.find('.t-weightup').removeClass('hidden');
                 }
-                if (val.liquidEnvironmentLevel < sensor.weight - sensor.weightDelta) {
+                if (newWeight < sensor.weight - sensor.weightDelta) {
                     container.find('.t-weightdown').removeClass('hidden');
                     container.find('.t-weightup').addClass('hidden');
                 }
 
-                sensor.weight = val.liquidEnvironmentLevel;
+                sensor.weight = newWeight;
                 if (sensor.weightTimeout !== 0) {
                     sensor.weightExpire = date + sensor.weightTimeout * 1000;
                 }

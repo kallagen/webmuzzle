@@ -16,17 +16,31 @@
                 <div class="tank-level" style="height: @Model.PercentLevel%"></div>
             </div>
         </div>
-        <div class="bl3 @dualModeClass">
-            <span><span class="t-label t-img-weight">Масса</span><span class="t-liquidEnvironmentLevel">@Model.LiquidEnvironmentLevel.ToString().Replace(",", ".")</span> т<i class="hidden t-weightdown fa fa-arrow-down"></i><i class="hidden t-weightup fa fa-arrow-up"></i></span>
-            <span><span class="t-label t-img-volume">Объём</span><span class="t-environmentVolume">@Model.EnvironmentVolume.ToString().Replace(",", ".")</span> м³</span>
-            <span><span class="t-label t-img-density">Плотность</span><span class="t-liquidDensity">@Model.LiquidDensity.ToString().Replace(",", ".")</span> кг/м³</span>
-            <span><span class="t-label t-img-temperature">Температура</span><span class="t-avgT">@Model.AvgT.ToString().Replace(",", ".")</span> °C</span>
-            <span><span class="t-label t-img-level">Уровень</span><span class="t-environmentLevel">@Model.EnvironmentLevel.ToString().Replace(",", ".")</span> мм</span>
-            @if (Model.DualMode)
-            {
-                <span><span class="t-label t-img-level">Уровень сиг.</span><span class="t-pressureFilter">@Model.PressureFilter.ToString().Replace(",", ".")</span> мм</span>
-            }
-        </div>
+        @if (Model.IsGas)
+        {
+            <div class="bl3 bl3-1">
+                <span><span class="t-label t-img-weight">Масса</span><span class="t-gasMass">@Model.GasMass.ToString().Replace(",", ".")</span> т<i class="hidden t-weightdown fa fa-arrow-down"></i><i class="hidden t-weightup fa fa-arrow-up"></i></span>
+                <span><span class="t-label t-img-volume">Объём</span><span class="t-environmentVolume">@Model.EnvironmentVolume.ToString().Replace(",", ".")</span> м³</span>
+                <span><span class="t-label t-img-density">Плотность</span><span class="t-liquidDensity">@Model.LiquidDensity.ToString().Replace(",", ".")</span> кг/м³</span>
+                <span><span class="t-label t-img-pressure">Давление</span><span class="t-pressureMeasuring">@Model.PressureMeasuring.ToString().Replace(",", ".")</span> атм</span>
+                <span><span class="t-label t-img-сomposition">Состав газа</span><span class="t-environmentComposition">@Model.EnvironmentComposition.ToString().Replace(",", ".")</span> %</span>
+                <span><span class="t-label t-img-temperature">Температура</span><span class="t-avgT">@Model.AvgT.ToString().Replace(",", ".")</span> °C</span>
+            </div>
+        }
+        else
+        {
+            <div class="bl3 @dualModeClass">
+                <span><span class="t-label t-img-weight">Масса</span><span class="t-liquidEnvironmentLevel">@Model.LiquidEnvironmentLevel.ToString().Replace(",", ".")</span> т<i class="hidden t-weightdown fa fa-arrow-down"></i><i class="hidden t-weightup fa fa-arrow-up"></i></span>
+                <span><span class="t-label t-img-volume">Объём</span><span class="t-environmentVolume">@Model.EnvironmentVolume.ToString().Replace(",", ".")</span> м³</span>
+                <span><span class="t-label t-img-density">Плотность</span><span class="t-liquidDensity">@Model.LiquidDensity.ToString().Replace(",", ".")</span> кг/м³</span>
+                <span><span class="t-label t-img-temperature">Температура</span><span class="t-avgT">@Model.AvgT.ToString().Replace(",", ".")</span> °C</span>
+                <span><span class="t-label t-img-level">Уровень</span><span class="t-environmentLevel">@Model.EnvironmentLevel.ToString().Replace(",", ".")</span> мм</span>
+                @if (Model.DualMode)
+                {
+                    <span><span class="t-label t-img-level">Уровень сиг.</span><span class="t-pressureFilter">@Model.PressureFilter.ToString().Replace(",", ".")</span> мм</span>
+                }
+            </div>
+        }
         <div class="bl-error"></div>
     </div>
 </div>

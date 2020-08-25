@@ -23,6 +23,10 @@ namespace TSensor.Web.Models.Entity
 
         public decimal SteamMass { get; set; }
         public int EnvironmentComposition { get; set; }
+        public decimal PressureMeasuring { get; set; }
+
+        public decimal GasMass =>
+            LiquidEnvironmentLevel + SteamMass * 10;
 
         public string SensorGuid =>
             string.Join("_", new[] { DeviceGuid, IzkNumber.ToString(), SensorSerial.ToString() });
