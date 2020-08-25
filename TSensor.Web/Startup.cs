@@ -71,7 +71,7 @@ namespace TSensor.Web
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment() || Configuration["debug"] == "true")
+            if (env.IsDevelopment() || Configuration.GetValue<bool>("debug"))
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -88,6 +88,16 @@ namespace TSensor.Web
             app.UseAuthorization();
 
             app.UseMiddleware<RequestModifyMiddleware>();
+
+            if (Configuration.GetValue<bool>("allowIframe"))
+            {
+                app.Use((context, next) =>
+                {
+                    context.Response.Headers["Content-Security-Policy"] = "frame-src *";
+                    context.Response.Headers["X-Frame-Options"] = "ALLOW-FROM *";
+                    return next.Invoke();
+                });
+            }
 
             app.UseEndpoints(endpoints =>
             {

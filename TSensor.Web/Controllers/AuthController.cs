@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 using TSensor.Web.Models.Repository;
@@ -13,17 +14,19 @@ namespace TSensor.Web.Controllers
     {
         private readonly IUserRepository _repository;
         private readonly AuthService _authService;
+        private readonly IConfiguration _configuration;
 
-        public AuthController(IUserRepository repository, AuthService authService)
+        public AuthController(IUserRepository repository, AuthService authService, IConfiguration configuration)
         {
             _repository = repository;
             _authService = authService;
+            _configuration = configuration;
         }
 
         [NonAction]
         private IActionResult StartPage()
         {
-            return RedirectToAction("Index", "Dashboard");
+            return RedirectToAction("Map", "Dashboard");
         }
 
         [Route("login")]
@@ -104,6 +107,38 @@ namespace TSensor.Web.Controllers
         public IActionResult Version()
         {
             return Content(_authService.Version);
+        }
+
+        [Route("iframe/{userGuid}")]
+        public async Task<IActionResult> IFrame(string userGuid)
+        {
+            if (_configuration.GetValue<bool>("allowIframe") &&
+                Guid.TryParse(userGuid, out var _userGuid))
+            {
+                var user = _repository.GetByGuid(_userGuid);
+                if (user?.IsInactive == false && user?.Role == RoleCollection.Operator)
+                {
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        if (_authService.CurrentUserGuid != _userGuid || !_authService.IsCurrentUserEmbedded)
+                        {
+                            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                        }
+                    }
+
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        AuthService.CreateUserPrincipal(user.UserGuid, user.Name, user.Role, isEmbedded: true),
+                        new AuthenticationProperties
+                        {
+                            IsPersistent = true,
+                            ExpiresUtc = DateTime.Now.AddDays(30)
+                        });
+                    return StartPage();
+                }
+            }
+
+            return Ok();
         }
     }
 }
