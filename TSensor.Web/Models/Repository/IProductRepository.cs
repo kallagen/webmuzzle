@@ -8,8 +8,8 @@ namespace TSensor.Web.Models.Repository
     {
         public IEnumerable<Product> List();
         public Product GetByGuid(Guid productGuid);
-        public Guid? Create(string name);
-        public bool Edit(Guid productGuid, string name);
+        public Guid? Create(string name, bool isGas);
+        public bool Edit(Guid productGuid, string name, bool isGas);
         public bool Remove(Guid productGuid);
     }
 }

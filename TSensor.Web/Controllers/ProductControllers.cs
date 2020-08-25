@@ -63,7 +63,7 @@ namespace TSensor.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var productGuid = _productRepository.Create(viewModel.Name);
+                var productGuid = _productRepository.Create(viewModel.Name, viewModel.IsGas);
                 if (productGuid == null)
                 {
                     viewModel.ErrorMessage = Program.GLOBAL_ERROR_MESSAGE;
@@ -93,7 +93,8 @@ namespace TSensor.Web.Controllers
                     var viewModel = new ProductCreateEditViewModel
                     {
                         ProductGuid = product.ProductGuid,
-                        Name = product.Name
+                        Name = product.Name,
+                        IsGas = product.IsGas
                     };
 
                     var successMessage = TempData["Product.Edit.SuccessMessage"] as string;
@@ -128,7 +129,7 @@ namespace TSensor.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var editResult = _productRepository.Edit(viewModel.ProductGuid, viewModel.Name);
+                var editResult = _productRepository.Edit(viewModel.ProductGuid, viewModel.Name, viewModel.IsGas);
                 if (editResult)
                 {
                     var productUrl = Url.Action("Edit", "Product", new { productGuid = viewModel.ProductGuid });

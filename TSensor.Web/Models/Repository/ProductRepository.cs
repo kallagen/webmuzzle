@@ -11,7 +11,7 @@ namespace TSensor.Web.Models.Repository
         public IEnumerable<Product> List()
         {
             return Query<Product>(@"
-                SELECT ProductGuid, [Name]
+                SELECT ProductGuid, [Name], IsGas
                 FROM [Product]
                 ORDER BY [Name]");
         }
@@ -19,31 +19,32 @@ namespace TSensor.Web.Models.Repository
         public Product GetByGuid(Guid productGuid)
         {
             return QueryFirst<Product>(@"
-                SELECT ProductGuid, [Name]
+                SELECT ProductGuid, [Name], IsGas
                 FROM Product WHERE ProductGuid = @productGuid", new { productGuid });
         }
 
-        public Guid? Create(string name)
+        public Guid? Create(string name, bool isGas)
         {
             return QueryFirst<Guid?>(@"
                 DECLARE @guid UNIQUEIDENTIFIER = NEWID()
 
-                INSERT Product(ProductGuid, [Name])
-                VALUES(@guid, @name)
+                INSERT Product(ProductGuid, [Name], IsGas)
+                VALUES(@guid, @name, @isGas)
                 
                 SELECT ProductGuid FROM Product WHERE ProductGuid = @guid",
-                new { name });
+                new { name, isGas });
         }
 
-        public bool Edit(Guid productGuid, string name)
+        public bool Edit(Guid productGuid, string name, bool isGas)
         {
             return QueryFirst<int?>(@"
                 UPDATE Product SET 
-                    [Name] = @name
+                    [Name] = @name,
+                    IsGas = @isGas
                 WHERE ProductGuid = @productGuid
 
                 SELECT @@ROWCOUNT",
-                new { productGuid, name }) == 1;
+                new { productGuid, name, isGas }) == 1;
         }
 
         public bool Remove(Guid productGuid)

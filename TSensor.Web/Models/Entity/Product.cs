@@ -6,5 +6,6 @@ namespace TSensor.Web.Models.Entity
     {
         public Guid ProductGuid { get; set; }
         public string Name { get; set; }
+        public bool IsGas { get; set; }
     }
 }
