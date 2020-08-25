@@ -8,10 +8,14 @@ namespace TSensor.Web.Models.Repository
     {
         public IEnumerable<Point> List();
         public Point GetByGuid(Guid pointGuid);
-        public Guid? Create(string name, string address, string phone, string email, string description);
-        public bool Edit(Guid pointGuid, string name, string address, string phone, string email, string description);
+        public Guid? Create(string name, string address, string phone, string email, string description,
+            decimal? longitude, decimal? latitude);
+        public bool Edit(Guid pointGuid, string name, string address, string phone, string email, string description,
+            decimal? longitude, decimal? latitude);
         public bool Remove(Guid pointGuid);
         public IEnumerable<SensorValue> GetNotAssignedSensorState();
         public IEnumerable<TankSensorValue> GetSensorActualState(IEnumerable<Guid> tankGuidList);
+
+        public IEnumerable<Point> GetUserPointList(Guid? userGuid);
     }
 }

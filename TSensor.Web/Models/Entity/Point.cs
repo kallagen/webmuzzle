@@ -12,7 +12,10 @@ namespace TSensor.Web.Models.Entity
         public string Email { get; set; }
         public string Description { get; set; }
 
-        public IEnumerable<Tank> TankList { get; set; }
+        public decimal? Longitude { get; set; }
+        public decimal? Latitude { get; set; }
+
+        public List<Tank> TankList { get; set; } = new List<Tank>();
 
         public IEnumerable<User> UserList { get; set; }
         public IEnumerable<User> AvailableUserList { get; set; }

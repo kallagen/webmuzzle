@@ -15,7 +15,8 @@ namespace TSensor.Web.Models.Repository
 		public IEnumerable<Point> List()
         {
             return Query<Point>($@"
-                SELECT PointGuid, [Name], Address, Phone, Email, Description
+                SELECT PointGuid, [Name], Address, Phone, Email, Description,
+					Longitude, Latitude
                 FROM [Point]
 				WHERE PointGuid != '{MASSMETER_POINT_GUID}'
 				ORDER BY [Name]");
@@ -29,7 +30,8 @@ namespace TSensor.Web.Models.Repository
             }
 
 			var point = QueryFirst<Point>(@"
-                SELECT PointGuid, [Name], Address, Phone, Email, Description
+                SELECT PointGuid, [Name], Address, Phone, Email, Description,
+					Longitude, Latitude
                 FROM [Point] WHERE PointGuid = @pointGuid", new { pointGuid });
 
 			if (point != null)
@@ -52,36 +54,40 @@ namespace TSensor.Web.Models.Repository
 			return point;
 		}
 
-        public Guid? Create(string name, string address, string phone, string email, string description)
+        public Guid? Create(string name, string address, string phone, string email, string description,
+			decimal? longitude, decimal? latitude)
         {
             return QueryFirst<Guid?>(@"
                 DECLARE @guid UNIQUEIDENTIFIER = NEWID()
 
-                INSERT [Point](PointGuid, [Name], [Address], Phone, Email, Description)
-                VALUES(@guid, @name, @address, @phone, @email, @description)
+                INSERT [Point](PointGuid, [Name], [Address], Phone, Email, Description, Longitude, Latitude)
+                VALUES(@guid, @name, @address, @phone, @email, @description, @longitude, @latitude)
                 
                 SELECT PointGuid FROM [Point] WHERE PointGuid = @guid",
-                new { name, address, phone, email, description });
+                new { name, address, phone, email, description, longitude, latitude });
         }
 
-        public bool Edit(Guid pointGuid, string name, string address, string phone, string email, string description)
+        public bool Edit(Guid pointGuid, string name, string address, string phone, string email, string description,
+			decimal? longitude, decimal? latitude)
         {
 			if (pointGuid == MASSMETER_POINT_GUID)
             {
 				return false;
             }
 
-            return QueryFirst<int?>(@"
+			return QueryFirst<int?>(@"
                 UPDATE [Point] SET 
                     [Name] = @name,
 					[Address] = @address,
 					Phone = @phone,
 					Email = @email,
-					Description = @description
+					Description = @description,
+					Longitude = @longitude,
+					Latitude = @latitude					
                 WHERE PointGuid = @pointGuid
 
                 SELECT @@ROWCOUNT",
-                new { pointGuid, name, address, phone, email, description }) == 1;
+				new { pointGuid, name, address, phone, email, description, longitude, latitude }) == 1;
         }
 
         public bool Remove(Guid pointGuid)
@@ -149,7 +155,9 @@ namespace TSensor.Web.Models.Repository
 					m.t5,
 					m.t6,
 					m.steamMass AS SteamMass,
-					m.environmentComposition AS EnvironmentComposition
+					m.environmentComposition AS EnvironmentComposition,
+					m.pressureMeasuring AS PressureMeasuring,
+					pr.IsGas
 				FROM Point p
 					JOIN Tank t ON p.PointGuid = t.PointGuid
 					LEFT JOIN Product pr ON t.ProductGuid = pr.ProductGuid
@@ -157,5 +165,29 @@ namespace TSensor.Web.Models.Repository
 				WHERE
 					t.TankGuid in @tankGuidList", new { tankGuidList = tankGuidList.Where(p => p != null).Distinct() });
         }
-	}
+
+        public IEnumerable<Point> GetUserPointList(Guid? userGuid)
+        {
+			var pointList = Query<Point>(@"
+				SELECT DISTINCT p.PointGuid, p.Name, p.Latitude, p.Longitude
+				FROM Point p
+					LEFT JOIN PointGroupPoint pgp ON p.PointGuid = pgp.PointGuid
+					LEFT JOIN UserPointGroupRights upgp ON upgp.PointGroupGuid = pgp.PointGroupGuid AND upgp.UserGuid = @userGuid
+					LEFT JOIN UserPointRights upr ON p.PointGuid = upr.PointGuid AND upr.UserGuid = @userGuid
+				WHERE @userGuid IS NULL OR (upgp.UserGuid IS NOT NULL OR upr.UserGuid IS NOT NULL)", new { userGuid });
+
+			var tankList = Query<Tank>(@"
+				SELECT TankGuid, PointGuid, t.Name, p.Name AS ProductName
+				FROM Tank t
+					LEFT JOIN Product p ON t.ProductGuid = p.ProductGuid
+				WHERE t.PointGuid IN @pointList", new { pointList = pointList.Select(p => p.PointGuid) });
+
+			foreach (var tank in tankList)
+            {
+				pointList.FirstOrDefault(p => p.PointGuid == tank.PointGuid).TankList.Add(tank);				
+            }
+
+			return pointList;
+        }
+    }
 }

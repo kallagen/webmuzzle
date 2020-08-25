@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.ViewModels;
@@ -14,12 +17,22 @@ namespace TSensor.Web.Controllers
         private readonly ITankRepository _tankRepository;
         private readonly IUserRepository _userRepository;
 
+        private readonly decimal mapPointDefaultLocationLongitude = 0;
+        private readonly decimal mapPointDefaultLocationLatitude = 0;
+
         public PointController(IPointRepository pointRepository, ITankRepository tankRepository,
-            IUserRepository userRepository)
+            IUserRepository userRepository, IConfiguration configuration)
         {
             _pointRepository = pointRepository;
             _tankRepository = tankRepository;
             _userRepository = userRepository;
+
+            var coordinates = configuration.GetSection("defaultPointPosition").Get<IEnumerable<decimal>>().ToArray();
+            if (coordinates?.Length == 2)
+            {
+                mapPointDefaultLocationLongitude = coordinates[0];
+                mapPointDefaultLocationLatitude = coordinates[1];
+            }
         }
 
         [Authorize(Policy = "Admin")]
@@ -49,7 +62,11 @@ namespace TSensor.Web.Controllers
         [Route("point/new")]
         public IActionResult Create()
         {
-            var viewModel = new PointCreateEditViewModel();
+            var viewModel = new PointCreateEditViewModel
+            {
+                DefaultLongitude = mapPointDefaultLocationLongitude,
+                DefaultLatitude = mapPointDefaultLocationLatitude
+            };
 
             return View(viewModel);
         }
@@ -72,7 +89,8 @@ namespace TSensor.Web.Controllers
             if (ModelState.IsValid)
             {
                 var pointGuid = _pointRepository.Create(viewModel.Name,
-                    viewModel.Address, viewModel.Phone, viewModel.Email, viewModel.Description);
+                    viewModel.Address, viewModel.Phone, viewModel.Email, viewModel.Description,
+                    viewModel.LongitudeParsed, viewModel.LatitudeParsed);
                 if (pointGuid == null)
                 {
                     viewModel.ErrorMessage = Program.GLOBAL_ERROR_MESSAGE;
@@ -108,9 +126,15 @@ namespace TSensor.Web.Controllers
                         Email = point.Email,
                         Description = point.Description,
 
+                        Longitude = point.Longitude?.ToString(),
+                        Latitude = point.Latitude?.ToString(),
+
+                        DefaultLongitude = mapPointDefaultLocationLongitude,
+                        DefaultLatitude = mapPointDefaultLocationLatitude,                        
+
                         Data = _tankRepository.GetListByPoint(point.PointGuid),
                         UserList = point.UserList,
-                        AvailableUserList = point.AvailableUserList
+                        AvailableUserList = point.AvailableUserList                        
                     };
 
                     var successMessage = TempData["Point.Edit.SuccessMessage"] as string;
@@ -150,10 +174,12 @@ namespace TSensor.Web.Controllers
             viewModel.Phone = viewModel.Phone?.Trim();
             viewModel.Email = viewModel.Email?.Trim();
 
+            viewModel.Validate(ModelState);
             if (ModelState.IsValid)
             {
                 var editResult = _pointRepository.Edit(viewModel.PointGuid, viewModel.Name,
-                    viewModel.Address, viewModel.Phone, viewModel.Email, viewModel.Description);
+                    viewModel.Address, viewModel.Phone, viewModel.Email, viewModel.Description,
+                    viewModel.LongitudeParsed, viewModel.LatitudeParsed);
                 if (editResult)
                 {
                     var pointUrl = Url.Action("Edit", "Point", new { pointGuid = viewModel.PointGuid });

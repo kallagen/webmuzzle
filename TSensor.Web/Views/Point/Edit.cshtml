@@ -1,7 +1,20 @@
-﻿@using TSensor.Web.Models.Services; 
+﻿@using TSensor.Web.Models.Services;
 @model PointCreateEditViewModel
 @{
     ViewBag.Title = $"Редактирование объекта \"{Model.Name}\"";
+
+    var mapOptions = string.Empty;
+    if (Model != null)
+    {
+        mapOptions = JsonSerializer.Serialize(
+            new
+            {
+                defaultLon = Model.DefaultLongitude,
+                defaultLat = Model.DefaultLatitude,
+                lon = Model.LongitudeParsed,
+                lat = Model.LatitudeParsed,
+            });
+    }
 }
 
 @section AdditionalHeader
@@ -15,6 +28,8 @@
             @using (Html.BeginForm("Edit", "Point", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
             {
                 @Html.HiddenFor(m => m.PointGuid)
+                @Html.HiddenFor(m => m.DefaultLongitude)
+                @Html.HiddenFor(m => m.DefaultLatitude)
                 <div class="box-body">
                     <div class="form-group @Html.ValidState("Name")">
                         <label for="Name" class="col-sm-3 control-label">Название</label>
@@ -50,6 +65,38 @@
                             @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label"></div>
+                        <div class="col-sm-9">Введите координаты объекта или укажите его на карте</div>
+                    </div>
+                    <div class="form-group @Html.ValidState("Longitude")">
+                        <label for="Longitude" class="col-sm-3 control-label">Долгота</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Longitude, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Longitude, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("Latitude")">
+                        <label for="Latitude" class="col-sm-3 control-label">Широта</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Latitude, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Latitude, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div>
+                        <div id="map" class="map" style="height: 400px; width: 100%"></div>
+                    </div>
+                    <link rel="stylesheet" href="~/lib/ol/css/ol.css" />
+                    <script src="~/lib/ol/build/ol.js"></script>
+                    <script src="~/js/map.js"></script>
+                    <script>
+                        var map = new Map();
+
+                        var lonInput = document.querySelector('#Longitude');
+                        var latInput = document.querySelector('#Latitude');
+
+                        map.initPointSelect(@Html.Raw(mapOptions), { lon: lonInput, lat: latInput });
+                    </script>
                 </div>
                 <div class="box-footer">
                     <a id="remove-point-button" href="javascript:void(0)" class="btn bg-red">Удалить</a>

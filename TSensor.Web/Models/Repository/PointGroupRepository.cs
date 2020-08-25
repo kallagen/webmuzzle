@@ -145,7 +145,7 @@ namespace TSensor.Web.Models.Repository
                             PointGuid = p.PointGuid,
                             Name = p.PointName,
                             TankList = tankList.Where(t => t.PointGuid == p.PointGuid)
-                                .Select(t => new Tank { TankGuid = t.TankGuid, Name = t.Name })                            
+                                .Select(t => new Tank { TankGuid = t.TankGuid, Name = t.Name }).ToList()                          
                         })
                 };
             });
