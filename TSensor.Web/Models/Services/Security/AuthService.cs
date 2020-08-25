@@ -37,8 +37,10 @@ namespace TSensor.Web.Models.Services.Security
         public Guid CurrentUserGuid =>
             Guid.Parse(_httpContext.HttpContext.User.Claims.FirstOrDefault(p => p.Type == "Guid")?.Value);
 
+        public bool IsCurrentUserEmbedded =>
+            _httpContext.HttpContext.User.Claims.FirstOrDefault(p => p.Type == "IsEmbedded")?.Value == "true";
 
-        public static ClaimsPrincipal CreateUserPrincipal(Guid userGuid, string name, string role)
+        public static ClaimsPrincipal CreateUserPrincipal(Guid userGuid, string name, string role, bool isEmbedded = false)
         {
             return new ClaimsPrincipal(
                 new ClaimsIdentity(
@@ -46,6 +48,7 @@ namespace TSensor.Web.Models.Services.Security
                     {
                         new Claim("LoginDate", DateTime.Now.ToString()),
                         new Claim("Guid", userGuid.ToString()),
+                        new Claim("IsEmbedded", isEmbedded.ToString()),
                         new Claim(ClaimsIdentity.DefaultNameClaimType, name),
                         new Claim(ClaimsIdentity.DefaultRoleClaimType, role)
                     },
