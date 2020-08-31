@@ -14,11 +14,11 @@ namespace TSensor.Web.ViewModels.Chart
 
         public static readonly Dictionary<string, string> ParamList = new Dictionary<string, string>
         {
-            { "WEIGHT", "Масса" },
-            { "VOLUME", "Объём" },
-            { "DENSITY", "Плотность" },
-            { "TEMPERATURE", "Температура" },
-            { "LEVEL", "Уровень" }
+            { "WEIGHT", "Масса, т" },
+            { "VOLUME", "Объём, м³" },
+            { "DENSITY", "Плотность, кг/м³" },
+            { "TEMPERATURE", "Температура, °C" },
+            { "LEVEL", "Уровень, мм" }
         };
     }
 }
