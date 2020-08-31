@@ -204,5 +204,24 @@ namespace TSensor.Web.Controllers
             };
             return View(viewModel);
         }
+
+        [Route("point/details/{guid}")]
+        public IActionResult PointDetails(string guid)
+        {
+            if (Guid.TryParse(guid, out var _pointGuid))
+            {
+                var features = _pointRepository.GetUserPointList(
+                    HttpContext.User.IsInRole("ADMIN") ? null as Guid? : _authService.CurrentUserGuid);
+
+                var point = features.FirstOrDefault(p => p.PointGuid == _pointGuid);
+                if (point != null)
+                {
+                    return ActualSensorValues(point.TankList.Select(p => p.TankGuid));
+                }
+            }
+
+            ViewBag.Title = "Объект не найден";
+            return View("NotFound");
+        }
     }
 }

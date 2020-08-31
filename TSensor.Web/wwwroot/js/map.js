@@ -20,13 +20,14 @@
 
     that.openOverlay = function (feature) {
         if (feature) {
-            document.querySelector('.ol-popup-header').innerHTML = feature.get('name');
+            document.querySelector('.ol-popup-header').innerHTML =
+                `<a href="${feature.get('url')}" target="_blank">${feature.get('name')}</a>`;
 
             var html = '';
             var tankList = feature.get('tankList');
             if (tankList.length) {
                 html = tankList.map(function (i) {
-                    return `<a href="${i.url}" target="_blank">${i.name}</a>`;
+                    return `<div>${i.name}</div>`;
                 }).join('');
             }
             document.querySelector('.ol-popup-content').innerHTML = html;
@@ -44,7 +45,8 @@
                     ol.proj.transform([i.lon, i.lat], 'EPSG:4326', 'EPSG:3857')
                 ),
                 name: i.name,
-                tankList: i.tankList
+                tankList: i.tankList,
+                url: i.url
             });
         });
 

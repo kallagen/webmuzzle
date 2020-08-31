@@ -20,6 +20,7 @@
                     name = p.Name,
                     lon = p.Longitude,
                     lat = p.Latitude,
+                    url = Url.Action("PointDetails", "Dashboard", new { guid = p.PointGuid }),
                     tankList = p.TankList.Select(t => new
                     {
                         name = string.Join(" ", new[] { t.Name, t.ProductName }),
