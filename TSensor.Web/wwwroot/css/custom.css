@@ -377,6 +377,7 @@ i.menu-point {
 
 .sidebar-menu > li.apply-button a:hover {
     background: #367FA9;
+    color: #fff;
 }
 
 .sidebar-menu > li.apply-button > a {
@@ -384,8 +385,8 @@ i.menu-point {
     color: #fff;
 }
 
-.skin-blue .sidebar-menu > li.header {
-    color: #69818C;
+.skin-black-light .sidebar-menu > li.header {
+    color: #333;
 }
 
 .page-header-form {
