@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Services;
 using TSensor.Web.Models.Services.Log;
 using TSensor.Web.ViewModels;
 
@@ -252,6 +253,35 @@ namespace TSensor.Web.Controllers
             }
 
             return RedirectToAction("UploadArchive", "Api");
+        }
+
+        [Route("coordinates/push")]
+        [HttpPost]
+        public async Task<IActionResult> PushCoordinates(string d, string lon, string lat)
+        {
+            if (string.IsNullOrEmpty(d))
+            {
+                return Json(new { success = false, error = "missing device guid" });
+            }
+            if (!lon.TryParseDecimal(out var _lon))
+            {
+                return Json(new { success = false, error = "wrong longitude" });
+            }
+            if (!lat.TryParseDecimal(out var _lat))
+            {
+                return Json(new { success = false, error = "wrong latitude" });
+            }
+
+            try
+            {
+                await _apiRepository.UploadPointCoordinatesAsync(d, _lon, _lat);
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
         }
     }
 }
