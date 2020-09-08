@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace TSensor.Web
@@ -9,16 +10,23 @@ namespace TSensor.Web
 
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+
+            CreateHostBuilder(config).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(IConfigurationRoot config) =>
+            Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder
-                        .UseKestrel()
-                        .UseStartup<Startup>();
+                    if (config.GetValue<bool>("useKestrel"))
+                    {
+                        webBuilder = webBuilder.UseKestrel();
+                    }
+
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }
