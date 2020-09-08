@@ -21,6 +21,7 @@
                     lon = p.Longitude,
                     lat = p.Latitude,
                     url = Url.Action("PointDetails", "Dashboard", new { guid = p.PointGuid }),
+                    guid = p.PointGuid,
                     tankList = p.TankList.Select(t => new
                     {
                         name = string.Join(" ", new[] { t.Name, t.ProductName }),
@@ -87,18 +88,18 @@
 <div id="ol-map" class="ol-map"></div>
 <div id="ol-popup" class="ol-popup">
     <div id="ol-popup-header" class="ol-popup-header"></div>
-    <div id="ol-popup-content" class="ol-popup-content">
-        <a href="$" target="_blank">324</a>
-        <a href="$" target="_blank">324</a>
-        <a href="$" target="_blank">324</a>
-        <a href="$" target="_blank">324</a>
-    </div>
+    <div id="ol-popup-content" class="ol-popup-content"></div>
 </div>
 
 <link rel="stylesheet" href="~/lib/ol/css/ol.css" />
+<script src="~/lib/signalr/signalr.min.js"></script>
 <script src="~/lib/ol/build/ol.js"></script>
 <script src="~/js/map.js"></script>
 <script>
     var map = new Map();
     map.init(@Html.Raw(featureJson));
+
+    const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast/coordinates').build();
+    connection.on('coordinatesupdate', map.coordinatesUpdate);
+    connection.start();
 </script>

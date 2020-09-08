@@ -9,6 +9,7 @@
     });
 
     that.map = null;
+    that.layerDataSource = null;
 
     that._overlay = new ol.Overlay({
         element: document.getElementById('ol-popup'),
@@ -18,6 +19,7 @@
         },
     });
 
+    that.overlayPointGuid = null;
     that.openOverlay = function (feature) {
         if (feature) {
             document.querySelector('.ol-popup-header').innerHTML =
@@ -33,8 +35,10 @@
             document.querySelector('.ol-popup-content').innerHTML = html;
 
             that._overlay.setPosition(feature.getGeometry().getCoordinates());
+            that.overlayPointGuid = feature.get('guid');
         } else {
             that._overlay.setPosition(undefined);
+            that.overlayPointGuid = null;
         }
     };
 
@@ -46,7 +50,8 @@
                 ),
                 name: i.name,
                 tankList: i.tankList,
-                url: i.url
+                url: i.url,
+                guid: i.guid
             });
         });
 
@@ -91,6 +96,25 @@
                 that.openOverlay(undefined);
             }
         });
+
+        that.map = _map;
+        that.layerDataSource = layerDataSource;
+    };
+
+    that.coordinatesUpdate = function (data, date) {
+        data.forEach(function (item) {
+            var coord = ol.proj.transform([item.lon, item.lat], 'EPSG:4326', 'EPSG:3857');
+
+            var feature = that.layerDataSource.getFeatures().filter(p => p.get('guid') == item.pointGuid);
+
+            if (feature.length == 1) {
+                feature[0].getGeometry().setCoordinates(coord);
+                    
+                if (that._overlay.getPosition() && that.overlayPointGuid == item.pointGuid) {
+                    that._overlay.setPosition(coord);
+                }
+            }
+        });        
     };
 
     that.initPointSelect = function (options, controls) {
