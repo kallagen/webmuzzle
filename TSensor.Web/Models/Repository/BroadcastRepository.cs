@@ -22,5 +22,16 @@ namespace TSensor.Web.Models.Repository
 				FROM ActualSensorValue
                 WHERE InsertDate >= DATEADD(HOUR, -1, GETDATE())");
         }
+
+        public IEnumerable<Point> GetChangedCoordinates()
+        {
+            return Query<Point>(@"
+                SELECT PointGuid, Longitude, Latitude
+                FROM Point
+                WHERE CoordinatesChanged = 1
+
+                UPDATE Point SET 
+                    CoordinatesChanged = 0");
+        }
     }
 }
