@@ -8,5 +8,7 @@ namespace TSensor.Web.Models.Repository
     {
         public Task<bool> PushValueAsync(string ip, ActualSensorValue value, string raw);
         public Task PushArchivedValuesAsync(string ip, IEnumerable<ActualSensorValue> valueList);
+
+        public Task UploadPointCoordinatesAsync(string deviceGuid, decimal longitude, decimal latitude);
     }
 }

@@ -176,5 +176,38 @@ namespace TSensor.Web.Models.Repository
 					}
 				}).Where(p => p != null));
         }
-    }
+
+		public async Task UploadPointCoordinatesAsync(string deviceGuid, decimal longitude, decimal latitude)
+        {
+			await ExecuteAsync(@"
+				INSERT PointCoordinates(PointGuid, Longitude, Latitude)
+				SELECT p.PointGuid, @longitude, @latitude
+				FROM Point p
+					JOIN Tank t ON p.PointGuid = t.PointGuid
+				WHERE (
+						t.MainDeviceGuid = @deviceGuid OR 
+						(t.DualMode = 1 AND t.SecondDeviceGuid = @deviceGuid)
+					) AND (
+						ISNULL(Longitude, -1000) != ISNULL(@longitude, -1000) OR
+						ISNULL(Latitude, -1000) != ISNULL(@latitude, -1000)
+					)
+				
+				UPDATE p SET
+					Longitude = @longitude,
+					Latitude = @latitude,
+					CoordinatesChanged = 1
+				FROM Point p
+					JOIN Tank t ON p.PointGuid = t.PointGuid
+				WHERE 
+					(
+						t.MainDeviceGuid = @deviceGuid OR 
+						(t.DualMode = 1 AND t.SecondDeviceGuid = @deviceGuid)
+					) AND
+					(
+						ISNULL(Longitude, -1000) != ISNULL(@longitude, -1000) OR
+						ISNULL(Latitude, -1000) != ISNULL(@latitude, -1000)
+					)",
+				new { deviceGuid, longitude, latitude });
+		}
+	}
 }
