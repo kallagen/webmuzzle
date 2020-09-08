@@ -63,7 +63,8 @@ namespace TSensor.Web
             services.AddSingleton<ILicenseRepository, LicenseRepository>(p => new LicenseRepository(connectionString));
             services.AddSingleton<IOLAPRepository, OLAPRepository>(p => new OLAPRepository(connectionString));
 
-            services.AddHostedService<BroadcastService>();
+            services.AddHostedService<BroadcastSensorValuesService>();
+            services.AddHostedService<BroadcastCoordinatesService>();
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddSignalR();            
@@ -101,7 +102,8 @@ namespace TSensor.Web
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<BroadcastHub>("broadcast");
+                endpoints.MapHub<BroadcastSensorValuesHub>("broadcast/sensorvalue");
+                endpoints.MapHub<BroadcastCoordinatesHub>("broadcast/coordinates");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Dashboard}/{action=Default}/{id?}");

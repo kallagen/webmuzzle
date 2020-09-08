@@ -174,7 +174,7 @@
     {
         <text>
             const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
-            const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast').build();
+            const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast/sensorvalue').build();
 
             connection.on('sensorupdate', tankSensorUpdate);
             connection.start();
