@@ -20,10 +20,12 @@ namespace TSensor.Web.Models.Middleware
         public async Task InvokeAsync(HttpContext context)
         {
             if (context.Request.Method?.ToUpperInvariant() == "POST" &&
-                !context.Request.Path.StartsWithSegments("/broadcast") &&
+                !context.Request.Path.StartsWithSegments("/broadcast/sensorvalue") &&
+                !context.Request.Path.StartsWithSegments("/broadcast/coordinates") &&
                 !context.Request.Path.StartsWithSegments("/tank/calibration/upload") &&
                 !context.Request.Path.StartsWithSegments("/api/archive/upload") &&
                 !context.Request.Path.StartsWithSegments("/api/sensorvalue/archive/push") &&
+                !context.Request.Path.StartsWithSegments("/api/coordinates/push") &&
                 !context.Request.Path.StartsWithSegments("/license/upload"))
             {
                 using var reader = new StreamReader(context.Request.Body);
