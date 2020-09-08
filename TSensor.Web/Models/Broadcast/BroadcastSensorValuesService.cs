@@ -6,22 +6,22 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TSensor.Web.Models.Repository;
-using TSensor.Web.Models.Services.Log;
 using TSensor.Web.Models.Services;
+using TSensor.Web.Models.Services.Log;
 
 namespace TSensor.Web.Models.Broadcast
 {
-    public class BroadcastService : IHostedService, IDisposable
+    public class BroadcastSensorValuesService : IHostedService, IDisposable
     {
         private readonly IBroadcastRepository _repository;
-        private readonly IHubContext<BroadcastHub> _hubContext;
+        private readonly IHubContext<BroadcastSensorValuesHub> _hubContext;
         private readonly FileLogService _logService;
 
         private Timer timer;
         private readonly int delay;
 
-        public BroadcastService(IBroadcastRepository repository, IConfiguration configuration,
-            FileLogService logService, IHubContext<BroadcastHub> hubContext)
+        public BroadcastSensorValuesService(IBroadcastRepository repository, IConfiguration configuration,
+            FileLogService logService, IHubContext<BroadcastSensorValuesHub> hubContext)
         {
             _repository = repository;
             _hubContext = hubContext;
