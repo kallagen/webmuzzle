@@ -4,7 +4,8 @@ namespace TSensor.FakeSensor
 {
     public class Config
     {
-        public readonly string ApiUrl;
+        public readonly string ApiPushValueUrl;
+        public readonly string ApiPushCoordinatesUrl;
 
         public Config()
         {
@@ -12,7 +13,8 @@ namespace TSensor.FakeSensor
                 .AddJsonFile("appconfig.json")
                 .Build();
 
-            ApiUrl = config["apiUrl"];
+            ApiPushValueUrl = $"{config["apiUrl"]}/sensorvalue/push";
+            ApiPushCoordinatesUrl = $"{config["apiUrl"]}/coordinates/push";
         }
     }
 }
