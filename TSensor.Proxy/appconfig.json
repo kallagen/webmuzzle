@@ -34,6 +34,12 @@
   "archiveFolder": "/home/pi/tsensor/archived",
   // максимальный размер файла с данными в режиме file (а также архивными в режиме api), кбайты
   "maxArchiveFileSize": 100,
-  // интервал рассылки архивных данных в режиме api
-  "archiveSendInterval": 300
+  // интервал рассылки архивных данных в режиме api, секунды
+  "archiveSendInterval": 300,
+
+  // устройство с gps для получения координат, пример: /dev/ttyS0
+  // если gps не установлен, то оставить пустым
+  "gpsDevice": "/dev/ttyS0",
+  // время обновления координат, секунды
+  "gpsSendInterval": 20
 }

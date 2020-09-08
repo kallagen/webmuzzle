@@ -33,6 +33,13 @@ namespace TSensor.Proxy
         public int MaxArchiveFileSize { get; private set; }
         public int ArchiveSendInterval { get; private set; }
         
+        public string GpsDevice { get; private set; }
+        public int? GpsSendInterval { get; private set; }
+
+        public string ApiUrlSendCoordinates { get; private set; }
+
+        public bool UseGps => !string.IsNullOrWhiteSpace(GpsDevice) && GpsSendInterval.HasValue;
+
         public bool IsLinux =>
             RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
@@ -92,14 +99,21 @@ namespace TSensor.Proxy
                 COMPortList = config.GetSection("portList").GetChildren().Select(p => p.Value?.ToUpper()).Distinct();
             }
 
+            var apiHost = config["apiHost"];
+
             OutputMode = config["outputMode"];
-            ApiUrlSendValue = $"http://{config["apiHost"]}/api/sensorvalue/push";
-            ApiUrlSendArchive = $"http://{config["apiHost"]}/api/sensorvalue/archive/push";
+            ApiUrlSendValue = $"http://{apiHost}/api/sensorvalue/push";
+            ApiUrlSendArchive = $"http://{apiHost}/api/sensorvalue/archive/push";
 
             ArchiveFolder = config["archiveFolder"];
 
             MaxArchiveFileSize = int.Parse(config["maxArchiveFileSize"]) * 1024;
             ArchiveSendInterval = int.Parse(config["archiveSendInterval"]) * 1000;
+
+            GpsDevice = config["gpsDevice"];
+            GpsSendInterval = int.TryParse(config["gpsSendInterval"], out var _gpsSendInterval) ? _gpsSendInterval * 1000 as int? : null;
+
+            ApiUrlSendCoordinates = $"http://{apiHost}/api/coordinates/push";
         }
     }
 }
