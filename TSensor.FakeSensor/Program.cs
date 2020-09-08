@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 
 namespace TSensor.FakeSensor
@@ -61,20 +63,28 @@ namespace TSensor.FakeSensor
             sdt.Do();
             sg.Do();
 
-            await r92.SendAsync(config.ApiUrl);
-            await r95.SendAsync(config.ApiUrl);
-            await rdt.SendAsync(config.ApiUrl);
-            await rg1.SendAsync(config.ApiUrl);
-            await rg2.SendAsync(config.ApiUrl);
-            await rg3.SendAsync(config.ApiUrl);
-            await t92.SendAsync(config.ApiUrl);
-            await t95.SendAsync(config.ApiUrl);
-            await tdt.SendAsync(config.ApiUrl);
-            await tg.SendAsync(config.ApiUrl);
-            await s92.SendAsync(config.ApiUrl);
-            await s95.SendAsync(config.ApiUrl);
-            await sdt.SendAsync(config.ApiUrl);
-            await sg.SendAsync(config.ApiUrl);
+            await r92.SendAsync(config.ApiPushValueUrl);
+            await r95.SendAsync(config.ApiPushValueUrl);
+            await rdt.SendAsync(config.ApiPushValueUrl);
+            await rg1.SendAsync(config.ApiPushValueUrl);
+            await rg2.SendAsync(config.ApiPushValueUrl);
+            await rg3.SendAsync(config.ApiPushValueUrl);
+            await t92.SendAsync(config.ApiPushValueUrl);
+            await t95.SendAsync(config.ApiPushValueUrl);
+            await tdt.SendAsync(config.ApiPushValueUrl);
+            await tg.SendAsync(config.ApiPushValueUrl);
+            await s92.SendAsync(config.ApiPushValueUrl);
+            await s95.SendAsync(config.ApiPushValueUrl);
+            await sdt.SendAsync(config.ApiPushValueUrl);
+            await sg.SendAsync(config.ApiPushValueUrl);
+
+            var coordinates = Coordinates.Next;
+            var result = await Http.PostAsync(config.ApiPushCoordinatesUrl, new Dictionary<string, string>
+            {
+                { "d", "00023" },
+                { "lon", Math.Round(coordinates.lon, 7).ToString() },
+                { "lat", Math.Round(coordinates.lat, 7).ToString() }
+            });
         }
     }
 }
