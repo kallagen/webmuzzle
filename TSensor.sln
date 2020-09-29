@@ -19,6 +19,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{47DA983A-7
 		docs\Протокол_обмена_ИЗК_3_2018_бензин_2020.docx = docs\Протокол_обмена_ИЗК_3_2018_бензин_2020.docx
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "massdata", "massdata", "{4D98B074-1DF2-4589-96EE-99EEBAE443D2}"
+	ProjectSection(SolutionItems) = preProject
+		massdata\АЗС№8M_РГУС_№1_ульяновск_3_вариант.txt = massdata\АЗС№8M_РГУС_№1_ульяновск_3_вариант.txt
+		massdata\датчик.mes = massdata\датчик.mes
+		massdata\Измерения по каналу 1 СУ5д АЗС16.mes = massdata\Измерения по каналу 1 СУ5д АЗС16.mes
+		massdata\Измерения по каналу 2 СУ5д АЗС16.mes = massdata\Измерения по каналу 2 СУ5д АЗС16.mes
+		massdata\Измерения по каналу 2 УС-5 АЗС16.mes = massdata\Измерения по каналу 2 УС-5 АЗС16.mes
+		massdata\Калибровка_рез_10июнь2020.docx = massdata\Калибровка_рез_10июнь2020.docx
+		massdata\массомер.mes = massdata\массомер.mes
+		massdata\Ульяновск 9000.txt = massdata\Ульяновск 9000.txt
+		massdata\Ульяновск_газовоз_верт_36куб.txt = massdata\Ульяновск_газовоз_верт_36куб.txt
+		massdata\Ульяновск_газовоз_верт_36куб_после_слива_до_половины.txt = massdata\Ульяновск_газовоз_верт_36куб_после_слива_до_половины.txt
+		massdata\Якутск бенз 25 2760 2 емк.txt = massdata\Якутск бенз 25 2760 2 емк.txt
+		massdata\Якутск бенз 25 2760 3 емк.txt = massdata\Якутск бенз 25 2760 3 емк.txt
+		massdata\Якутск бенз 25 2760 4 емк.txt = massdata\Якутск бенз 25 2760 4 емк.txt
+		massdata\Якутск бенз 25 2770 5 емк.txt = massdata\Якутск бенз 25 2770 5 емк.txt
+		massdata\Якутск бенз 25 2780 1 емк.txt = massdata\Якутск бенз 25 2780 1 емк.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
