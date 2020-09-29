@@ -37,7 +37,6 @@
         top: 102px;
         bottom: 12px;
         width: calc(100% - 260px);
-        border: 1px solid #ccc;
     }
 
     .ol-popup {
@@ -78,11 +77,14 @@
 
     .ol-popup-header {
         margin-bottom: 4px;
-        font-weight: bold;
+        font-weight: 500;
     }
 
-    .ol-popup-content a {
+    .ol-popup a, .ol-popup a:hover {
         display: block;
+        color: #333;
+        text-decoration: none;
+        font-weight: 500;
     }
 </style>
 <div id="ol-map" class="ol-map"></div>
