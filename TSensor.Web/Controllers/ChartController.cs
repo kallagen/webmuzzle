@@ -35,6 +35,9 @@ namespace TSensor.Web.Controllers
             return Json(new { datasets });
         }
 
+        private const string CHART_COLOR_MAIN = "#244E6D";
+        private const string CHART_COLOR_SECOND = "#E57145";
+
         private IEnumerable<object> GetData(IEnumerable<Guid> tankGuidList,
             DateTime dateStart, DateTime dateEnd,
             string mainParam, string additionalParam)
@@ -69,8 +72,8 @@ namespace TSensor.Web.Controllers
                         .GroupBy(p => p.x)
                         .Select(p => new { x = p.Key, y = Math.Round(p.Average(v => (decimal)v.y), 3) })
                         .OrderBy(p => p.x),
-                    backgroundColor = dataset.Key.isSecond ? "#4BC0C0" : "#36A2EB",
-                    borderColor = dataset.Key.isSecond ? "#4BC0C0" : "#36A2EB",
+                    backgroundColor = dataset.Key.isSecond ? CHART_COLOR_SECOND : CHART_COLOR_MAIN,
+                    borderColor = dataset.Key.isSecond ? CHART_COLOR_SECOND : CHART_COLOR_MAIN,
                     yAxisID = dataset.Key.isSecond ? "y-axis-additional" : "y-axis-main",
                     cubicInterpolationMode = "monotone"
                 };
