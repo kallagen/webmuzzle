@@ -1,0 +1,12 @@
+scada
+Ваш логин: strebkov@tsensor.ru
+Ваш пароль: iuJNhjhF3
+
+tsensor.beget.tech
+tsensor_web
+Zaloopa2020
+
+raspberry
+109.167.253.104:4466
+pi
+raspberry

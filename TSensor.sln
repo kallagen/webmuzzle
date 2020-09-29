@@ -11,7 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TSensor.Proxy", "TSensor.Pr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TSensor.License", "TSensor.License\TSensor.License.csproj", "{D46A53C0-9C1B-4B43-8592-CE1EAC5357C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSensor.FakeSensor", "TSensor.FakeSensor\TSensor.FakeSensor.csproj", "{797DDBFF-2C3E-4578-99C4-224CDD09D2EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TSensor.FakeSensor", "TSensor.FakeSensor\TSensor.FakeSensor.csproj", "{797DDBFF-2C3E-4578-99C4-224CDD09D2EF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{47DA983A-76D6-49E1-924E-A142AAF415B3}"
+	ProjectSection(SolutionItems) = preProject
+		docs\pwd.txt = docs\pwd.txt
+		docs\Протокол_обмена_ИЗК_3_2018_бензин_2020.docx = docs\Протокол_обмена_ИЗК_3_2018_бензин_2020.docx
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
