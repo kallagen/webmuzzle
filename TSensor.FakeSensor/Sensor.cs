@@ -62,18 +62,44 @@ namespace TSensor.FakeSensor
         public decimal Weight =>
             Density * CurrentVol / 1000;
 
-        public void Do()
+        public void Do(DateTime? date = null)
         {
+            var _date = date ?? DateTime.Now;
+
+            var fuelCoef = 1M;
+            switch (Product)
+            {
+                case ProductType.DT: fuelCoef = 0.15M; break;
+                case ProductType.G95: fuelCoef = 0.92M; break;
+                case ProductType.Gas: fuelCoef = 0.07M; break;
+                default: break;
+            }
+            //7 - 9 slow
+            //9 - 20 fast
+            //20 - 23 slow
+            //23 - 7 very slow
+
+            var coef = 1.15M;
+            if ((_date.Hour >= 7 && _date.Hour <= 9) || (_date.Hour >= 20 && _date.Hour <= 23))
+            {
+                coef = 0.85M;
+            }
+            else if (_date.Hour >= 23 || _date.Hour < 7)
+            {
+                coef = 0.055M;
+            }
+
             if (State == State.TankDec)
             {
-                if (CurrentLevel >= 55)
+                var rand = new Random().Next(0, 30);
+                if (CurrentVol < MaxVol * rand / 100)
                 {
-                    var delta = new Random().Next(5, 50);
-                    CurrentVol -= delta * 0.001M;
+                    CurrentVol = MaxVol * new Random().Next(85, 95) / 100;
                 }
                 else
                 {
-                    CurrentVol = MaxVol * 0.95M;
+                    var delta = new Random().Next(0, 45);
+                    CurrentVol -= delta * 0.0003M * coef * fuelCoef;
                 }
             }
         }
@@ -82,12 +108,24 @@ namespace TSensor.FakeSensor
         {
             var pracel = GetPracel();
 
-            var debug = ActualSensorValue.TryParse(pracel);
+            //var debug = ActualSensorValue.TryParse(pracel);
 
             return await Http.PostAsync(url, new Dictionary<string, string>
             {
                 { "v", GetPracel() },
                 { "d", DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff") },
+                { "g", DevGuid }
+            });
+        }
+
+        public string Send(string url, DateTime date)
+        {
+            var pracel = GetPracel();
+
+            return Http.Post(url, new Dictionary<string, string>
+            {
+                { "v", GetPracel() },
+                { "d", date.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss.fff") },
                 { "g", DevGuid }
             });
         }
