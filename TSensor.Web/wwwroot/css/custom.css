@@ -126,6 +126,9 @@ span.form-control {
     float: left;
     width: 340px;
     padding: 0 15px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    margin-right: 15px;
+    margin-bottom: 15px;
 }
 
     .t-cell h5 {
@@ -188,7 +191,7 @@ span.form-control {
     height: 120px;
     overflow: hidden;
     background: #fff;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    /*box-shadow: 0 1px 1px rgba(0,0,0,0.1);*/
     border-radius: 2px;
     margin-bottom: 15px;
 }
@@ -372,12 +375,13 @@ i.menu-point {
 
 .apply-button {
     text-align: center;
-    background: #3C8DBC;
+    background: #E57145;
 }
 
 .sidebar-menu > li.apply-button a:hover {
-    background: #367FA9;
+    background-color: #244E6D;
     color: #fff;
+    transition: background-color 0.5s ease;
 }
 
 .sidebar-menu > li.apply-button > a {
@@ -454,7 +458,6 @@ i.menu-point {
 
     .title-button-container .btn {
         display: inline-block;
-        width: 80px;
     }
 
 /**/
@@ -480,4 +483,167 @@ i.menu-point {
 /**/
 .sidebar-menu.tree {
     overflow-x: hidden;
+}
+
+/*design like site*/
+
+.content-wrapper {
+    /*background: #E4EDF3 url('../img/content-background.png') repeat-y;*/
+    background: #fff;
+}
+
+body {
+    color: #244E6D;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.content-wrapper a, .content-wrapper a:hover {
+    color: #244E6D;
+    text-decoration: underline;
+}
+
+.main-header .logo {
+    box-sizing: border-box;
+    padding: 4px;
+    padding-bottom: 0;
+    overflow: hidden;
+}
+
+.logo-lg {
+    height: 41px;
+    background: #fff url('../img/logo_2.svg') center center no-repeat;
+    background-size: contain;
+}
+
+.sidebar-menu li.header, .skin-black-light .sidebar-menu > li.header {
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    background: #244E6D;
+    text-align: center;
+}
+
+.user-menu span {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.main-sidebar {
+    padding-top: 59px;
+}
+
+.treeview.menu-open, .treeview.menu-open:hover {
+    background: #E4EDF3;
+    transition: background-color 0.5s ease;
+    transition: background 0.5s ease;
+}
+
+h3 {
+    font-weight: 700;
+}
+
+
+.form-control, .form-control:active {
+    border-color: #244E6D;
+    font-weight: 500;
+    font-size: 13px;
+    color: #244E6D;
+}
+
+.btn-primary, .btn-primary:focus {
+    border: none;
+    padding: 8px 20px;
+    background: #E57145;
+    min-width: 90px;
+    outline: none;
+}
+
+    .btn-primary:hover, .btn-primary:active, .btn-primary:checked,
+    .btn:hover, .btn:active, .btn:checked {
+        border: none;
+        background: #244E6D;
+        color: #fff;
+        transition: background-color 0.5s ease;
+        transition: background 0.5s ease;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+
+    .btn, .btn:hover {
+        border: 0;
+        border-radius: 0;
+        padding: 8px 20px;
+        /*padding: 8px 20px;*/
+    }
+
+    .box-footer {
+        border-top: none;
+    }
+
+    .box {
+        box-shadow: none;
+        border: none;
+    }
+
+    a.btn, a.btn:hover {
+        text-decoration: none;
+    }
+
+.table-hover tbody tr:hover {
+    background: #E4EDF3;
+}
+
+.t-cell h5 a:hover, .t-cell h5 a {
+    color: #333;
+    font-weight: 500;
+}
+
+
+    .btn-block {
+        width:auto;
+    }
+
+.bg-red, .btn-default {
+    background: #fff !important;
+    color: #244E6D !important;
+    border: 1px solid #004767 !important;
+    line-height: 18px;
+}
+
+    .bg-red:hover, .btn-default:hover {
+        color: #fff !important;
+        background: #244E6D !important;
+    }
+
+.bg-aqua, .callout.callout-info, .alert-info, .label-info, .modal-info .modal-body {
+    background: #244E6D !important;
+}
+
+.btn.bg-blue {
+    background: #E57145 !important;
+    border: 0 !important;
+    color: #fff !important;
+    padding: 8px 20px !important;
+    line-height: 20px;
+}
+
+    .btn.bg-blue:hover {
+        background: #244E6D !important;
+    }
+
+.user-search-form {
+    border: solid 1px #244E6D;
+    margin-bottom: 15px;
+}
+
+.t-info a {
+    text-decoration: none;
+}
+
+
+.callout {
+    border: 0;
+    border-radius: 0;
 }
