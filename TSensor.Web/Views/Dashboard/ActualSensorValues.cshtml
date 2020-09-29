@@ -19,7 +19,7 @@
                             @Html.Hidden("valueList[]", (Guid)item, new { id = $"add-favorite-item-{item}" })
                         }
                     </div>
-                    <div class="col-md-6"><button type="submit" class="btn bg-blue btn-block inline-header-button">Добавить в избранное</button></div>
+                    <div class="col-md-6"><button type="submit" class="btn bg-blue btn-block inline-header-button pull-right">Добавить в избранное</button></div>
                 </div>
             }
         }
@@ -35,7 +35,7 @@
                             @Html.Hidden("valueList[]", (Guid)item, new { id = $"remove-favorite-item-{item}" })
                         }
                     </div>
-                    <div class="col-md-6"><button type="submit" class="btn bg-red btn-block inline-header-button">Убрать из избранного</button></div>
+                    <div class="col-md-6"><button type="submit" class="btn bg-red btn-block inline-header-button pull-right">Убрать из избранного</button></div>
                 </div>
             }
         }

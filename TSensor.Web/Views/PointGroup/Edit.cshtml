@@ -50,7 +50,7 @@
                         @Html.DropDownList("pointGuid", new SelectList(Model.AvailablePointList.OrderBy(p => p.Name), "PointGuid", "Name"), new { @class = "form-control inline-header-button" })
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn bg-blue btn-block inline-header-button">Добавить объект</button>
+                        <button type="submit" class="btn bg-blue btn-block inline-header-button pull-right">Добавить объект</button>
                     </div>
                 }
             }
@@ -110,7 +110,7 @@
                         @Html.DropDownList("userGuid", new SelectList(Model.AvailableUserList.OrderBy(p => p.Name), "UserGuid", "Name"), new { @class = "form-control inline-header-button" })
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn bg-blue btn-block inline-header-button">Добавить оператора</button>
+                        <button type="submit" class="btn bg-blue btn-block inline-header-button pull-right">Добавить оператора</button>
                     </div>
                 }
             }

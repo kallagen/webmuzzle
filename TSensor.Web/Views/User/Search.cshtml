@@ -6,11 +6,11 @@
 
 @section AdditionalHeader
 {
-    @Html.ActionLink("Создать нового пользователя", "Create", "User", null, new { @class = "btn bg-blue btn-block" })
+    @Html.ActionLink("Создать нового пользователя", "Create", "User", null, new { @class = "btn bg-blue btn-block pull-right" })
 }
 <div class="row">
     <div class="col-md-3">
-        @using (Html.BeginForm("Search", "User", FormMethod.Post, new { autocomplete = "off" }))
+        @using (Html.BeginForm("Search", "User", FormMethod.Post, new { autocomplete = "off", @class = "user-search-form" }))
         {
             <div class="box box-solid">
                 <div class="box-body">
@@ -47,7 +47,7 @@
                                 }
                                 <th>Логин</th>
                                 <th>Фамилия</th>
-                                <th>Имя</th>                                
+                                <th>Имя</th>
                                 <th>Отчество</th>
                                 <th>Группа</th>
                                 <th>Примечание</th>
@@ -56,23 +56,23 @@
                         <tbody>
                             @foreach (var item in Model.Data.OrderBy(p => p.Name, new AlphanumComparer()))
                             {
-                            <tr @if (item.IsInactive) { <text> class="text-muted" </text> }>
-                                @if (Model.HasInactiveRecord)
-                                {
-                                    <td>
-                                        @if (item.IsInactive)
-                                        {
-                                            <span class="badge">заблокирован</span>
-                                        }
-                                    </td>
-                                }
-                                <td>@Html.ActionLink(item.Login, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
-                                <td>@Html.ActionLink(item.LastName, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
-                                <td>@Html.ActionLink(item.FirstName, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
-                                <td>@Html.ActionLink(item.Patronymic ?? string.Empty, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
-                                <td>@Model.GetRoleName(item.Role)</td>
-                                <td>@item.Description</td>
-                            </tr>
+                                <tr @if (item.IsInactive) { <text> class="text-muted" </text> }>
+                                    @if (Model.HasInactiveRecord)
+                                    {
+                                        <td>
+                                            @if (item.IsInactive)
+                                            {
+                                                <span class="badge">заблокирован</span>
+                                            }
+                                        </td>
+                                    }
+                                    <td>@Html.ActionLink(item.Login, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                    <td>@Html.ActionLink(item.LastName, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                    <td>@Html.ActionLink(item.FirstName, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                    <td>@Html.ActionLink(item.Patronymic ?? string.Empty, "Edit", "User", new { userGuid = item.UserGuid }, null)</td>
+                                    <td>@Model.GetRoleName(item.Role)</td>
+                                    <td>@item.Description</td>
+                                </tr>
                             }
                         </tbody>
                     </table>
