@@ -39,16 +39,19 @@
 <body class="hold-transition skin-black-light sidebar-mini">
     <div class="wrapper">
         <header class="main-header">
-            <a href="@Url.Action("Index", "Dashboard")" class="logo">
+            <a href="@Url.Action("Map", "Dashboard")" class="logo">
                 <span class="logo-mini">УЧЕТ <b>СУ5Д</b></span>
                 <span class="logo-lg"></span>
             </a>
             <nav class="navbar navbar-static-top">
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">Меню</span>
+                </a>
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
                         <li class="dropdown user user-menu">
                             <a class="dropdown-toggle">
-                                <span class="hidden-xs">@User.Identity.Name</span>
+                                <span>@User.Identity.Name</span>
                             </a>
                         </li>
                         @if (!isEmbedded)
