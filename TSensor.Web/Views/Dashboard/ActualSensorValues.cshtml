@@ -9,7 +9,7 @@
     {
         @if (Model.Favorite == null)
         {
-            @using (Html.BeginForm("AddFavorite", "Dashboard", FormMethod.Post, new { @class = "form-horizontal page-header-form", autocomplete = "off" }))
+            @using (Html.BeginForm("AddFavorite", "Dashboard", FormMethod.Post, new { @class = "form-horizontal page-header-form favorite-add-block", autocomplete = "off" }))
             {
                 <div class="row">
                     <div class="col-md-6">
@@ -25,7 +25,7 @@
         }
         else
         {
-            @using (Html.BeginForm("RemoveFavorite", "Dashboard", FormMethod.Post, new { @class = "form-horizontal page-header-form", autocomplete = "off" }))
+            @using (Html.BeginForm("RemoveFavorite", "Dashboard", FormMethod.Post, new { @class = "form-horizontal page-header-form favorite-remove-block", autocomplete = "off" }))
             {
                 <div class="row">
                     <div class="col-md-6">
@@ -42,9 +42,9 @@
     }
     @section TitleButtons
     {
-        @using (Html.BeginForm("Index", "Chart", FormMethod.Post, new { @class = "title-button-container", autocomplete = "off" }))
+        @using (Html.BeginForm("Index", "Chart", FormMethod.Post, new { @class = "title-button-container chart-block", autocomplete = "off" }))
         {
-            foreach(var tankGuid in Model.ActualSensorValueList.Select(p => p.TankGuid))
+            foreach (var tankGuid in Model.ActualSensorValueList.Select(p => p.TankGuid))
             {
                 @Html.Hidden("TankGuidList[]", tankGuid, new { id = $"guidList{tankGuid}" })
             }
@@ -66,6 +66,10 @@
             weight = t.LiquidEnvironmentLevel,
             isGas = t.IsGas
         });
+
+    <div class="callout callout-warning chart-mobile-warning">
+        <p>Графики недоступны в мобильной версии</p>
+    </div>
 
     <div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">
         <h4>Внимание!</h4>
