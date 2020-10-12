@@ -23,14 +23,14 @@
                     <div class="form-group">
                         <span class="@Html.ValidState("LastName")"><label for="LastName" class="col-sm-3 control-label">Фамилия</label></span>
                         <div class="col-sm-9 inline-form-container">
-                            <span class="@Html.ValidState("LastName")">
+                            <span class="name-block @Html.ValidState("LastName")">
                                 @Html.TextBoxFor(m => m.LastName, new { @class = "form-control input-inline" })
                             </span>
-                            <span class="@Html.ValidState("FirstName")">
+                            <span class="name-block @Html.ValidState("FirstName")">
                                 <label for="FirstName" class="control-label">Имя</label>
                                 @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control input-inline" })
                             </span>
-                            <span class="@Html.ValidState("Patronymic")">
+                            <span class="name-block @Html.ValidState("Patronymic")">
                                 <label for="Patronymic" class="control-label">Отчество</label>
                                 @Html.TextBoxFor(m => m.Patronymic, new { @class = "form-control input-inline" })
                             </span>
