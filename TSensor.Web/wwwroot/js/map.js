@@ -42,7 +42,15 @@
         }
     };
 
+    that.fitMobile = function (e) {
+        if (window.screen.width < 768) {
+            document.querySelector('.ol-map').style.height = (window.screen.height - 170) + 'px';
+        }
+    };
+
     that.init = function (e) {
+        that.fitMobile();
+
         var _features = e.features.map(function (i) {
             return new ol.Feature({
                 geometry: new ol.geom.Point(
