@@ -9,4 +9,9 @@ Zaloopa2020
 raspberry
 109.167.253.104:4466
 pi
-raspberry
+tsensor
+
+BoatVM
+109.167.253.104:999
+kallagen
+Zaloopa17
