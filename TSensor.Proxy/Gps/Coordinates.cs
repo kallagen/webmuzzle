@@ -19,16 +19,20 @@ namespace TSensor.Proxy.Gps
                 {
                     var lat1 = double.Parse(matches.Groups[1].Value);
                     var lat2 = double.Parse(matches.Groups[2].Value);
-                    var lat3 = double.Parse(matches.Groups[3].Value.Substring(0, 2));
+
+                    var latSecVal = matches.Groups[3].Value;
+                    var lat3 = double.Parse(latSecVal) / Math.Pow(10, latSecVal.Length);
 
                     var lon1 = double.Parse(matches.Groups[4].Value);
                     var lon2 = double.Parse(matches.Groups[5].Value);
-                    var lon3 = double.Parse(matches.Groups[6].Value.Substring(0, 2));
+
+                    var lonSecVal = matches.Groups[6].Value;
+                    var lon3 = double.Parse(lonSecVal) / Math.Pow(10, lonSecVal.Length);
 
                     return new Coordinates
                     {
-                        Longitude = Math.Round(lon1 + lon2 / 60 + lon3 / 3600, 6),
-                        Latitude = Math.Round(lat1 + lat2 / 60 + lat3 / 3600, 6)
+                        Longitude = Math.Round(lon1 + lon2 / 60 + 60 * lon3 / 3600, 6),
+                        Latitude = Math.Round(lat1 + lat2 / 60 + 60 * lat3 / 3600, 6)
                     };
                 }
             }
