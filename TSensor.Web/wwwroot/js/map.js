@@ -89,7 +89,13 @@
             var extent = layerDataSource.getExtent();
             _view.fit(extent, _map.getSize());
 
-            _view.setZoom(_view.getZoom() - 0.25);
+            var zoom = _view.getZoom();
+            if (zoom > 16) {
+                zoom = 16;
+            } else {
+                zoom -= 0.25;
+            }
+            _view.setZoom(zoom);
         }
 
         var _select = new ol.interaction.Select({
