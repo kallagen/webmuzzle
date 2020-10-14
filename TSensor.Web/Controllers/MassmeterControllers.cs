@@ -182,7 +182,7 @@ namespace TSensor.Web.Controllers
             }
             else
             {
-                if (_tankRepository.Remove(PointRepository.MASSMETER_POINT_GUID, _massmeterGuid))
+                if (_tankRepository.Remove(_massmeterGuid, PointRepository.MASSMETER_POINT_GUID))
                 {
                     TempData["Massmeter.List.SuccessMessage"] = "Объект удален";
                 }
