@@ -1,10 +1,12 @@
-﻿var Map = function () {
+﻿var Map = function (options) {
     var that = this;
+
+    that.options = options;
 
     that.featureStyle = new ol.style.Style({
         image: new ol.style.Icon({
-            anchor: [0.52, 1],
-            src: '/img/feature.png'
+            anchor: [0.5, 1],
+            src: that.options.PushpinImage
         })
     });
 
@@ -67,7 +69,8 @@
 
         var _view = new ol.View({
             center: ol.proj.fromLonLat([e.options.defaultLon, e.options.defaultLat]),
-            zoom: 10
+            zoom: 10,
+            maxZoom: that.options.MaxZoom
         });
 
         var _map = new ol.Map({
@@ -89,12 +92,7 @@
             var extent = layerDataSource.getExtent();
             _view.fit(extent, _map.getSize());
 
-            var zoom = _view.getZoom();
-            if (zoom > 16) {
-                zoom = 16;
-            } else {
-                zoom -= 0.25;
-            }
+            var zoom = _view.getZoom() - 0.25;
             _view.setZoom(zoom);
         }
 
