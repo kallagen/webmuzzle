@@ -31,6 +31,8 @@ namespace TSensor.Web.ViewModels.Point
         public decimal DefaultLongitude { get; set; }
         public decimal DefaultLatitude { get; set; }        
 
+        public Models.Entity.MapSettings MapSettings { get; set; }
+
         public IEnumerable<Models.Entity.User> UserList { get; set; }
         public bool HasUser =>
             UserList?.Any() == true;

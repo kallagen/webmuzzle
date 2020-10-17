@@ -8,5 +8,7 @@ namespace TSensor.Web.ViewModels.Dashboard
 
         public decimal? DefaultLon { get; set; }
         public decimal? DefaultLat { get; set; }
+
+        public Models.Entity.MapSettings Settings { get; set; }
     }
 }

@@ -18,6 +18,7 @@ namespace TSensor.Web.Controllers
     {
         private readonly IPointRepository _pointRepository;
         private readonly IFavoriteRepository _favoriteRepository;
+        private readonly IMapSettingsRepository _mapSettingsRepository;
         private readonly AuthService _authService;
         private readonly LicenseManager _licenseManager;
 
@@ -25,10 +26,12 @@ namespace TSensor.Web.Controllers
         private readonly decimal mapPointDefaultLocationLatitude = 0;
 
         public DashboardController(IPointRepository pointRepository, IFavoriteRepository favoriteRepository,
+            IMapSettingsRepository mapSettingsRepository,
             AuthService authService, LicenseManager licenseManager, IConfiguration configuration)
         {
             _pointRepository = pointRepository;
             _favoriteRepository = favoriteRepository;
+            _mapSettingsRepository = mapSettingsRepository;
             _authService = authService;
             _licenseManager = licenseManager;
 
@@ -200,7 +203,9 @@ namespace TSensor.Web.Controllers
                 DefaultLat = mapPointDefaultLocationLatitude,
 
                 Features = _pointRepository.GetUserPointList(
-                    HttpContext.User.IsInRole("ADMIN") ? null as Guid? : _authService.CurrentUserGuid)
+                    HttpContext.User.IsInRole("ADMIN") ? null as Guid? : _authService.CurrentUserGuid),
+
+                Settings = _mapSettingsRepository.GetSettings()
             };
             return View(viewModel);
         }

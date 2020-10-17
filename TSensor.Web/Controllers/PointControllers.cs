@@ -16,16 +16,18 @@ namespace TSensor.Web.Controllers
         private readonly IPointRepository _pointRepository;
         private readonly ITankRepository _tankRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IMapSettingsRepository _mapSettingsRepository;
 
         private readonly decimal mapPointDefaultLocationLongitude = 0;
         private readonly decimal mapPointDefaultLocationLatitude = 0;
 
         public PointController(IPointRepository pointRepository, ITankRepository tankRepository,
-            IUserRepository userRepository, IConfiguration configuration)
+            IUserRepository userRepository, IMapSettingsRepository mapSettingsRepository, IConfiguration configuration)
         {
             _pointRepository = pointRepository;
             _tankRepository = tankRepository;
             _userRepository = userRepository;
+            _mapSettingsRepository = mapSettingsRepository;
 
             var coordinates = configuration.GetSection("defaultPointPosition").Get<IEnumerable<decimal>>().ToArray();
             if (coordinates?.Length == 2)
@@ -68,6 +70,7 @@ namespace TSensor.Web.Controllers
                 DefaultLatitude = mapPointDefaultLocationLatitude
             };
 
+            viewModel.MapSettings = _mapSettingsRepository.GetSettings();
             return View(viewModel);
         }
 
@@ -105,6 +108,7 @@ namespace TSensor.Web.Controllers
                 }
             }
 
+            viewModel.MapSettings = _mapSettingsRepository.GetSettings();
             return View(viewModel);
         }
 
@@ -130,11 +134,13 @@ namespace TSensor.Web.Controllers
                         Latitude = point.Latitude?.ToString(),
 
                         DefaultLongitude = mapPointDefaultLocationLongitude,
-                        DefaultLatitude = mapPointDefaultLocationLatitude,                        
+                        DefaultLatitude = mapPointDefaultLocationLatitude,
 
                         Data = _tankRepository.GetListByPoint(point.PointGuid),
                         UserList = point.UserList,
-                        AvailableUserList = point.AvailableUserList                        
+                        AvailableUserList = point.AvailableUserList,
+
+                        MapSettings = _mapSettingsRepository.GetSettings()
                     };
 
                     var successMessage = TempData["Point.Edit.SuccessMessage"] as string;
@@ -200,6 +206,7 @@ namespace TSensor.Web.Controllers
                 viewModel.Data = _tankRepository.GetListByPoint(viewModel.PointGuid);
                 viewModel.UserList = point.UserList;                
                 viewModel.AvailableUserList = point.AvailableUserList;
+                viewModel.MapSettings = _mapSettingsRepository.GetSettings();
                 return View(viewModel);
             }
             else
