@@ -26,6 +26,8 @@ namespace TSensor.Web.Controllers
             var viewModel = new MapSettingsEditViewModel
             {
                 MaxZoom = entity.MaxZoom,
+                DefaultLongitude = entity.DefaultLongitude,
+                DefaultLatitude = entity.DefaultLatitude,
                 PushpinImage = entity.PushpinImage
             };
 
@@ -55,7 +57,8 @@ namespace TSensor.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                var result = _repository.SaveSettings(viewModel.MaxZoom);
+                var result = _repository.SaveSettings(viewModel.MaxZoom, 
+                    viewModel.DefaultLongitude, viewModel.DefaultLatitude);
                 if (result)
                 {
                     TempData["MapSettings.Edit.SuccessMessage"] =
