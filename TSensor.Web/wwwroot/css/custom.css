@@ -511,7 +511,7 @@ body {
 
 .logo-lg {
     height: 41px;
-    background: #fff url('../img/logo_2.svg') center center no-repeat;
+    background: #fff url('../img/logo.png') center center no-repeat;
     background-size: contain;
 }
 
