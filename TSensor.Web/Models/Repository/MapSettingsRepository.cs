@@ -8,16 +8,22 @@ namespace TSensor.Web.Models.Repository
         public MapSettings GetSettings()
         {
             return QueryFirst<MapSettings>(@"
-                SELECT TOP 1 MaxZoom, PushpinImage FROM MapSettings");
+                SELECT TOP 1 
+                    MaxZoom, PushpinImage,
+                    DefaultLongitude, DefaultLatitude
+                FROM MapSettings");
         }
 
-        public bool SaveSettings(int maxZoom)
+        public bool SaveSettings(int maxZoom, 
+            decimal defaultLongitude, decimal defaultLatitude)
         {
             return QueryFirst<int?>(@"
                 UPDATE MapSettings SET
-                    MaxZoom = @maxZoom
+                    MaxZoom = @maxZoom,
+                    DefaultLongitude = @defaultLongitude,
+                    DefaultLatitude = @defaultLatitude
 
-                SELECT @@ROWCOUNT", new { maxZoom }) > 0;
+                SELECT @@ROWCOUNT", new { maxZoom, defaultLongitude, defaultLatitude }) > 0;
         }
 
         public bool UploadPushpinImage(string image)

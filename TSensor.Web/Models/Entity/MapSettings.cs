@@ -4,5 +4,8 @@
     {
         public int MaxZoom { get; set; }
         public string PushpinImage { get; set; }
+
+        public decimal DefaultLongitude { get; set; }
+        public decimal DefaultLatitude { get; set; }
     }
 }
