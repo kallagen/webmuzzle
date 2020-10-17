@@ -50,10 +50,10 @@
         }
     };
 
-    that.init = function (e) {
+    that.init = function (features) {
         that.fitMobile();
 
-        var _features = e.features.map(function (i) {
+        var _features = features.map(function (i) {
             return new ol.Feature({
                 geometry: new ol.geom.Point(
                     ol.proj.transform([i.lon, i.lat], 'EPSG:4326', 'EPSG:3857')
@@ -68,7 +68,7 @@
         var layerDataSource = new ol.source.Vector({ features: _features });
 
         var _view = new ol.View({
-            center: ol.proj.fromLonLat([e.options.defaultLon, e.options.defaultLat]),
+            center: ol.proj.fromLonLat([that.options.DefaultLongitude, that.options.DefaultLatitude]),
             zoom: 10,
             maxZoom: that.options.MaxZoom
         });
@@ -129,7 +129,7 @@
         });        
     };
 
-    that.initPointSelect = function (options, controls) {
+    that.initPointSelect = function (data, controls) {
         var disableChangeEvent = false;
 
         var setCoordinates = function (lonlat) {
@@ -181,16 +181,16 @@
 
         var center, point;
 
-        if (options.lon && options.lat) {
+        if (data.lon && data.lat) {
             point = new ol.Feature(
                 new ol.geom.Point(
-                    ol.proj.transform([options.lon, options.lat], 'EPSG:4326', 'EPSG:3857')
+                    ol.proj.transform([data.lon, data.lat], 'EPSG:4326', 'EPSG:3857')
                 ));
             layerDataSource.addFeature(point);
 
-            center = [options.lon, options.lat];
+            center = [data.lon, data.lat];
         } else {
-            center = [options.defaultLon, options.defaultLat];
+            center = [that.options.DefaultLongitude, that.options.DefaultLatitude];
         }
 
         var _view = new ol.View({

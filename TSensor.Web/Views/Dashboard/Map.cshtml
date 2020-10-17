@@ -3,34 +3,25 @@
 @{
     ViewBag.Title = "Карта объектов";
 
-    var comparer = new AlphanumComparer();
-
-    var featureJson = JsonSerializer.Serialize(
-        new
-        {
-            options = new
-            {
-                defaultLon = Model.DefaultLon,
-                defaultLat = Model.DefaultLat
-            },
-            features = Model?.Features?
-                .Where(p => p.Longitude.HasValue && p.Latitude.HasValue)
-                .Select(p => new
-                {
-                    name = p.Name,
-                    lon = p.Longitude,
-                    lat = p.Latitude,
-                    url = Url.Action("PointDetails", "Dashboard", new { guid = p.PointGuid }),
-                    guid = p.PointGuid,
-                    tankList = p.TankList.Select(t => new
-                    {
-                        name = string.Join(" ", new[] { t.Name, t.ProductName }),
-                        url = Url.Action("Details", "Tank", new { guid = t.TankGuid })
-                    }).OrderBy(t => t.name, comparer)
-                })
-        });
-
     var mapSettings = JsonSerializer.Serialize(Model.Settings);
+
+    var comparer = new AlphanumComparer();
+    var featureJson = JsonSerializer.Serialize(
+        Model?.Features?
+            .Where(p => p.Longitude.HasValue && p.Latitude.HasValue)
+            .Select(p => new
+            {
+                name = p.Name,
+                lon = p.Longitude,
+                lat = p.Latitude,
+                url = Url.Action("PointDetails", "Dashboard", new { guid = p.PointGuid }),
+                guid = p.PointGuid,
+                tankList = p.TankList.Select(t => new
+                {
+                    name = string.Join(" ", new[] { t.Name, t.ProductName }),
+                    url = Url.Action("Details", "Tank", new { guid = t.TankGuid })
+                }).OrderBy(t => t.name, comparer)
+            }));
 }
 
 <link rel="stylesheet" href="~/css/map.css" />

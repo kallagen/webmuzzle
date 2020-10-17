@@ -3,16 +3,14 @@
     ViewBag.Title = "Создание нового объекта";
 
     var mapSettings = string.Empty;
-    var mapOptions = string.Empty;
+    var mapData = string.Empty;
     if (Model != null)
     {
-        mapOptions = JsonSerializer.Serialize(
+        mapData = JsonSerializer.Serialize(
             new
             {
-                defaultLon = Model.DefaultLongitude,
-                defaultLat = Model.DefaultLatitude,
                 lon = Model.LongitudeParsed,
-                lat = Model.LatitudeParsed,
+                lat = Model.LatitudeParsed
             });
         mapSettings = JsonSerializer.Serialize(Model.MapSettings);
     }
@@ -28,9 +26,6 @@
         <div class="box">
             @using (Html.BeginForm("Create", "Point", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
             {
-                @Html.HiddenFor(m => m.DefaultLongitude)
-                @Html.HiddenFor(m => m.DefaultLatitude)
-
                 <div class="box-body">
                     <div class="form-group @Html.ValidState("Name")">
                         <label for="Name" class="col-sm-3 control-label">Название</label>
@@ -96,7 +91,7 @@
                         var lonInput = document.querySelector('#Longitude');
                         var latInput = document.querySelector('#Latitude');
 
-                        map.initPointSelect(@Html.Raw(mapOptions), { lon: lonInput, lat: latInput });
+                        map.initPointSelect(@Html.Raw(mapData), { lon: lonInput, lat: latInput });
                     </script>
                 </div>
                 <div class="box-footer">
