@@ -16,6 +16,20 @@
                             @Html.ValidationMessageFor(m => m.MaxZoom, null, new { @class = "help-block" })
                         </div>
                     </div>
+                    <div class="form-group @Html.ValidState("DefaultLongitude")">
+                        <label for="DefaultLongitude" class="col-sm-3 control-label">Долгота по умолчанию</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.DefaultLongitude, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.DefaultLongitude, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group @Html.ValidState("DefaultLatitude")">
+                        <label for="DefaultLatitude" class="col-sm-3 control-label">Широта по умолчанию</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.DefaultLatitude, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.DefaultLatitude, null, new { @class = "help-block" })
+                        </div>
+                    </div>
                 </div>
                 <div class="box-footer">
                     <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
