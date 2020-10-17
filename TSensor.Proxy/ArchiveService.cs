@@ -130,12 +130,12 @@ namespace TSensor.Proxy
                     {
                         using var elapsed = Elapsed.Create;
 
-                        var result = await Http.Http.PostAsync(_config.ApiUrlSendArchive,
+                        var result = await Http.Http.PostFileAsync(_config.ApiUrlSendArchive,
                             new Dictionary<string, string>
                             {
-                                { "d", _config.DeviceGuid },
-                                { "a", await File.ReadAllTextAsync(archive) }
-                            });
+                                { "d", _config.DeviceGuid }
+                            },
+                            new FileStream(archive, FileMode.Open));
 
                         if (result.Exception != null)
                         {
