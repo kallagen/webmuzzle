@@ -60,6 +60,8 @@ namespace TSensor.Web
             services.AddScoped<IPointGroupRepository, PointGroupRepository>(p => new PointGroupRepository(connectionString));
             services.AddScoped<IProductRepository, ProductRepository>(p => new ProductRepository(connectionString));
             services.AddScoped<IFavoriteRepository, FavoriteRepository>(p => new FavoriteRepository(connectionString));
+            services.AddScoped<IMapSettingsRepository, MapSettingsRepository>(p => new MapSettingsRepository(connectionString));
+
             services.AddSingleton<ILicenseRepository, LicenseRepository>(p => new LicenseRepository(connectionString));
             services.AddSingleton<IOLAPRepository, OLAPRepository>(p => new OLAPRepository(connectionString));
 
