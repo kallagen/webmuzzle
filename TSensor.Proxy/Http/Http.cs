@@ -12,24 +12,6 @@ namespace TSensor.Proxy.Http
 {
     public static class Http
     {
-        private static readonly object Locker = new object();
-
-        private static bool isConnectionError = true;
-        public static bool IsConnectionError
-        {
-            get
-            {
-                return isConnectionError;
-            }
-            set
-            {
-                lock (Locker)
-                {
-                    isConnectionError = value;
-                }
-            }
-        }
-
         public static async Task<HttpResult> PostAsync(string url, Dictionary<string, string> param)
         {
             HttpWebRequest request;
@@ -55,12 +37,6 @@ namespace TSensor.Proxy.Http
                 }
 
                 response = await request.GetResponseAsync() as HttpWebResponse;
-
-                if (IsConnectionError)
-                {
-                    IsConnectionError = false;
-                }
-
                 using var reader = new StreamReader(response.GetResponseStream());
 
                 return new HttpResult
@@ -70,11 +46,6 @@ namespace TSensor.Proxy.Http
             }
             catch (Exception ex)
             {
-                if (!isConnectionError)
-                {
-                    IsConnectionError = true;
-                }
-
                 return new HttpResult
                 {
                     Exception = ex
@@ -89,14 +60,13 @@ namespace TSensor.Proxy.Http
 
         public static async Task<HttpResult> PostFileAsync(string url, Dictionary<string, string> param, Stream fileStream = null)
         {
-            HttpClient client;
-            HttpResponseMessage response;
-
             try
             {
-                client = new HttpClient();
-                client.Timeout = new TimeSpan(0, 5, 0);
-                
+                using var client = new HttpClient
+                {
+                    Timeout = new TimeSpan(0, 5, 0)
+                };
+
                 var form = new MultipartFormDataContent();
                 if (param?.Any() == true)
                 {
@@ -118,13 +88,7 @@ namespace TSensor.Proxy.Http
                     form.Add(fileContent);
                 }
 
-                response = await client.PostAsync(url, form);
-
-                if (IsConnectionError)
-                {
-                    IsConnectionError = false;
-                }
-
+                using var response = await client.PostAsync(url, form);
                 return new HttpResult
                 {
                     Content = await response.Content.ReadAsStringAsync()
@@ -132,21 +96,11 @@ namespace TSensor.Proxy.Http
             }
             catch (Exception ex)
             {
-                if (!isConnectionError)
-                {
-                    IsConnectionError = true;
-                }
-
                 return new HttpResult
                 {
                     Exception = ex
                 };
-            }
-            finally
-            {
-                client = null;
-                response = null;
-            }            
+            }          
         }
     }
 }

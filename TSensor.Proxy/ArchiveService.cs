@@ -112,13 +112,6 @@ namespace TSensor.Proxy
 
         private async Task SendAsync()
         {
-            if (Http.Http.IsConnectionError)
-            {
-                _logger.Log("last data sending return connection error, ignore archive sending");
-
-                return;
-            }
-
             FinishCurrentArchive(forceMove: true);
 
             try
