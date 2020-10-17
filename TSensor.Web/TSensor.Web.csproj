@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="docs\updatescripts\" />
     <Folder Include="Models\Services\Security\" />
     <Folder Include="ViewModels\Auth\" />
     <Folder Include="ViewModels\Api\" />
