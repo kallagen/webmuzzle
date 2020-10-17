@@ -99,10 +99,12 @@ namespace TSensor.Web.Controllers
 
         [Route("sensorvalue/archive/push")]
         [HttpPost]
-        public async Task<IActionResult> PushArchivedSensorValues(string d, string a)
+        public async Task<IActionResult> PushArchivedSensorValues(string d, IFormFile file)
         {
-            var value = a;
             var deviceGuid = d;
+
+            using var reader = new StreamReader(file.OpenReadStream());
+            var value = reader.ReadToEnd() ?? string.Empty;
 
             if (string.IsNullOrWhiteSpace(deviceGuid))
             {
