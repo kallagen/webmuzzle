@@ -22,9 +22,6 @@ namespace TSensor.Web.Controllers
         private readonly AuthService _authService;
         private readonly LicenseManager _licenseManager;
 
-        private readonly decimal mapPointDefaultLocationLongitude = 0;
-        private readonly decimal mapPointDefaultLocationLatitude = 0;
-
         public DashboardController(IPointRepository pointRepository, IFavoriteRepository favoriteRepository,
             IMapSettingsRepository mapSettingsRepository,
             AuthService authService, LicenseManager licenseManager, IConfiguration configuration)
@@ -34,13 +31,6 @@ namespace TSensor.Web.Controllers
             _mapSettingsRepository = mapSettingsRepository;
             _authService = authService;
             _licenseManager = licenseManager;
-
-            var coordinates = configuration.GetSection("defaultPointPosition").Get<IEnumerable<decimal>>().ToArray();
-            if (coordinates?.Length == 2)
-            {
-                mapPointDefaultLocationLongitude = coordinates[0];
-                mapPointDefaultLocationLatitude = coordinates[1];
-            }
         }
 
         private IActionResult ActualSensorValues(IEnumerable<Guid> guidList, Favorite favorite = null,
@@ -199,9 +189,6 @@ namespace TSensor.Web.Controllers
         {
             var viewModel = new MapViewModel
             {
-                DefaultLon = mapPointDefaultLocationLongitude,
-                DefaultLat = mapPointDefaultLocationLatitude,
-
                 Features = _pointRepository.GetUserPointList(
                     HttpContext.User.IsInRole("ADMIN") ? null as Guid? : _authService.CurrentUserGuid),
 

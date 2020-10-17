@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.ViewModels;
@@ -18,9 +16,6 @@ namespace TSensor.Web.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IMapSettingsRepository _mapSettingsRepository;
 
-        private readonly decimal mapPointDefaultLocationLongitude = 0;
-        private readonly decimal mapPointDefaultLocationLatitude = 0;
-
         public PointController(IPointRepository pointRepository, ITankRepository tankRepository,
             IUserRepository userRepository, IMapSettingsRepository mapSettingsRepository, IConfiguration configuration)
         {
@@ -28,13 +23,6 @@ namespace TSensor.Web.Controllers
             _tankRepository = tankRepository;
             _userRepository = userRepository;
             _mapSettingsRepository = mapSettingsRepository;
-
-            var coordinates = configuration.GetSection("defaultPointPosition").Get<IEnumerable<decimal>>().ToArray();
-            if (coordinates?.Length == 2)
-            {
-                mapPointDefaultLocationLongitude = coordinates[0];
-                mapPointDefaultLocationLatitude = coordinates[1];
-            }
         }
 
         [Authorize(Policy = "Admin")]
@@ -66,11 +54,8 @@ namespace TSensor.Web.Controllers
         {
             var viewModel = new PointCreateEditViewModel
             {
-                DefaultLongitude = mapPointDefaultLocationLongitude,
-                DefaultLatitude = mapPointDefaultLocationLatitude
+                MapSettings = _mapSettingsRepository.GetSettings()
             };
-
-            viewModel.MapSettings = _mapSettingsRepository.GetSettings();
             return View(viewModel);
         }
 
@@ -132,9 +117,6 @@ namespace TSensor.Web.Controllers
 
                         Longitude = point.Longitude?.ToString(),
                         Latitude = point.Latitude?.ToString(),
-
-                        DefaultLongitude = mapPointDefaultLocationLongitude,
-                        DefaultLatitude = mapPointDefaultLocationLatitude,
 
                         Data = _tankRepository.GetListByPoint(point.PointGuid),
                         UserList = point.UserList,

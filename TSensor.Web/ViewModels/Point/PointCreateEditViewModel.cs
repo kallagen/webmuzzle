@@ -28,9 +28,6 @@ namespace TSensor.Web.ViewModels.Point
         public decimal? LatitudeParsed =>
             decimal.TryParse(Latitude, out var _latitude) ? (decimal?)_latitude : null;
 
-        public decimal DefaultLongitude { get; set; }
-        public decimal DefaultLatitude { get; set; }        
-
         public Models.Entity.MapSettings MapSettings { get; set; }
 
         public IEnumerable<Models.Entity.User> UserList { get; set; }
