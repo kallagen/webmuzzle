@@ -26,7 +26,8 @@ namespace TSensor.Web.Models.Middleware
                 !context.Request.Path.StartsWithSegments("/api/archive/upload") &&
                 !context.Request.Path.StartsWithSegments("/api/sensorvalue/archive/push") &&
                 !context.Request.Path.StartsWithSegments("/api/coordinates/push") &&
-                !context.Request.Path.StartsWithSegments("/license/upload"))
+                !context.Request.Path.StartsWithSegments("/license/upload") &&
+                !context.Request.Path.StartsWithSegments("/settings/map/pushpin/upload"))
             {
                 using var reader = new StreamReader(context.Request.Body);
                 var content = await reader.ReadToEndAsync();
