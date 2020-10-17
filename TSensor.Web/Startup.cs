@@ -92,16 +92,6 @@ namespace TSensor.Web
 
             app.UseMiddleware<RequestModifyMiddleware>();
 
-            if (Configuration.GetValue<bool>("allowIframe"))
-            {
-                app.Use((context, next) =>
-                {
-                    context.Response.Headers["Content-Security-Policy"] = "frame-src *";
-                    context.Response.Headers["X-Frame-Options"] = "ALLOW-FROM *";
-                    return next.Invoke();
-                });
-            }
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<BroadcastSensorValuesHub>("broadcast/sensorvalue");
