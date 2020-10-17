@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Services.Security;
@@ -86,6 +87,23 @@ namespace TSensor.Web.Controllers
         [Route("logout")]
         public async Task<IActionResult> Logout()
         {
+            if (_configuration.GetValue<bool>("allowAutoAuth") &&
+                bool.TryParse(User?.Claims?.FirstOrDefault(p => p.Type == "IsEmbedded")?.Value,
+                    out var _isCurrentUserEmbedded) &&
+                _isCurrentUserEmbedded)
+            {
+                return StartPage();
+            }
+            else
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                return RedirectToAction("Login", "Auth");
+            }
+        }
+
+        [Route("forcelogout")]
+        public async Task<IActionResult> ForceLogout()
+        {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Auth");
         }
@@ -109,10 +127,10 @@ namespace TSensor.Web.Controllers
             return Content(_authService.Version);
         }
 
-        [Route("iframe/{userGuid}")]
-        public async Task<IActionResult> IFrame(string userGuid)
+        [Route("embedded/{userGuid}")]
+        public async Task<IActionResult> Embedded(string userGuid)
         {
-            if (_configuration.GetValue<bool>("allowIframe") &&
+            if (_configuration.GetValue<bool>("allowAutoAuth") &&
                 Guid.TryParse(userGuid, out var _userGuid))
             {
                 var user = _repository.GetByGuid(_userGuid);
