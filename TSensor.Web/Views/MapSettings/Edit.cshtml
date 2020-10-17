@@ -1,0 +1,60 @@
+﻿@model MapSettingsEditViewModel
+@{
+    ViewBag.Title = "Настройки карты";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            @using (Html.BeginForm("Edit", "MapSettings", FormMethod.Post, new { @class = "form-horizontal", autocomplete = "off" }))
+            {
+                <div class="box-body">
+                    <div class="form-group @Html.ValidState("MaxZoom")">
+                        <label for="MaxZoom" class="col-sm-3 control-label">Максимальный масштаб</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.MaxZoom, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.MaxZoom, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
+                </div>
+            }
+        </div>
+        <div class="box">
+            @using (Html.BeginForm("UploadPushpinImage", "MapSettings", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data", autocomplete = "off", id = "upload-form" }))
+            {
+                <div class="box-body">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Иконка объекта</label>
+                        <div class="col-sm-9">
+                            @if (string.IsNullOrEmpty(Model.PushpinImage))
+                            {
+                                <span>Нет изображения</span>
+                            }
+                            else
+                            {
+                                <img src="@Model.PushpinImage" />
+                            }
+                            <button id="upload-button" type="button" class="btn bg-blue pull-right">Загрузить новую иконку</button>
+                            <input id="upload-input" class="hidden" type="file" name="file" accept=".png" />
+                        </div>
+                    </div>
+                </div>
+                <div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    var uploadInput = document.querySelector('#upload-input');
+    uploadInput.addEventListener('change', function () {
+        document.querySelector('#upload-form').submit();
+    });
+    document.querySelector('#upload-button').addEventListener('click', function () {
+        uploadInput.click();
+    });
+</script>
+@Html.ViewModelWindow()
