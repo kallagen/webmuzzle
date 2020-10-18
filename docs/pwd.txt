@@ -15,3 +15,7 @@ BoatVM
 109.167.253.104:999
 kallagen
 Zaloopa17
+
+login: boris
+pass: JscbB9trab
+t-sensor.ru/manager
