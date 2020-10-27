@@ -1,13 +1,15 @@
 ﻿@model ActualSensorValuesViewModel
 @{
     ViewBag.Title = "Измерения по системе";
+    var hasFavorite = Model?.Favorite != null;
+    var hasItems = Model?.ActualSensorValueList?.Any() == true;
 }
 
-@if (Model?.ActualSensorValueList?.Any() == true)
+@if (hasItems || hasFavorite)
 {
     @section AdditionalHeader
     {
-        @if (Model.Favorite == null)
+        @if (!hasFavorite)
         {
             @using (Html.BeginForm("AddFavorite", "Dashboard", FormMethod.Post, new { @class = "form-horizontal page-header-form favorite-add-block", autocomplete = "off" }))
             {
@@ -40,69 +42,77 @@
             }
         }
     }
-    @section TitleButtons
+
+    if (hasItems)
     {
-        @using (Html.BeginForm("Index", "Chart", FormMethod.Post, new { @class = "title-button-container chart-block", autocomplete = "off" }))
+        @section TitleButtons
         {
-            foreach (var tankGuid in Model.ActualSensorValueList.Select(p => p.TankGuid))
+            @using (Html.BeginForm("Index", "Chart", FormMethod.Post, new { @class = "title-button-container chart-block", autocomplete = "off" }))
             {
-                @Html.Hidden("TankGuidList[]", tankGuid, new { id = $"guidList{tankGuid}" })
+                foreach (var tankGuid in Model.ActualSensorValueList.Select(p => p.TankGuid))
+                {
+                    @Html.Hidden("TankGuidList[]", tankGuid, new { id = $"guidList{tankGuid}" })
+                }
+
+                <button class="btn bg-blue btn-block" type="submit">Графики</button>
             }
-
-            <button class="btn bg-blue btn-block" type="submit">Графики</button>
         }
-    }
-    var hasError = Model.ActualSensorValueList.Any(t => t.IsError);
-    var hasWarning = Model.ActualSensorValueList.Any(t => t.IsWarning);
+        var hasError = Model.ActualSensorValueList.Any(t => t.IsError);
+        var hasWarning = Model.ActualSensorValueList.Any(t => t.IsWarning);
 
-    var listenSensors = Model.ActualSensorValueList.Select(t =>
-        new
+        var listenSensors = Model.ActualSensorValueList.Select(t =>
+            new
+            {
+                guid = t.MainSensorGuid,
+                updateDate = t.MainSensorInsertDate,
+                warningDate = t.MainSensorWarningDateTicks,
+                weightDelta = t.WeightChangeDelta ?? 0,
+                weightTimeout = t.WeightChangeTimeout ?? 0,
+                weight = t.LiquidEnvironmentLevel,
+                isGas = t.IsGas
+            });
+
+        <div class="callout callout-warning chart-mobile-warning">
+            <p>Графики недоступны в мобильной версии</p>
+        </div>
+
+        <div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">
+            <h4>Внимание!</h4>
+            <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
+        </div>
+        <div class="t-warning-message callout callout-warning @if(!hasWarning){<text>hidden</text>}">
+            <h4>Внимание!</h4>
+            <p>Данные с некоторых датчиков не поступают больше десяти минут. Проверьте правильность настроек и исправность системы.</p>
+        </div>
+
+        @foreach (var tank in Model.ActualSensorValueList)
         {
-            guid = t.MainSensorGuid,
-            updateDate = t.MainSensorInsertDate,
-            warningDate = t.MainSensorWarningDateTicks,
-            weightDelta = t.WeightChangeDelta ?? 0,
-            weightTimeout = t.WeightChangeTimeout ?? 0,
-            weight = t.LiquidEnvironmentLevel,
-            isGas = t.IsGas
-        });
+            @await Html.PartialAsync("TankCard", tank)
+        }
 
-    <div class="callout callout-warning chart-mobile-warning">
-        <p>Графики недоступны в мобильной версии</p>
-    </div>
+        <div class="clearfix"></div>
 
-    <div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">
-        <h4>Внимание!</h4>
-        <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
-    </div>
-    <div class="t-warning-message callout callout-warning @if(!hasWarning){<text>hidden</text>}">
-        <h4>Внимание!</h4>
-        <p>Данные с некоторых датчиков не поступают больше десяти минут. Проверьте правильность настроек и исправность системы.</p>
-    </div>
+        <script src="~/lib/signalr/signalr.min.js"></script>
+        <script>
+            const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
+            const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast/sensorvalue').build();
 
-    @foreach (var tank in Model.ActualSensorValueList)
-    {
-        @Html.Partial("TankCard", tank)
+            var errorBlock = $('.t-error-message');
+            var warningBlock = $('.t-warning-message');
+
+            connection.on('sensorupdate', sensorUpdate);
+
+            connection.start();
+        </script>
+
+        @Html.ViewModelWindow()
     }
-
-    <div class="clearfix"></div>
-
-    <script src="~/lib/signalr/signalr.min.js"></script>
-    <script>
-        const listenSensors = @Html.Raw(JsonSerializer.Serialize(listenSensors));
-        const connection = new signalR.HubConnectionBuilder().withUrl('/broadcast/sensorvalue').build();
-
-        var errorBlock = $('.t-error-message');
-        var warningBlock = $('.t-warning-message');
-
-        connection.on('sensorupdate', sensorUpdate);
-
-        connection.start();
-    </script>
-
-    @Html.ViewModelWindow()
-}
-else
-{
-    <p>Выберите в меню данные для отображения</p>
-}
+    else 
+    {
+        <p>Нет данных для отображения</p>
+    }
+}   
+else    
+{   
+    <p>Нет данных для отображения</p>
+}   
