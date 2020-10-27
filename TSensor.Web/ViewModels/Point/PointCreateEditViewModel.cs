@@ -21,7 +21,10 @@ namespace TSensor.Web.ViewModels.Point
         public string Description { get; set; }
 
         public string Longitude { get; set; }
-        public string Latitude { get; set; }        
+        public string Latitude { get; set; }
+
+        public Guid? PointTypeGuid { get; set; }
+        public IEnumerable<Models.Entity.PointType> PointTypeList { get; set; }
 
         public decimal? LongitudeParsed =>
             decimal.TryParse(Longitude, out var _longitude) ? (decimal?)_longitude : null;
@@ -67,7 +70,7 @@ namespace TSensor.Web.ViewModels.Point
                         modelState?.AddModelError("Latitude", "Значение должно быть в диапазоне от -90 до 90 градусов");
                     }
                 }
-            }            
+            }
         }
     }
 }

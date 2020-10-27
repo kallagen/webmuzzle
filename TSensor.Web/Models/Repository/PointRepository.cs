@@ -15,9 +15,11 @@ namespace TSensor.Web.Models.Repository
 		public IEnumerable<Point> List()
         {
             return Query<Point>($@"
-                SELECT PointGuid, [Name], Address, Phone, Email, Description,
-					Longitude, Latitude
-                FROM [Point]
+                SELECT PointGuid, p.[Name], Address, Phone, Email, Description,
+					Longitude, Latitude,
+					p.PointTypeGuid, pt.Name AS PointTypeName
+                FROM [Point] p
+					LEFT JOIN PointType pt ON p.PointTypeGuid = pt.PointTypeGuid
 				WHERE PointGuid != '{MASSMETER_POINT_GUID}'
 				ORDER BY [Name]");
         }
@@ -31,7 +33,7 @@ namespace TSensor.Web.Models.Repository
 
 			var point = QueryFirst<Point>(@"
                 SELECT PointGuid, [Name], Address, Phone, Email, Description,
-					Longitude, Latitude
+					Longitude, Latitude, PointTypeGuid
                 FROM [Point] WHERE PointGuid = @pointGuid", new { pointGuid });
 
 			if (point != null)
@@ -55,20 +57,20 @@ namespace TSensor.Web.Models.Repository
 		}
 
         public Guid? Create(string name, string address, string phone, string email, string description,
-			decimal? longitude, decimal? latitude)
+			decimal? longitude, decimal? latitude, Guid? pointTypeGuid)
         {
             return QueryFirst<Guid?>(@"
                 DECLARE @guid UNIQUEIDENTIFIER = NEWID()
 
-                INSERT [Point](PointGuid, [Name], [Address], Phone, Email, Description, Longitude, Latitude)
-                VALUES(@guid, @name, @address, @phone, @email, @description, @longitude, @latitude)
+                INSERT [Point](PointGuid, [Name], [Address], Phone, Email, Description, Longitude, Latitude, PointTypeGuid)
+                VALUES(@guid, @name, @address, @phone, @email, @description, @longitude, @latitude, @pointTypeGuid)
                 
                 SELECT PointGuid FROM [Point] WHERE PointGuid = @guid",
-                new { name, address, phone, email, description, longitude, latitude });
+                new { name, address, phone, email, description, longitude, latitude, pointTypeGuid });
         }
 
         public bool Edit(Guid pointGuid, string name, string address, string phone, string email, string description,
-			decimal? longitude, decimal? latitude)
+			decimal? longitude, decimal? latitude, Guid? pointTypeGuid)
         {
 			if (pointGuid == MASSMETER_POINT_GUID)
             {
@@ -83,11 +85,12 @@ namespace TSensor.Web.Models.Repository
 					Email = @email,
 					Description = @description,
 					Longitude = @longitude,
-					Latitude = @latitude					
+					Latitude = @latitude,
+					PointTypeGuid = @pointTypeGuid
                 WHERE PointGuid = @pointGuid
 
                 SELECT @@ROWCOUNT",
-				new { pointGuid, name, address, phone, email, description, longitude, latitude }) == 1;
+				new { pointGuid, name, address, phone, email, description, longitude, latitude, pointTypeGuid }) == 1;
         }
 
         public bool Remove(Guid pointGuid)
@@ -169,7 +172,7 @@ namespace TSensor.Web.Models.Repository
         public IEnumerable<Point> GetUserPointList(Guid? userGuid)
         {
 			var pointList = Query<Point>(@"
-				SELECT DISTINCT p.PointGuid, p.Name, p.Latitude, p.Longitude
+				SELECT DISTINCT p.PointGuid, p.Name, p.Latitude, p.Longitude, p.PointTypeGuid
 				FROM Point p
 					LEFT JOIN PointGroupPoint pgp ON p.PointGuid = pgp.PointGuid
 					LEFT JOIN UserPointGroupRights upgp ON upgp.PointGroupGuid = pgp.PointGroupGuid AND upgp.UserGuid = @userGuid

@@ -15,6 +15,9 @@ namespace TSensor.Web.Models.Entity
         public decimal? Longitude { get; set; }
         public decimal? Latitude { get; set; }
 
+        public Guid? PointTypeGuid { get; set; }
+        public string PointTypeName { get; set; }
+
         public List<Tank> TankList { get; set; } = new List<Tank>();
 
         public IEnumerable<User> UserList { get; set; }
@@ -29,7 +32,9 @@ namespace TSensor.Web.Models.Entity
                 Address = entity.Address,
                 Phone = entity.Phone,
                 Email = entity.Email,
-                Description = entity.Description
+                Description = entity.Description,
+                PointTypeGuid = entity.PointTypeGuid,
+                PointTypeName = entity.PointTypeName
             };
         }
     }
