@@ -1,5 +1,7 @@
-﻿using System;
+﻿ using Microsoft.AspNetCore.Http;
+using System;
 using System.Globalization;
+using System.IO;
 
 namespace TSensor.Web.Models.Services
 {
@@ -28,6 +30,21 @@ namespace TSensor.Web.Models.Services
             }
 
             return parseResult;
+        }
+
+        public static string Base64PngImage(this IFormFile file)
+        {
+            if (file != null)
+            {
+                using var memoryStream = new MemoryStream();
+                file.CopyTo(memoryStream);
+
+                return $"data:image/png;base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+            }
+            else 
+            {
+                return null;
+            }
         }
     }
 }
