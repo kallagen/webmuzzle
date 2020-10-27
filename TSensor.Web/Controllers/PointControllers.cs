@@ -2,8 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Services;
 using TSensor.Web.ViewModels;
 using TSensor.Web.ViewModels.Point;
 
@@ -15,14 +18,26 @@ namespace TSensor.Web.Controllers
         private readonly ITankRepository _tankRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapSettingsRepository _mapSettingsRepository;
+        private readonly IPointTypeRepository _pointTypeRepository;
 
         public PointController(IPointRepository pointRepository, ITankRepository tankRepository,
-            IUserRepository userRepository, IMapSettingsRepository mapSettingsRepository, IConfiguration configuration)
+            IUserRepository userRepository, IMapSettingsRepository mapSettingsRepository, IPointTypeRepository pointTypeRepository,
+            IConfiguration configuration)
         {
             _pointRepository = pointRepository;
             _tankRepository = tankRepository;
             _userRepository = userRepository;
             _mapSettingsRepository = mapSettingsRepository;
+            _pointTypeRepository = pointTypeRepository;
+        }
+
+        [NonAction]
+        private IEnumerable<PointType> GetPointTypeList()
+        {
+            var comparer = new AlphanumComparer();
+
+            return _pointTypeRepository.List(includeImage: true)
+                .OrderBy(p => p.Name, comparer);
         }
 
         [Authorize(Policy = "Admin")]
@@ -52,10 +67,17 @@ namespace TSensor.Web.Controllers
         [Route("point/new")]
         public IActionResult Create()
         {
+            var pointTypeList = GetPointTypeList();
+
             var viewModel = new PointCreateEditViewModel
             {
-                MapSettings = _mapSettingsRepository.GetSettings()
+                MapSettings = _mapSettingsRepository.GetSettings(),
+                PointTypeList = pointTypeList
             };
+            viewModel.MapSettings.PointTypeImageList = pointTypeList
+                .Where(p => p.Image != null)
+                .ToDictionary(p => p.PointTypeGuid.ToString(), p => p.Image);
+
             return View(viewModel);
         }
 
@@ -78,7 +100,7 @@ namespace TSensor.Web.Controllers
             {
                 var pointGuid = _pointRepository.Create(viewModel.Name,
                     viewModel.Address, viewModel.Phone, viewModel.Email, viewModel.Description,
-                    viewModel.LongitudeParsed, viewModel.LatitudeParsed);
+                    viewModel.LongitudeParsed, viewModel.LatitudeParsed, viewModel.PointTypeGuid);
                 if (pointGuid == null)
                 {
                     viewModel.ErrorMessage = Program.GLOBAL_ERROR_MESSAGE;
@@ -93,7 +115,13 @@ namespace TSensor.Web.Controllers
                 }
             }
 
+            var pointTypeList = GetPointTypeList();
+
             viewModel.MapSettings = _mapSettingsRepository.GetSettings();
+            viewModel.MapSettings.PointTypeImageList = pointTypeList
+                .Where(p => p.Image != null)
+                .ToDictionary(p => p.PointTypeGuid.ToString(), p => p.Image);
+            viewModel.PointTypeList = pointTypeList;
             return View(viewModel);
         }
 
@@ -106,6 +134,8 @@ namespace TSensor.Web.Controllers
                 var point = _pointRepository.GetByGuid(_pointGuid);
                 if (point != null)
                 {
+                    var pointTypeList = GetPointTypeList();
+
                     var viewModel = new PointCreateEditViewModel
                     {
                         PointGuid = point.PointGuid,
@@ -118,12 +148,18 @@ namespace TSensor.Web.Controllers
                         Longitude = point.Longitude?.ToString(),
                         Latitude = point.Latitude?.ToString(),
 
+                        PointTypeGuid = point.PointTypeGuid,
+
                         Data = _tankRepository.GetListByPoint(point.PointGuid),
                         UserList = point.UserList,
                         AvailableUserList = point.AvailableUserList,
 
-                        MapSettings = _mapSettingsRepository.GetSettings()
+                        MapSettings = _mapSettingsRepository.GetSettings(),
+                        PointTypeList = pointTypeList
                     };
+                    viewModel.MapSettings.PointTypeImageList = pointTypeList
+                        .Where(p => p.Image != null)
+                        .ToDictionary(p => p.PointTypeGuid.ToString(), p => p.Image);
 
                     var successMessage = TempData["Point.Edit.SuccessMessage"] as string;
                     if (!string.IsNullOrEmpty(successMessage))
@@ -167,7 +203,7 @@ namespace TSensor.Web.Controllers
             {
                 var editResult = _pointRepository.Edit(viewModel.PointGuid, viewModel.Name,
                     viewModel.Address, viewModel.Phone, viewModel.Email, viewModel.Description,
-                    viewModel.LongitudeParsed, viewModel.LatitudeParsed);
+                    viewModel.LongitudeParsed, viewModel.LatitudeParsed, viewModel.PointTypeGuid);
                 if (editResult)
                 {
                     var pointUrl = Url.Action("Edit", "Point", new { pointGuid = viewModel.PointGuid });
@@ -186,9 +222,16 @@ namespace TSensor.Web.Controllers
             if (point != null)
             {
                 viewModel.Data = _tankRepository.GetListByPoint(viewModel.PointGuid);
-                viewModel.UserList = point.UserList;                
+                viewModel.UserList = point.UserList;
                 viewModel.AvailableUserList = point.AvailableUserList;
+
+                var pointTypeList = GetPointTypeList();
                 viewModel.MapSettings = _mapSettingsRepository.GetSettings();
+                viewModel.MapSettings.PointTypeImageList = pointTypeList
+                    .Where(p => p.Image != null)
+                    .ToDictionary(p => p.PointTypeGuid.ToString(), p => p.Image);
+                viewModel.PointTypeList = pointTypeList;
+
                 return View(viewModel);
             }
             else

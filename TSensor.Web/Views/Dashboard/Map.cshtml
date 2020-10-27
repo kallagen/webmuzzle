@@ -16,6 +16,7 @@
                 lat = p.Latitude,
                 url = Url.Action("PointDetails", "Dashboard", new { guid = p.PointGuid }),
                 guid = p.PointGuid,
+                pointTypeGuid = p.PointTypeGuid.ToString(),
                 tankList = p.TankList.Select(t => new
                 {
                     name = string.Join(" ", new[] { t.Name, t.ProductName }),

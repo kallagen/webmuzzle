@@ -19,16 +19,18 @@ namespace TSensor.Web.Controllers
         private readonly IPointRepository _pointRepository;
         private readonly IFavoriteRepository _favoriteRepository;
         private readonly IMapSettingsRepository _mapSettingsRepository;
+        private readonly IPointTypeRepository _pointTypeRepository;
         private readonly AuthService _authService;
         private readonly LicenseManager _licenseManager;
 
         public DashboardController(IPointRepository pointRepository, IFavoriteRepository favoriteRepository,
-            IMapSettingsRepository mapSettingsRepository,
+            IMapSettingsRepository mapSettingsRepository, IPointTypeRepository pointTypeRepository,
             AuthService authService, LicenseManager licenseManager, IConfiguration configuration)
         {
             _pointRepository = pointRepository;
             _favoriteRepository = favoriteRepository;
             _mapSettingsRepository = mapSettingsRepository;
+            _pointTypeRepository = pointTypeRepository;
             _authService = authService;
             _licenseManager = licenseManager;
         }
@@ -187,12 +189,16 @@ namespace TSensor.Web.Controllers
         [Route("map")]
         public IActionResult Map()
         {
+            var mapSettings = _mapSettingsRepository.GetSettings();
+            mapSettings.PointTypeImageList = _pointTypeRepository.List(includeImage: true)
+                .Where(p => p.Image != null)
+                .ToDictionary(p => p.PointTypeGuid.ToString(), p => p.Image);
+
             var viewModel = new MapViewModel
             {
                 Features = _pointRepository.GetUserPointList(
                     HttpContext.User.IsInRole("ADMIN") ? null as Guid? : _authService.CurrentUserGuid),
-
-                Settings = _mapSettingsRepository.GetSettings()
+                Settings = mapSettings
             };
             return View(viewModel);
         }

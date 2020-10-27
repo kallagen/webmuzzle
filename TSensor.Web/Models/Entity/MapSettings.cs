@@ -1,4 +1,6 @@
-﻿namespace TSensor.Web.Models.Entity
+﻿using System.Collections.Generic;
+
+namespace TSensor.Web.Models.Entity
 {
     public class MapSettings
     {
@@ -7,5 +9,7 @@
 
         public decimal DefaultLongitude { get; set; }
         public decimal DefaultLatitude { get; set; }
+
+        public Dictionary<string, string> PointTypeImageList { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace TSensor.Web.Controllers
         {
             var viewModel = new SearchViewModel<PointType>
             {
-                Data = _repository.List()
+                Data = _repository.List(includeImage: false)
             };
 
             var successMessage = TempData["PointType.List.SuccessMessage"] as string;

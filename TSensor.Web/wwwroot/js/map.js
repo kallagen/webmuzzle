@@ -3,15 +3,22 @@
 
     that.options = options;
 
-    that.featureStyle = new ol.style.Style({
-        image: new ol.style.Icon({
-            anchor: [0.5, 1],
-            src: that.options.PushpinImage
-        })
-    });
-
     that.map = null;
     that.layerDataSource = null;
+
+    that.getFeatureStyle = function(feature) {
+        var pointTypeImage = that.options.PointTypeImageList[feature.get('pointTypeGuid')];
+        if (!pointTypeImage) {
+            pointTypeImage = that.options.PushpinImage
+        }
+        
+        return new ol.style.Style({
+            image: new ol.style.Icon({
+                anchor: [0.5, 1],
+                src: pointTypeImage
+            })
+        });
+    };
 
     that._overlay = new ol.Overlay({
         element: document.getElementById('ol-popup'),
@@ -61,7 +68,8 @@
                 name: i.name,
                 tankList: i.tankList,
                 url: i.url,
-                guid: i.guid
+                guid: i.guid,
+                pointTypeGuid: i.pointTypeGuid
             });
         });
 
@@ -81,7 +89,7 @@
                 }),
                 new ol.layer.Vector({
                     source: layerDataSource,
-                    style: that.featureStyle
+                    style: that.getFeatureStyle
                 })
             ],
             view: _view,
@@ -97,7 +105,7 @@
         }
 
         var _select = new ol.interaction.Select({
-            style: that.featureStyle
+            style: that.getFeatureStyle
         });
         _map.addInteraction(_select);
         _select.on('select', function (e) {
@@ -121,12 +129,12 @@
 
             if (feature.length == 1) {
                 feature[0].getGeometry().setCoordinates(coord);
-                    
+
                 if (that._overlay.getPosition() && that.overlayPointGuid == item.pointGuid) {
                     that._overlay.setPosition(coord);
                 }
             }
-        });        
+        });
     };
 
     that.initPointSelect = function (data, controls) {
@@ -155,8 +163,11 @@
                 if (point) {
                     point.setGeometry(new ol.geom.Point(_coord));
                 } else {
-                    point = new ol.Feature(
-                        new ol.geom.Point(_coord));
+                    point = new ol.Feature({
+                        geometry: new ol.geom.Point(_coord),
+                        pointTypeGuid: controls.type.value
+                    });
+                        
                     layerDataSource.addFeature(point);
                 }
 
@@ -176,16 +187,23 @@
         controls.lat.addEventListener('change', function (e) {
             changeCoordinates(e);
         });
+        controls.type.addEventListener('change', function (e) {
+            if (point) {
+                point.set('pointTypeGuid', controls.type.value);
+            }
+        });
 
         var layerDataSource = new ol.source.Vector({ features: [] });
 
         var center, point;
 
         if (data.lon && data.lat) {
-            point = new ol.Feature(
-                new ol.geom.Point(
+            point = new ol.Feature({
+                geometry: new ol.geom.Point(
                     ol.proj.transform([data.lon, data.lat], 'EPSG:4326', 'EPSG:3857')
-                ));
+                ),
+                pointTypeGuid: data.type
+            });
             layerDataSource.addFeature(point);
 
             center = [data.lon, data.lat];
@@ -198,16 +216,17 @@
             zoom: 10
         });
 
+        var _layer = new ol.layer.Vector({
+            source: layerDataSource,
+            style: that.getFeatureStyle
+        });
         var _map = new ol.Map({
             target: 'map',
             layers: [
                 new ol.layer.Tile({
                     source: new ol.source.OSM()
                 }),
-                new ol.layer.Vector({
-                    source: layerDataSource,
-                    style: that.featureStyle
-                })
+                _layer
             ],
             view: _view
         });
@@ -234,8 +253,11 @@
                 return;
             }
 
-            point = new ol.Feature(
-                new ol.geom.Point(e.coordinate));
+            point = new ol.Feature({
+                geometry: new ol.geom.Point(e.coordinate),
+                pointTypeGuid: controls.type.value
+            });
+                
             layerDataSource.addFeature(point);
 
             var lonlat = ol.proj.transform(e.coordinate, 'EPSG:3857', 'EPSG:4326');
