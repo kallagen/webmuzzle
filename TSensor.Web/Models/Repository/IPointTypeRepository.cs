@@ -6,7 +6,7 @@ namespace TSensor.Web.Models.Repository
 {
     public interface IPointTypeRepository
     {
-        public IEnumerable<PointType> List();
+        public IEnumerable<PointType> List(bool includeImage);
         public PointType GetByGuid(Guid pointTypeGuid);
         public Guid? Create(string name, string image);
         public bool Edit(Guid pointTypeGuid, string name, string image);

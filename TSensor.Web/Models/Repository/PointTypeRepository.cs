@@ -8,10 +8,10 @@ namespace TSensor.Web.Models.Repository
     {
         public PointTypeRepository(string connectionString) : base(connectionString) { }
 
-        public IEnumerable<PointType> List()
+        public IEnumerable<PointType> List(bool includeImage)
         {
-            return Query<PointType>(@"
-                SELECT PointTypeGuid, Name
+            return Query<PointType>($@"
+                SELECT PointTypeGuid, Name {(includeImage ? ", Image" : "")}
                 FROM PointType");
         }
 
