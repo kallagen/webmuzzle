@@ -65,6 +65,7 @@
                                 <thead>
                                     <tr>
                                         <th>Название</th>
+                                        <th>Тип</th>
                                         <th>Адрес</th>
                                         <th>Телефон</th>
                                         <th>Email</th>
@@ -77,6 +78,7 @@
                                     {
                                         <tr>
                                             <td>@Html.ActionLink(item.Name, "Edit", "Point", new { pointGuid = item.PointGuid }, null)</td>
+                                            <td>@item.PointTypeName</td>
                                             <td>@item.Address</td>
                                             <td>@item.Phone</td>
                                             <td>@item.Email</td>

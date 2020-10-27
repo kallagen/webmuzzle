@@ -28,8 +28,9 @@ namespace TSensor.Web.Models.Repository
             {
                 var pointList = Query<dynamic>($@"
                     SELECT DISTINCT p.PointGuid, p.Name, p.[Address], p.Phone, p.Email,
-                        p.Description, pgp.PointGroupGuid
+                        p.Description, pgp.PointGroupGuid, p.PointTypeGuid, pt.PointTypeName
                     FROM Point p
+                        LEFT JOIN PointType pt ON p.PointTypeGuid = pt.PointTypeGuid
                         LEFT JOIN PointGroupPoint pgp ON pgp.PointGuid = p.PointGuid AND
                             pgp.PointGroupGuid = @pointGroupGuid
                     WHERE p.PointGuid != '{PointRepository.MASSMETER_POINT_GUID}'", new { pointGroupGuid });
