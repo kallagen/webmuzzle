@@ -9,7 +9,7 @@
 
     @foreach (var sensor in Model)
     {
-        @Html.Partial("SensorCard", sensor)
+        @await Html.PartialAsync("SensorCard", sensor)
     }
 
     @using (Html.BeginForm("SetSensor", "Tank", FormMethod.Post, new { id = "t-setsensor-form", @class = "hidden" }))

@@ -23,7 +23,7 @@
         {
             foreach (var point in group.PointList.OrderBy(p => p.Name, comparer))
             {
-                @Html.Partial("MenuElementPoint", new MenuElementViewModel { Point = point, MaxLabelLength = 20 });
+                @await Html.PartialAsync("MenuElementPoint", new MenuElementViewModel { Point = point, MaxLabelLength = 20 });
             }
         }
         else
@@ -38,7 +38,7 @@
                     <ul class="treeview-menu">
                         @foreach (var point in group.PointList.OrderBy(p => p.Name, comparer))
                         {
-                            @Html.Partial("MenuElementPoint", new MenuElementViewModel { Point = point, GroupGuid = group.PointGroupGuid, MaxLabelLength = 18 });
+                            @await Html.PartialAsync("MenuElementPoint", new MenuElementViewModel { Point = point, GroupGuid = group.PointGroupGuid, MaxLabelLength = 18 });
                         }
                     </ul>
                 </li>

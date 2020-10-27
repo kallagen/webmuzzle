@@ -18,7 +18,7 @@
 
     @foreach (var massmeter in Model)
     {
-        @Html.Partial("MassmeterCard", massmeter)
+        @await Html.PartialAsync("MassmeterCard", massmeter)
     }
 
     <div class="clearfix"></div>
