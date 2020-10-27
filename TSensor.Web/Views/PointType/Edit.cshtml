@@ -1,0 +1,60 @@
+﻿@model PointTypeCreateEditViewModel
+@{
+    ViewBag.Title = $"Редактирование типа объектов \"{Model.Name}\"";
+}
+
+@section AdditionalHeader
+{
+    @Html.ActionLink("назад к списку типов объектов", "List", "PointType", null, new { @class = "footer-link pull-right additional-header-link" })
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            @using (Html.BeginForm("Edit", "PointType", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data", autocomplete = "off" }))
+            {
+                @Html.HiddenFor(m => m.PointTypeGuid)
+                <div class="box-body">
+                    <div class="form-group @Html.ValidState("Name")">
+                        <label for="Name" class="col-sm-3 control-label">Название</label>
+                        <div class="col-sm-9">
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="NewImage" class="col-sm-3 control-label">Изображение на карте</label>
+                        <div  class="col-sm-9">
+                            @if (string.IsNullOrEmpty(Model.Image))
+                            {
+                                <span>Нет изображения</span>
+                            }
+                            else
+                            {
+                                <img src="@Model.Image" />
+                            }
+                            <input id="NewImage" style="margin-top: 6px;" type="file" name="NewImage" accept=".png" />
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <a id="remove-pointtype-button" href="javascript:void(0)" class="btn bg-red">Удалить</a>
+                    <button type="submit" class="btn bg-blue pull-right">Сохранить</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("Remove", "PointType", FormMethod.Post, new { id = "remove-pointtype-form", @class = "hidden" }))
+{
+    @Html.Hidden("PointTypeGuid", Model.PointTypeGuid, new { id = "remove-pointtype-guid" })
+}
+<script>
+    document.querySelector('#Name').focus();
+    $('#remove-pointtype-button').click(function () {
+        new ConfirmModal('Удалить тип объектов?', function () {
+            $('#remove-pointtype-form').submit();
+        }).show();
+    });
+</script>
+@Html.ViewModelWindow()

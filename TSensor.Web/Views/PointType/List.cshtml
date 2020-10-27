@@ -1,0 +1,41 @@
+﻿@using TSensor.Web.Models.Services;
+@model SearchViewModel<PointType>
+@{
+    ViewBag.Title = "Настройка типов объектов";
+}
+
+@section AdditionalHeader
+{
+    @Html.ActionLink("Добавить тип объектов", "Create", "PointType", null, new { @class = "btn bg-blue btn-block pull-right" })
+}
+<div class="row">
+    <div class="col-md-12">
+        @if (!Model.HasData)
+        {
+            <h4>ничего не найдено</h4>
+        }
+        else
+        {
+            <div class="box box-solid">
+                <div class="box-body table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Data.OrderBy(p => p.Name, new AlphanumComparer()))
+                            {
+                                <tr>
+                                    <td>@Html.ActionLink(item.Name, "Edit", "PointType", new { pointTypeGuid = item.PointTypeGuid }, null)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@Html.ViewModelWindow()
