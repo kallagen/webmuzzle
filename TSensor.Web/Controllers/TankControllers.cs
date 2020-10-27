@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
+using TSensor.Web.Models.Services;
 using TSensor.Web.ViewModels.Tank;
 
 namespace TSensor.Web.Controllers
@@ -27,6 +29,14 @@ namespace TSensor.Web.Controllers
             _productRepository = productRepository;
         }
 
+        [NonAction]
+        private IEnumerable<Product> GetProductList()
+        {
+            var comparer = new AlphanumComparer();
+            
+            return _productRepository.List().OrderBy(p => p.Name, comparer);
+        }
+
         [Authorize(Policy = "Admin")]
         [Route("point/{pointGuid}/tank/new")]
         public IActionResult Create(string pointGuid)
@@ -40,7 +50,7 @@ namespace TSensor.Web.Controllers
                     {
                         PointGuid = point.PointGuid,
                         PointName = point.Name,
-                        ProductList = _productRepository.List()
+                        ProductList = GetProductList()
                     };
 
                     return View(viewModel);
@@ -98,7 +108,7 @@ namespace TSensor.Web.Controllers
                 }
             }
 
-            viewModel.ProductList = _productRepository.List();
+            viewModel.ProductList = GetProductList();
             viewModel.PointName = point.Name;
             return View(viewModel);
         }
@@ -147,7 +157,7 @@ namespace TSensor.Web.Controllers
                 WeightChangeTimeout = tank.WeightChangeTimeout?.ToString()
             };
 
-            viewModel.ProductList = _productRepository.List();
+            viewModel.ProductList = GetProductList();
             return View(viewModel);
         }
 
@@ -200,7 +210,7 @@ namespace TSensor.Web.Controllers
                 }
             }
 
-            viewModel.ProductList = _productRepository.List();
+            viewModel.ProductList = GetProductList();
             viewModel.PointName = point.Name;
             return View(viewModel);
         }
@@ -688,7 +698,7 @@ namespace TSensor.Web.Controllers
                             DateTime.TryParseExact(dates[1], "yyyy-MM-dd HH:mm:ss",
                             CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateEnd))
                     {
- 
+
                     }
                 }
             }
