@@ -12,12 +12,24 @@
     });
 }
 
-@section AdditionalHeader
+@section TitleButtons
 {
-    <div class="right">
+    <div class="title-button-container">
         <button id="chart-unzoom" class="btn btn-default fixed-button-width pull-right hidden" style="margin-left: 14px;">Сбросить масштаб</button>
         <button id="chart-refresh" class="btn bg-blue fixed-button-width pull-right">Обновить график</button>
     </div>
+}
+
+@section AdditionalHeader
+{
+    @using (Html.BeginForm("Index", "Dashboard", FormMethod.Post, new { id = "back-form", @class = "title-button-container", autocomplete = "off" }))
+    {
+        foreach (var tankGuid in Model.TankGuidList)
+        {
+            @Html.Hidden("guidList[]", tankGuid, new { id = $"guidList{tankGuid}" })
+        }
+    }
+    <a id="back-link" href="javascript:void(0)" class="footer-link pull-right additional-header-link">назад к объектам</a>
 }
 
 <script src="~/lib/chartjs/Chart.bundle.js"></script>
@@ -230,5 +242,8 @@ else
 
     $('#chart-refresh').click(function (e) {
         $('#chart-form').submit();
+    });
+    $('#back-link').click(function () {
+        $('#back-form').submit();
     });
 </script>
