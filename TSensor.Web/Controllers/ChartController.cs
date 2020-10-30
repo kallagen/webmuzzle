@@ -70,7 +70,7 @@ namespace TSensor.Web.Controllers
                             y = p.Value
                         })
                         .GroupBy(p => p.x)
-                        .Select(p => new { x = p.Key, y = Math.Round(p.Average(v => (decimal)v.y), 3) })
+                        .Select(p => new { x = p.Key, y = Math.Round(p.Max(v => (decimal)v.y), 3) })
                         .OrderBy(p => p.x),
                     backgroundColor = dataset.Key.isSecond ? CHART_COLOR_SECOND : CHART_COLOR_MAIN,
                     borderColor = dataset.Key.isSecond ? CHART_COLOR_SECOND : CHART_COLOR_MAIN,
