@@ -75,7 +75,7 @@ namespace TSensor.Web.Models.Entity
                     pressureAndTempSensorState = raw.Substring(11, 2),
                     sensorFirmwareVersionAndReserv = raw.Substring(13, 2),
                     alarma = raw.Substring(15, 2),
-                    environmentLevel = (decimal)int.Parse(raw.Substring(17, 4), NumberStyles.HexNumber) / 10, // уровень среды
+                    environmentLevel = (decimal)int.Parse(raw.Substring(17, 4), NumberStyles.HexNumber), // уровень среды
                     pressureFilter = int.Parse(raw.Substring(21, 4), NumberStyles.HexNumber),
                     pressureMeasuring = (decimal)int.Parse(raw.Substring(25, 4), NumberStyles.HexNumber) / 100,
                     levelInPercent = (decimal)int.Parse(raw.Substring(29, 4), NumberStyles.HexNumber) / 10, // объем %
@@ -97,8 +97,8 @@ namespace TSensor.Web.Models.Entity
                     plateServiceParam = raw.Substring(97, 4),
                     environmentComposition = int.Parse(raw.Substring(103, 2), NumberStyles.HexNumber),
                     cs1 = (decimal)int.Parse(raw.Substring(105, 4), NumberStyles.HexNumber) / 100,
-                    plateServiceParam2 = (decimal)int.Parse(raw.Substring(109, 4), NumberStyles.HexNumber) / 10,
-                    plateServiceParam3 = (decimal)(int.Parse(raw.Substring(113, 4), NumberStyles.HexNumber) - 65536) / 100,
+                    plateServiceParam2 = (decimal)short.Parse(raw.Substring(109, 4), NumberStyles.HexNumber) / 10,
+                    plateServiceParam3 = (decimal)short.Parse(raw.Substring(113, 4), NumberStyles.HexNumber) / 10,
                     sensorWorkMode = (decimal)int.Parse(raw.Substring(117, 2), NumberStyles.HexNumber) / 10,
                     plateServiceParam4 = (decimal)int.Parse(raw.Substring(119, 2), NumberStyles.HexNumber) / 10,
                     plateServiceParam5 = int.Parse(raw.Substring(121, 4), NumberStyles.HexNumber),
