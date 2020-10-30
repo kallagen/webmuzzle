@@ -266,6 +266,8 @@ function tankSensorUpdate(data) {
             $('.plateTemp[data-sensorGuid="' + sensorGuid + '"]').html(val.plateTemp);
             $('.period[data-sensorGuid="' + sensorGuid + '"]').html(val.period);
             $('.environmentComposition[data-sensorGuid="' + sensorGuid + '"]').html(val.environmentComposition);
+            $('.plateServiceParam2[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam2);
+            $('.plateServiceParam3[data-sensorGuid="' + sensorGuid + '"]').html(val.plateServiceParam3);
             $('.cs1[data-sensorGuid="' + sensorGuid + '"]').html(val.cs1);
             $('.crc[data-sensorGuid="' + sensorGuid + '"]').html(val.crc);
 

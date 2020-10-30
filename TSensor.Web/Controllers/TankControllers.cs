@@ -300,8 +300,8 @@ namespace TSensor.Web.Controllers
                 sheet.Cells[1, idx++].Value = "plateServiceParam";
                 sheet.Cells[1, idx++].Value = "Состав среды, %";
                 sheet.Cells[1, idx++].Value = "Измеренная емкость платы, Пф";
-                sheet.Cells[1, idx++].Value = "plateServiceParam2";
-                sheet.Cells[1, idx++].Value = "plateServiceParam3";
+                sheet.Cells[1, idx++].Value = "Угол крена, °";
+                sheet.Cells[1, idx++].Value = "Угол дифферента, °";
                 sheet.Cells[1, idx++].Value = "sensorWorkMode";
                 sheet.Cells[1, idx++].Value = "plateServiceParam4";
                 sheet.Cells[1, idx++].Value = "plateServiceParam5";
