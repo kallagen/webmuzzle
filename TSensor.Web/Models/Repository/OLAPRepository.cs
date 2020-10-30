@@ -152,6 +152,7 @@ namespace TSensor.Web.Models.Repository
                 result.Add(
                     new
                     {
+                        tank.TankGuid,
                         label,
                         isSecond
                     }, 
