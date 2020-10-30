@@ -74,6 +74,9 @@ namespace TSensor.Web.Controllers
                         .OrderBy(p => p.x),
                     backgroundColor = dataset.Key.isSecond ? CHART_COLOR_SECOND : CHART_COLOR_MAIN,
                     borderColor = dataset.Key.isSecond ? CHART_COLOR_SECOND : CHART_COLOR_MAIN,
+                    borderWidth = 2,
+                    pointRadius = 1,
+                    pointHoverRadius = 2,
                     yAxisID = dataset.Key.isSecond ? "y-axis-additional" : "y-axis-main",
                     cubicInterpolationMode = "monotone"
                 };
@@ -111,10 +114,10 @@ namespace TSensor.Web.Controllers
 
             if ((viewModel.DateEnd.Value - viewModel.DateStart.Value).TotalDays > 15)
             {
-                viewModel.DateStart = viewModel.DateEnd.Value.AddDays(-15);
-                ModelState.Remove("DateStart");
+                viewModel.DateEnd = viewModel.DateStart.Value.AddDays(15);
+                ModelState.Remove("DateEnd");
 
-                viewModel.ErrorMessage = "Ќельз€ указать период больше 15 суток";
+                viewModel.ErrorMessage = "Ќельз€ указать период больше 15 суток.  онец периода был автоматически изменен";
             }
 
             viewModel.Values = GetData(viewModel.TankGuidList,
