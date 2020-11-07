@@ -1,61 +1,59 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace TSensor.Web.Models.Services.Log
 {
     public class FileLogService
     {
-        private static ReaderWriterLock InputErrorLocker = new ReaderWriterLock();
-        private static ReaderWriterLock RawInputLocker = new ReaderWriterLock();
-        private static ReaderWriterLock ExceptionLocker = new ReaderWriterLock();
-        private static ReaderWriterLock SystemExceptionLocker = new ReaderWriterLock();
+        private static readonly Dictionary<LogCategory, ReaderWriterLock> LockCollection =
+            new Dictionary<LogCategory, ReaderWriterLock> {
+                { LogCategory.InputError, new ReaderWriterLock() },
+                { LogCategory.RawInput, new ReaderWriterLock() },
+                { LogCategory.Exception, new ReaderWriterLock() },
+                { LogCategory.SystemException, new ReaderWriterLock() },
+                { LogCategory.SmsLog, new ReaderWriterLock() },
+                { LogCategory.SmsException, new ReaderWriterLock() }
+            };
 
         private readonly string LogFilePath;
 
+        private string Delim =>
+            RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "/" : "\\";
+
         public FileLogService(IConfiguration configuration, IWebHostEnvironment environment)
         {
-            LogFilePath = configuration.GetValue("logPath", $"{environment?.ContentRootPath}\\log\\");
+            LogFilePath = configuration.GetValue("logPath", $"{environment?.ContentRootPath}{Delim}log{Delim}");
         }
 
-        public void Write(string header, string message)
-        {
-            switch (header)
-            {
-                case "inputerror":
-                    Write(header, message, InputErrorLocker);
-                    break;
-                case "rawinput":
-                    Write(header, message, RawInputLocker);
-                    break;
-                case "exception":
-                    Write(header, message, ExceptionLocker);
-                    break;
-                case "systemexception":
-                    Write(header, message, SystemExceptionLocker);
-                    break;
-                default: break;
-            }
-        }
-
-        private void Write(string header, string message, ReaderWriterLock locker)
+        public void Write(LogCategory category, string message)
         {
             try
             {
+                if (!LockCollection.ContainsKey(category))
+                {
+                    return;
+                }
+
+                var locker = LockCollection[category];
+
                 locker.AcquireWriterLock(5000);
 
                 try
                 {
-                    var path = $"{LogFilePath}\\{header}";
+                    var path = $"{LogFilePath}{Delim}{category}";
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
                     }
 
-                    using var writer = File.AppendText($"{path}\\{DateTime.Now.ToString("yyyyMMdd")}.log");
-                    writer.Write($"{DateTime.Now.ToString("HH:mm:ss")}: {message}");
+                    File.AppendAllText(
+                        $"{path}{Delim}{DateTime.Now:yyyyMMdd}.log",
+                        $"{DateTime.Now:HH:mm:ss}: {message}");
                 }
                 finally
                 {
