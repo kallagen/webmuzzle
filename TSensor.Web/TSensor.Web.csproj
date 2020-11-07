@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="docs\dbbackup\" />
     <Folder Include="Models\Services\Security\" />
     <Folder Include="ViewModels\Auth\" />
     <Folder Include="ViewModels\Api\" />
