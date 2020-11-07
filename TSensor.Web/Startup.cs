@@ -13,6 +13,8 @@ using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Security;
 using TSensor.Web.Models.Services.Log;
 using TSensor.Web.Models.Services.Security;
+using TSensor.Web.Models.Services.Sms;
+using TSensor.Web.Models.Services.Sms.Provider;
 
 namespace TSensor.Web
 {
@@ -50,6 +52,8 @@ namespace TSensor.Web
             services.AddSingleton<AuthService>();
             services.AddSingleton<FileLogService>();
             services.AddSingleton<LicenseManager>();
+            services.AddSingleton<ISmsServiceProvider, SmsgorodProvider>();
+            services.AddSingleton<SmsService>();
 
             var connectionString = Configuration.GetConnectionString("oltp");
             services.AddSingleton<IBroadcastRepository, BroadcastRepository>(p => new BroadcastRepository(connectionString));
