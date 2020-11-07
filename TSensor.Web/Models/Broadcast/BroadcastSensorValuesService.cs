@@ -42,7 +42,7 @@ namespace TSensor.Web.Models.Broadcast
                 }
                 catch (Exception exception)
                 {
-                    _logService.Write("exception", exception.ToString());
+                    _logService.Write(LogCategory.Exception, exception.ToString());
                 }
             }, null, TimeSpan.Zero, TimeSpan.FromSeconds(delay));
 

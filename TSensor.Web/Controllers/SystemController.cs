@@ -21,7 +21,7 @@ namespace TSensor.Web.Controllers
                 HttpContext.Features.Get<IExceptionHandlerPathFeature>()?.Error;
             if (error != null)
             {
-                _logService.Write("systemexception", error.Message);
+                _logService.Write(LogCategory.SystemException, error.Message);
             }
 
             return View();
