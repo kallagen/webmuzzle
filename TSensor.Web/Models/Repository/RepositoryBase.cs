@@ -22,6 +22,13 @@ namespace TSensor.Web.Models.Repository
             return db.Query<T>(sql, param);
         }
 
+        public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null)
+        {
+            using IDbConnection db = new SqlConnection(connectionString);
+
+            return await db.QueryAsync<T>(sql, param);
+        }
+
         public T QueryFirst<T>(string sql, object param = null)
         {
             using IDbConnection db = new SqlConnection(connectionString);
