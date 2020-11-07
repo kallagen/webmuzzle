@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Globalization;
 using System.IO;
@@ -10,6 +11,7 @@ using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Services;
 using TSensor.Web.Models.Services.Log;
+using TSensor.Web.Models.Services.Sms;
 using TSensor.Web.ViewModels;
 
 namespace TSensor.Web.Controllers
@@ -19,17 +21,30 @@ namespace TSensor.Web.Controllers
     {
         private readonly IApiRepository _apiRepository;
         private readonly FileLogService _logService;
+        private readonly SmsService _smsService;
 
-        public ApiController(IApiRepository apiRepository, FileLogService logService)
+        private readonly int movementDelta;
+        private readonly int holdTimeout;
+        private readonly string smsTemplateMovementStart;
+        private readonly string smsTemplateMovementEnd;
+
+        public ApiController(IConfiguration configuration, IApiRepository apiRepository, 
+            FileLogService logService, SmsService smsService)
         {
             _apiRepository = apiRepository;
             _logService = logService;
+            _smsService = smsService;
+
+            movementDelta = configuration.GetValue<int>("movementDelta");
+            holdTimeout = configuration.GetValue<int>("holdTimeout");
+            smsTemplateMovementStart = configuration.GetValue<string>("smsTemplateMovementStart");
+            smsTemplateMovementEnd = configuration.GetValue<string>("smsTemplateMovementEnd");
         }
 
         [NonAction]
         private IActionResult Error(string message, string value, string date, string guid)
         {
-            _logService.Write("inputerror", $"{guid} {date} {value} {message}");
+            _logService.Write(LogCategory.InputError, $"{guid} {date} {value} {message}");
 
             return Json(new { success = false, error = message });
         }
@@ -44,7 +59,7 @@ namespace TSensor.Web.Controllers
 
             try
             {
-                _logService.Write("rawinput", $"{guid} {date} {value}");
+                _logService.Write(LogCategory.RawInput, $"{guid} {date} {value}");
 
                 if (string.IsNullOrWhiteSpace(value))
                 {
@@ -257,10 +272,30 @@ namespace TSensor.Web.Controllers
             return RedirectToAction("UploadArchive", "Api");
         }
 
+        //очень грубое приближение, расчитываем на плоскости, только для положительных исходя из 1 градус = 111.1 км
+        private bool IsCoordinatesChangedSignificantly(decimal lon1, decimal lat1, decimal lon2, decimal lat2)
+        {
+            var lonD = (double)(lon1 - lon2);
+            var latD = (double)(lat1 - lat2);
+
+            return Math.Sqrt(lonD * lonD + latD * latD) * 111.1 * 1000 > movementDelta;
+        }
+
+        private string PrepareTemplate(string template,
+            string pointName, DateTime date)
+        {
+            return template
+                .Replace("{point}", pointName)
+                .Replace("{date}", date.ToString("dd.MM.yyyy"))
+                .Replace("{time}", date.ToString("HH:mm"));
+        }
+
         [Route("coordinates/push")]
+        [HttpGet]
         [HttpPost]
         public async Task<IActionResult> PushCoordinates(string d, string lon, string lat)
         {
+            _logService.Write(LogCategory.SmsLog, $"{d} {lon} {lat}");
             if (string.IsNullOrEmpty(d))
             {
                 return Json(new { success = false, error = "missing device guid" });
@@ -276,12 +311,63 @@ namespace TSensor.Web.Controllers
 
             try
             {
-                await _apiRepository.UploadPointCoordinatesAsync(d, _lon, _lat);
+                var pointInfoList = await _apiRepository.UploadPointCoordinatesAsync(d, _lon, _lat);
+                foreach (var point in pointInfoList)
+                {
+                    var isPointMoving = point.IsMoving as bool?;
+                    var pointLastMovingDateUTC = point.LastMovingDateUTC as DateTime?;
+                    var newLongitude = point.Longitude as decimal?;
+                    var newLatitude = point.Latitude as decimal?;
+
+                    var coordinatesChanged = newLongitude != _lon || newLatitude != _lat ?
+                            true as bool? : null;
+                    var coordinatesChangedSignificantly = newLongitude.HasValue && newLatitude.HasValue && 
+                        IsCoordinatesChangedSignificantly(_lon, _lat, newLongitude.Value, newLatitude.Value);
+
+                    bool? isMoving = null;
+                    DateTime? lastMovingDateUTC = null;
+
+                    var currentDateUTC = DateTime.Now.ToUniversalTime();
+
+                    if (isPointMoving == true)
+                    {
+                        if (coordinatesChangedSignificantly)
+                        {
+                            lastMovingDateUTC = currentDateUTC;
+                        }
+                        else
+                        {
+                            if ((currentDateUTC - pointLastMovingDateUTC.Value).TotalSeconds > holdTimeout)
+                            {
+                                _smsService.SendSms(
+                                    PrepareTemplate(
+                                        smsTemplateMovementEnd, point.PointName, pointLastMovingDateUTC.Value.ToLocalTime()));
+                                isMoving = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (coordinatesChangedSignificantly)
+                        {
+                            _smsService.SendSms(
+                                PrepareTemplate(
+                                    smsTemplateMovementStart, point.PointName, DateTime.Now));
+                            isMoving = true;
+                            lastMovingDateUTC = currentDateUTC;
+                        }
+                    }
+
+                    await _apiRepository.UpdatePointCoordinate(point.PointGuid, _lon, _lat,
+                        coordinatesChanged, isMoving, lastMovingDateUTC);
+                }
 
                 return Json(new { success = true });
             }
             catch (Exception ex)
             {
+                _logService.Write(LogCategory.Exception, ex.Message);
+
                 return Json(new { success = false, error = ex.Message });
             }
         }
