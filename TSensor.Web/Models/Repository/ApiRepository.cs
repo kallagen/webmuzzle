@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TSensor.Web.Models.Entity;
@@ -177,37 +178,44 @@ namespace TSensor.Web.Models.Repository
 				}).Where(p => p != null));
         }
 
-		public async Task UploadPointCoordinatesAsync(string deviceGuid, decimal longitude, decimal latitude)
+		public async Task<IEnumerable<dynamic>> UploadPointCoordinatesAsync(string deviceGuid, 
+			decimal longitude, decimal latitude)
         {
-			await ExecuteAsync(@"
-				INSERT PointCoordinates(PointGuid, Longitude, Latitude)
-				SELECT p.PointGuid, @longitude, @latitude
+			return await QueryAsync<dynamic>(@"
+				SELECT DISTINCT p.PointGuid, p.Name AS PointName, Longitude, Latitude, IsMoving, LastMovingDateUTC
 				FROM Point p
 					JOIN Tank t ON p.PointGuid = t.PointGuid
-				WHERE (
-						t.MainDeviceGuid = @deviceGuid OR 
-						(t.DualMode = 1 AND t.SecondDeviceGuid = @deviceGuid)
-					) AND (
-						ISNULL(Longitude, -1000) != ISNULL(@longitude, -1000) OR
-						ISNULL(Latitude, -1000) != ISNULL(@latitude, -1000)
-					)
-				
-				UPDATE p SET
-					Longitude = @longitude,
-					Latitude = @latitude,
-					CoordinatesChanged = 1
+				WHERE
+					t.MainDeviceGuid = @deviceGuid OR 
+					(t.DualMode = 1 AND t.SecondDeviceGuid = @deviceGuid)
+
+				INSERT PointCoordinates(PointGuid, Longitude, Latitude)
+				SELECT DISTINCT p.PointGuid, @longitude, @latitude
 				FROM Point p
 					JOIN Tank t ON p.PointGuid = t.PointGuid
 				WHERE 
-					(
-						t.MainDeviceGuid = @deviceGuid OR 
-						(t.DualMode = 1 AND t.SecondDeviceGuid = @deviceGuid)
-					) AND
-					(
-						ISNULL(Longitude, -1000) != ISNULL(@longitude, -1000) OR
-						ISNULL(Latitude, -1000) != ISNULL(@latitude, -1000)
-					)",
+					t.MainDeviceGuid = @deviceGuid OR 
+					(t.DualMode = 1 AND t.SecondDeviceGuid = @deviceGuid)",
 				new { deviceGuid, longitude, latitude });
+		}
+
+		public async Task UpdatePointCoordinate(Guid pointGuid, decimal longitude, decimal latitude,
+			bool? coordinatesChanged, bool? isMoving, DateTime? lastMovingDateUTC)
+        {
+			await ExecuteAsync(@"
+				UPDATE Point SET
+					Longitude = @longitude,
+					Latitude = @latitude,
+					CoordinatesChanged = ISNULL(@coordinatesChanged, CoordinatesChanged),
+					IsMoving = ISNULL(@isMoving, IsMoving),
+					LastMovingDateUTC = ISNULL(@lastMovingDateUTC, LastMovingDateUTC)
+				WHERE PointGuid = @pointGuid",
+				new
+				{
+					longitude, latitude, coordinatesChanged,
+					isMoving, lastMovingDateUTC,
+					pointGuid
+				});
 		}
 	}
 }
