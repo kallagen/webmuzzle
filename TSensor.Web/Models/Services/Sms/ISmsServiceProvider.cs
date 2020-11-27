@@ -2,6 +2,6 @@
 {
     public interface ISmsServiceProvider
     {
-        public void Send(string message, out string request, out string response);
+        public void Send(string message, string senderName, out string request, out string response);
     }
 }

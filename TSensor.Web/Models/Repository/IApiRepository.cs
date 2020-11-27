@@ -8,6 +8,7 @@ namespace TSensor.Web.Models.Repository
     public interface IApiRepository
     {
         public Task<bool> PushValueAsync(string ip, ActualSensorValue value, string raw);
+        public Task<ActualSensorValue> TakeLastValueAsync(ActualSensorValue value);
         public Task PushArchivedValuesAsync(string ip, IEnumerable<ActualSensorValue> valueList);
 
         public Task<IEnumerable<dynamic>> UploadPointCoordinatesAsync(string deviceGuid,

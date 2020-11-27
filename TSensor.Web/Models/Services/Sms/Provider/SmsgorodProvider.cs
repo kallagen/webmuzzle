@@ -50,7 +50,7 @@ namespace TSensor.Web.Models.Services.Sms.Provider
             return reader.ReadToEnd();
         }
 
-        public void Send(string message, out string request, out string response)
+        public void Send(string message, string senderName, out string request, out string response)
         {
             var requestData = new
             {
@@ -61,7 +61,8 @@ namespace TSensor.Web.Models.Services.Sms.Provider
                     {
                         channel = "char",
                         phone,
-                        text = message
+                        text = message,
+                        sender = senderName
                     }
                 }
             };

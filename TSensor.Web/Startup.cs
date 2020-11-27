@@ -11,6 +11,8 @@ using TSensor.Web.Models.Broadcast;
 using TSensor.Web.Models.Middleware;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Security;
+using TSensor.Web.Models.Services.Email;
+using TSensor.Web.Models.Services.Email.Provider;
 using TSensor.Web.Models.Services.Log;
 using TSensor.Web.Models.Services.Security;
 using TSensor.Web.Models.Services.Sms;
@@ -54,8 +56,13 @@ namespace TSensor.Web
             services.AddSingleton<LicenseManager>();
             services.AddSingleton<ISmsServiceProvider, SmsgorodProvider>();
             services.AddSingleton<SmsService>();
+            services.AddSingleton<IEmailServiceProvider, EmailProvider>();
+            services.AddSingleton<EmailService>();
 
-            var connectionString = Configuration.GetConnectionString("oltp");
+            bool useLocalDB = Configuration.GetValue<bool>("useLocalDB");
+
+            string connectionString = useLocalDB? Configuration.GetConnectionString("localDB"): Configuration.GetConnectionString("oltp");
+
             services.AddSingleton<IBroadcastRepository, BroadcastRepository>(p => new BroadcastRepository(connectionString));
             services.AddScoped<IApiRepository, ApiRepository>(p => new ApiRepository(connectionString));
             services.AddScoped<IUserRepository, UserRepository>(p => new UserRepository(connectionString));

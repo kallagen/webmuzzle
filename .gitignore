@@ -24,3 +24,4 @@ TSensor.Web/package-lock.json
 /TSensor.Web/.vscode
 /TSensor.FakeSensor/bin
 /TSensor.FakeSensor/obj
+TSensor.Web/.idea/

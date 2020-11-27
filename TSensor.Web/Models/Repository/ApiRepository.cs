@@ -96,6 +96,19 @@ namespace TSensor.Web.Models.Repository
 				SELECT @@ROWCOUNT", value) == 1;
         }
 
+        public async Task<ActualSensorValue> TakeLastValueAsync(ActualSensorValue value)
+        {
+	        return await QueryFirstAsync<ActualSensorValue>(@"
+			SELECT TOP 1 * 
+				FROM ActualSensorValue
+				WHERE DeviceGuid = @DeviceGuid 
+					AND izkNumber = @izkNumber
+					AND sensorSerial = @sensorSerial
+					AND sensorChannel = @sensorChannel
+",
+		        new { value.DeviceGuid, value.izkNumber, value.sensorSerial, value.sensorChannel });
+        }
+
         public async Task PushArchivedValuesAsync(string ip, IEnumerable<ActualSensorValue> valueList)
         {
             await ExecuteAsync(@"
@@ -178,6 +191,7 @@ namespace TSensor.Web.Models.Repository
 				}).Where(p => p != null));
         }
 
+        //TODO если понадобится танк то сделать тут запрос получающий такн тейм через сенсор валуе, по танк гуид
 		public async Task<IEnumerable<dynamic>> UploadPointCoordinatesAsync(string deviceGuid, 
 			decimal longitude, decimal latitude)
         {

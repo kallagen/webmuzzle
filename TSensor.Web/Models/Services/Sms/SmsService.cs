@@ -14,11 +14,11 @@ namespace TSensor.Web.Models.Services.Sms
             _logService = logService;
         }
 
-        public void SendSms(string message)
+        public void SendSms(string message, string senderName)
         {
             try
             {
-                _provider.Send(message, out var request, out var response);
+                _provider.Send(message, senderName, out var request, out var response);
                 _logService.Write(LogCategory.SmsLog, $@"
 request: {request}
 response: {response}");

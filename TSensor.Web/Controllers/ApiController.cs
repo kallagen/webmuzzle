@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Services;
+using TSensor.Web.Models.Services.Email;
 using TSensor.Web.Models.Services.Log;
 using TSensor.Web.Models.Services.Sms;
 using TSensor.Web.ViewModels;
@@ -22,23 +23,30 @@ namespace TSensor.Web.Controllers
         private readonly IApiRepository _apiRepository;
         private readonly FileLogService _logService;
         private readonly SmsService _smsService;
+        private readonly EmailService _emailService;
 
         private readonly int movementDelta;
         private readonly int holdTimeout;
+        private readonly decimal criticalLiquidLeveldelta;
         private readonly string smsTemplateMovementStart;
         private readonly string smsTemplateMovementEnd;
+        private readonly string smsTemplateLiquidLevelChangedSignificantly;
 
         public ApiController(IConfiguration configuration, IApiRepository apiRepository, 
-            FileLogService logService, SmsService smsService)
+            FileLogService logService, SmsService smsService, EmailService emailService)
         {
             _apiRepository = apiRepository;
             _logService = logService;
             _smsService = smsService;
+            _emailService = emailService;
 
             movementDelta = configuration.GetValue<int>("movementDelta");
+            criticalLiquidLeveldelta = configuration.GetValue<decimal>("criticalLiquidLeveldelta");
             holdTimeout = configuration.GetValue<int>("holdTimeout");
+            
             smsTemplateMovementStart = configuration.GetValue<string>("smsTemplateMovementStart");
             smsTemplateMovementEnd = configuration.GetValue<string>("smsTemplateMovementEnd");
+            smsTemplateLiquidLevelChangedSignificantly = configuration.GetValue<string>("smsTemplateLiquidLevelChangedSignificantly");
         }
 
         [NonAction]
@@ -56,6 +64,9 @@ namespace TSensor.Web.Controllers
             var date = d;
             var guid = g;
             var value = v;
+
+            if (v == null || d == null || g == null) 
+                 return Error("empty archive, nothing to insert", value, null,  guid);
 
             try
             {
@@ -94,6 +105,14 @@ namespace TSensor.Web.Controllers
 
                 sensorValue.DeviceGuid = guid;
                 sensorValue.EventUTCDate = eventUTCDate;
+
+                var oldSensorValue = await _apiRepository.TakeLastValueAsync(sensorValue);
+                if (Math.Abs(oldSensorValue.liquidEnvironmentLevel - sensorValue.liquidEnvironmentLevel) > criticalLiquidLeveldelta)
+                {
+                    // _smsService.SendSms(
+                    //     PrepareSmsLiquidChangedTemplate(
+                    //         smsTemplateLiquidLevelChangedSignificantly, sensorValue.EventUTCDate.ToLocalTime()));
+                }
 
                 if (await _apiRepository.PushValueAsync(
                     Request.HttpContext.Connection.RemoteIpAddress.ToString(),
@@ -281,21 +300,19 @@ namespace TSensor.Web.Controllers
             return Math.Sqrt(lonD * lonD + latD * latD) * 111.1 * 1000 > movementDelta;
         }
 
-        private string PrepareTemplate(string template,
-            string pointName, DateTime date)
+        private string PrepareMessageMovementTemplate(string template, string pointName, DateTime date)
         {
             return template
                 .Replace("{point}", pointName)
                 .Replace("{date}", date.ToString("dd.MM.yyyy"))
                 .Replace("{time}", date.ToString("HH:mm"));
         }
-
+        
         [Route("coordinates/push")]
         [HttpGet]
         [HttpPost]
         public async Task<IActionResult> PushCoordinates(string d, string lon, string lat)
         {
-            _logService.Write(LogCategory.SmsLog, $"{d} {lon} {lat}");
             if (string.IsNullOrEmpty(d))
             {
                 return Json(new { success = false, error = "missing device guid" });
@@ -339,9 +356,15 @@ namespace TSensor.Web.Controllers
                         {
                             if ((currentDateUTC - pointLastMovingDateUTC.Value).TotalSeconds > holdTimeout)
                             {
-                                _smsService.SendSms(
-                                    PrepareTemplate(
-                                        smsTemplateMovementEnd, point.PointName, pointLastMovingDateUTC.Value.ToLocalTime()));
+                                _emailService.Send(
+                                    "Остановка",
+                                    PrepareMessageMovementTemplate(
+                                        smsTemplateMovementEnd,
+                                        point.PointName,
+                                        pointLastMovingDateUTC.Value.ToLocalTime()
+                                    )
+                                );
+                                
                                 isMoving = false;
                             }
                         }
@@ -350,9 +373,15 @@ namespace TSensor.Web.Controllers
                     {
                         if (coordinatesChangedSignificantly)
                         {
-                            _smsService.SendSms(
-                                PrepareTemplate(
-                                    smsTemplateMovementStart, point.PointName, DateTime.Now));
+                            _emailService.Send(
+                                "Начало движения",
+                                PrepareMessageMovementTemplate(
+                                    smsTemplateMovementStart,
+                                    point.PointName,
+                                    DateTime.Now
+                                )
+                            );
+                            
                             isMoving = true;
                             lastMovingDateUTC = currentDateUTC;
                         }
