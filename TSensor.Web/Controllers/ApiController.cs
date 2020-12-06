@@ -32,7 +32,10 @@ namespace TSensor.Web.Controllers
         private readonly decimal criticalLiquidLeveldelta;
         private readonly string smsTemplateMovementStart;
         private readonly string smsTemplateMovementEnd;
-        private readonly string smsTemplateLiquidLevelChangedSignificantly;
+        private readonly string TemplateLiquidLevelChangedUpStart;
+        private readonly string TemplateLiquidLevelChangedUpEnd;
+        private readonly string TemplateLiquidLevelChangedDownStart;
+        private readonly string TemplateLiquidLevelChangedDownEnd;
         private const int countStoredValue = 6;
         private bool lockFlag = false;
         
@@ -43,7 +46,7 @@ namespace TSensor.Web.Controllers
             NOTHING
         }
         private static List<decimal> lastValues = new List<decimal>(countStoredValue);
-        private State _state = State.NOTHING;
+        private static State _state = State.NOTHING;
 
         public ApiController(IConfiguration configuration, IApiRepository apiRepository, 
             FileLogService logService, SmsService smsService, EmailService emailService)
@@ -60,7 +63,11 @@ namespace TSensor.Web.Controllers
             
             smsTemplateMovementStart = configuration.GetValue<string>("smsTemplateMovementStart");
             smsTemplateMovementEnd = configuration.GetValue<string>("smsTemplateMovementEnd");
-            smsTemplateLiquidLevelChangedSignificantly = configuration.GetValue<string>("smsTemplateLiquidLevelChangedSignificantly");
+            
+            TemplateLiquidLevelChangedUpStart = configuration.GetValue<string>("TemplateLiquidLevelChangedUpStart");
+            TemplateLiquidLevelChangedUpEnd = configuration.GetValue<string>("TemplateLiquidLevelChangedUpEnd");
+            TemplateLiquidLevelChangedDownStart = configuration.GetValue<string>("TemplateLiquidLevelChangedDownStart");
+            TemplateLiquidLevelChangedDownEnd = configuration.GetValue<string>("TemplateLiquidLevelChangedDownEnd");
         }
 
         [NonAction]
@@ -86,81 +93,74 @@ namespace TSensor.Web.Controllers
 
             try
             {
-                // _logService.Write(LogCategory.RawInput, $"{guid} {date} {value}");
-                //
-                // #region ErrorChecks
-                //
-                // if (string.IsNullOrWhiteSpace(value))
-                // {
-                //     return Error("missing sensor value", value, date, guid);
-                // }
-                //
-                // var dateParseResult = DateTime.TryParseExact(date,
-                //     new[]
-                //     {
-                //         "yyyy-MM-dd HH:mm:ss.fff",
-                //         "yyyy-MM-dd HH:mm:ss.ff",
-                //         "yyyy-MM-dd HH:mm:ss.f",
-                //         "yyyy-MM-dd HH:mm:ss.",
-                //         "yyyy-MM-dd HH:mm:ss"
-                //     },
-                //     CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
-                // if (!dateParseResult)
-                // {
-                //     return Error("wrong event utc date", value, date, guid);
-                // }
-                //
-                // if (string.IsNullOrWhiteSpace(guid))
-                // {
-                //     return Error("missing device guid", value, date, guid);
-                // }
-                //
-                // var sensorValue = ActualSensorValue.TryParse(value);
-                // if (sensorValue == null)
-                // {
-                //     return Error("wrong value format", value, date, guid);
-                // }
-                //
-                // #endregion
+                _logService.Write(LogCategory.RawInput, $"{guid} {date} {value}");
                 
-                var sensorValue = new ActualSensorValue(){liquidEnvironmentLevel = decimal.Parse(v)};
+                #region ErrorChecks
+                
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return Error("missing sensor value", value, date, guid);
+                }
+                
+                var dateParseResult = DateTime.TryParseExact(date,
+                    new[]
+                    {
+                        "yyyy-MM-dd HH:mm:ss.fff",
+                        "yyyy-MM-dd HH:mm:ss.ff",
+                        "yyyy-MM-dd HH:mm:ss.f",
+                        "yyyy-MM-dd HH:mm:ss.",
+                        "yyyy-MM-dd HH:mm:ss"
+                    },
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
+                if (!dateParseResult)
+                {
+                    return Error("wrong event utc date", value, date, guid);
+                }
+                
+                if (string.IsNullOrWhiteSpace(guid))
+                {
+                    return Error("missing device guid", value, date, guid);
+                }
+                
+                var sensorValue = ActualSensorValue.TryParse(value);
+                if (sensorValue == null)
+                {
+                    return Error("wrong value format", value, date, guid);
+                }
+                
+                #endregion
+                
+                // var sensorValue = new ActualSensorValue(){liquidEnvironmentLevel = decimal.Parse(v)};
+                //var oldSensorValue = await _apiRepository.TakeLastValueAsync(sensorValue);
 
                 sensorValue.DeviceGuid = guid;
-               // sensorValue.EventUTCDate = eventUTCDate;
-
+                sensorValue.EventUTCDate = eventUTCDate;
 
                 #region CheckStartEndFilling
                 
-                //var oldSensorValue = await _apiRepository.TakeLastValueAsync(sensorValue);
                 //
-                if (lastValues.Count < countStoredValue)
+                if (lastValues.Count < countStoredValue - 1)
                 {
                     lastValues.Add(sensorValue.liquidEnvironmentLevel);
                 }
-                else if (lastValues.Count == countStoredValue)
+                else if (lastValues.Count == countStoredValue - 1)
                 {
-                    lastValues.RemoveAt(0);
                     lastValues.Add(sensorValue.liquidEnvironmentLevel);
                     var state = recognizeState();
-
-                    // #region TimerRun
-                    //
-                    // if (lockFlag)
-                    // {
-                    //     Task.Delay(1 * 60 * 1000).ContinueWith(t => );
-                    // }
-                    //
-                    // #endregion
-                    _state = (State) int.Parse(g);
+                    
                     switch (_state)
                     {
                         case State.UP:
                         {
                             if (state == State.NOTHING)
                             {
-                                //TODO Емеил о том что налив закончился
-                                Console.Out.WriteLine("налив закончился");
-
+                                _emailService.Send(
+                                    "Налив закончился",
+                                    PrepareMessageLiquidLevelChangedTemplate(
+                                        TemplateLiquidLevelChangedUpEnd,
+                                        DateTime.Now
+                                    )
+                                );
                                 _state = state;
                             }
                         }
@@ -169,8 +169,13 @@ namespace TSensor.Web.Controllers
                         {
                             if (state == State.NOTHING)
                             {
-                                //TODO Емеил о том что слив закончился
-                                Console.Out.WriteLine("слив закончился");
+                                _emailService.Send(
+                                    "Слив закончился",
+                                    PrepareMessageLiquidLevelChangedTemplate(
+                                        TemplateLiquidLevelChangedDownEnd,
+                                        DateTime.Now
+                                    )
+                                );
                                 _state = state;
                             }
                         }
@@ -179,54 +184,59 @@ namespace TSensor.Web.Controllers
                         {
                             if (state == State.UP)
                             {
-                                //TODO Емеил о том что начался налив
-                                Console.Out.WriteLine("начался налив");
+                                _emailService.Send(
+                                    "Начался налив",
+                                    PrepareMessageLiquidLevelChangedTemplate(
+                                        TemplateLiquidLevelChangedUpStart,
+                                        DateTime.Now
+                                    )
+                                );
                                 _state = state;
 
                             }
                             else if (state == State.DOWN)
                             {
-                                //TODO Емеил о том что начался слив
-                                Console.Out.WriteLine("начался слив");
-
+                                _emailService.Send(
+                                    "Начался слив",
+                                    PrepareMessageLiquidLevelChangedTemplate(
+                                        TemplateLiquidLevelChangedDownStart,
+                                        DateTime.Now
+                                    )
+                                );
                                 _state = state;
                             }
                         }
                             break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        // default:
+                        //     throw new ArgumentOutOfRangeException();
                     }
                     
                     
-                        
+                    lastValues.RemoveAt(0);    
                 } 
-                else if (lastValues.Count > countStoredValue)
+                else if (lastValues.Count > countStoredValue - 1)
                 {
-                    while (lastValues.Count != countStoredValue)
+                    while (lastValues.Count != countStoredValue - 1)
                     {
                         lastValues.RemoveAt(0);
                     }
                 }
-                //
                 
-                
-              
-
                 #endregion
                 
 
                 #region PushNewValueToDB
                 //
-                // if (await _apiRepository.PushValueAsync(
-                //     Request.HttpContext.Connection.RemoteIpAddress.ToString(),
-                //     sensorValue, value))
-                // {
-                return Json(new { success = true });
-                // }
-                // else
-                // {
-                //     return Error("no record inserted to db", value, date, guid);
-                // }
+                if (await _apiRepository.PushValueAsync(
+                    Request.HttpContext.Connection.RemoteIpAddress.ToString(),
+                    sensorValue, value))
+                {
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Error("no record inserted to db", value, date, guid);
+                }
 
                 #endregion
                
@@ -244,11 +254,11 @@ namespace TSensor.Web.Controllers
         {
             var abstractDeltas = calcAbstractDeltas(calcDeltas(lastValues));
             var average = abstractDeltas.Average();
-            if (average >= 1.5)
+            if (average >= 0.5)
             {
                 return State.UP;
             } 
-            else if (average <= -1.5)
+            else if (average <= -0.5)
             {
                 return State.DOWN;
             }
@@ -277,17 +287,17 @@ namespace TSensor.Web.Controllers
             foreach (var diff in diffs)
             {
                 var absDiff = Math.Abs(diff);
-                if (absDiff > 0 && absDiff < criticalLiquidLeveldelta)
-                {
-                    list.Add(0);
-                }
-                else if (diff > 0 && absDiff >= criticalLiquidLeveldelta)
+                if (diff > 0 && absDiff >= criticalLiquidLeveldelta)
                 {
                     list.Add(1);
                 } 
                 else if (diff < 0 && absDiff >= criticalLiquidLeveldelta )
                 {
                     list.Add(-1);
+                }
+                else
+                {
+                    list.Add(0);
                 }
             }
             return list;
@@ -309,6 +319,13 @@ namespace TSensor.Web.Controllers
         {
             return template
                 .Replace("{point}", pointName)
+                .Replace("{date}", date.ToString("dd.MM.yyyy"))
+                .Replace("{time}", date.ToString("HH:mm"));
+        }
+        
+        private string PrepareMessageLiquidLevelChangedTemplate(string template, DateTime date)
+        {
+            return template
                 .Replace("{date}", date.ToString("dd.MM.yyyy"))
                 .Replace("{time}", date.ToString("HH:mm"));
         }
