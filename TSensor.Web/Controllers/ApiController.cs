@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
 using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Services;
@@ -31,6 +33,17 @@ namespace TSensor.Web.Controllers
         private readonly string smsTemplateMovementStart;
         private readonly string smsTemplateMovementEnd;
         private readonly string smsTemplateLiquidLevelChangedSignificantly;
+        private const int countStoredValue = 6;
+        private bool lockFlag = false;
+        
+        enum State
+        {
+            UP,
+            DOWN,
+            NOTHING
+        }
+        private static List<decimal> lastValues = new List<decimal>(countStoredValue);
+        private State _state = State.NOTHING;
 
         public ApiController(IConfiguration configuration, IApiRepository apiRepository, 
             FileLogService logService, SmsService smsService, EmailService emailService)
@@ -44,6 +57,7 @@ namespace TSensor.Web.Controllers
             criticalLiquidLeveldelta = configuration.GetValue<decimal>("criticalLiquidLeveldelta");
             holdTimeout = configuration.GetValue<int>("holdTimeout");
             
+            
             smsTemplateMovementStart = configuration.GetValue<string>("smsTemplateMovementStart");
             smsTemplateMovementEnd = configuration.GetValue<string>("smsTemplateMovementEnd");
             smsTemplateLiquidLevelChangedSignificantly = configuration.GetValue<string>("smsTemplateLiquidLevelChangedSignificantly");
@@ -56,7 +70,9 @@ namespace TSensor.Web.Controllers
 
             return Json(new { success = false, error = message });
         }
-
+        
+        
+        
         [Route("sensorvalue/push")]
         [HttpPost]
         public async Task<IActionResult> PushSensorValue(string v, string d, string g)
@@ -70,66 +86,328 @@ namespace TSensor.Web.Controllers
 
             try
             {
-                _logService.Write(LogCategory.RawInput, $"{guid} {date} {value}");
-
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    return Error("missing sensor value", value, date, guid);
-                }
-
-                var dateParseResult = DateTime.TryParseExact(date,
-                    new[]
-                    {
-                        "yyyy-MM-dd HH:mm:ss.fff",
-                        "yyyy-MM-dd HH:mm:ss.ff",
-                        "yyyy-MM-dd HH:mm:ss.f",
-                        "yyyy-MM-dd HH:mm:ss.",
-                        "yyyy-MM-dd HH:mm:ss"
-                    },
-                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
-                if (!dateParseResult)
-                {
-                    return Error("wrong event utc date", value, date, guid);
-                }
-
-                if (string.IsNullOrWhiteSpace(guid))
-                {
-                    return Error("missing device guid", value, date, guid);
-                }
-
-                var sensorValue = ActualSensorValue.TryParse(value);
-                if (sensorValue == null)
-                {
-                    return Error("wrong value format", value, date, guid);
-                }
+                // _logService.Write(LogCategory.RawInput, $"{guid} {date} {value}");
+                //
+                // #region ErrorChecks
+                //
+                // if (string.IsNullOrWhiteSpace(value))
+                // {
+                //     return Error("missing sensor value", value, date, guid);
+                // }
+                //
+                // var dateParseResult = DateTime.TryParseExact(date,
+                //     new[]
+                //     {
+                //         "yyyy-MM-dd HH:mm:ss.fff",
+                //         "yyyy-MM-dd HH:mm:ss.ff",
+                //         "yyyy-MM-dd HH:mm:ss.f",
+                //         "yyyy-MM-dd HH:mm:ss.",
+                //         "yyyy-MM-dd HH:mm:ss"
+                //     },
+                //     CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
+                // if (!dateParseResult)
+                // {
+                //     return Error("wrong event utc date", value, date, guid);
+                // }
+                //
+                // if (string.IsNullOrWhiteSpace(guid))
+                // {
+                //     return Error("missing device guid", value, date, guid);
+                // }
+                //
+                // var sensorValue = ActualSensorValue.TryParse(value);
+                // if (sensorValue == null)
+                // {
+                //     return Error("wrong value format", value, date, guid);
+                // }
+                //
+                // #endregion
+                
+                var sensorValue = new ActualSensorValue(){liquidEnvironmentLevel = decimal.Parse(v)};
 
                 sensorValue.DeviceGuid = guid;
-                sensorValue.EventUTCDate = eventUTCDate;
+               // sensorValue.EventUTCDate = eventUTCDate;
 
-                var oldSensorValue = await _apiRepository.TakeLastValueAsync(sensorValue);
-                if (Math.Abs(oldSensorValue.liquidEnvironmentLevel - sensorValue.liquidEnvironmentLevel) > criticalLiquidLeveldelta)
-                {
-                    // _smsService.SendSms(
-                    //     PrepareSmsLiquidChangedTemplate(
-                    //         smsTemplateLiquidLevelChangedSignificantly, sensorValue.EventUTCDate.ToLocalTime()));
-                }
 
-                if (await _apiRepository.PushValueAsync(
-                    Request.HttpContext.Connection.RemoteIpAddress.ToString(),
-                    sensorValue, value))
+                #region CheckStartEndFilling
+                
+                //var oldSensorValue = await _apiRepository.TakeLastValueAsync(sensorValue);
+                //
+                if (lastValues.Count < countStoredValue)
                 {
-                    return Json(new { success = true });
+                    lastValues.Add(sensorValue.liquidEnvironmentLevel);
                 }
-                else
+                else if (lastValues.Count == countStoredValue)
                 {
-                    return Error("no record inserted to db", value, date, guid);
+                    lastValues.RemoveAt(0);
+                    lastValues.Add(sensorValue.liquidEnvironmentLevel);
+                    var state = recognizeState();
+
+                    // #region TimerRun
+                    //
+                    // if (lockFlag)
+                    // {
+                    //     Task.Delay(1 * 60 * 1000).ContinueWith(t => );
+                    // }
+                    //
+                    // #endregion
+                    _state = (State) int.Parse(g);
+                    switch (_state)
+                    {
+                        case State.UP:
+                        {
+                            if (state == State.NOTHING)
+                            {
+                                //TODO Емеил о том что налив закончился
+                                Console.Out.WriteLine("налив закончился");
+
+                                _state = state;
+                            }
+                        }
+                            break;
+                        case State.DOWN:
+                        {
+                            if (state == State.NOTHING)
+                            {
+                                //TODO Емеил о том что слив закончился
+                                Console.Out.WriteLine("слив закончился");
+                                _state = state;
+                            }
+                        }
+                            break;
+                        case State.NOTHING:
+                        {
+                            if (state == State.UP)
+                            {
+                                //TODO Емеил о том что начался налив
+                                Console.Out.WriteLine("начался налив");
+                                _state = state;
+
+                            }
+                            else if (state == State.DOWN)
+                            {
+                                //TODO Емеил о том что начался слив
+                                Console.Out.WriteLine("начался слив");
+
+                                _state = state;
+                            }
+                        }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    
+                    
+                        
+                } 
+                else if (lastValues.Count > countStoredValue)
+                {
+                    while (lastValues.Count != countStoredValue)
+                    {
+                        lastValues.RemoveAt(0);
+                    }
                 }
+                //
+                
+                
+              
+
+                #endregion
+                
+
+                #region PushNewValueToDB
+                //
+                // if (await _apiRepository.PushValueAsync(
+                //     Request.HttpContext.Connection.RemoteIpAddress.ToString(),
+                //     sensorValue, value))
+                // {
+                return Json(new { success = true });
+                // }
+                // else
+                // {
+                //     return Error("no record inserted to db", value, date, guid);
+                // }
+
+                #endregion
+               
             }
             catch (Exception exception)
             {
                 return Error(exception.ToString(), value, date, guid);
             }
         }
+
+        #region StateRecognize
+
+        
+        private State recognizeState()
+        {
+            var abstractDeltas = calcAbstractDeltas(calcDeltas(lastValues));
+            var average = abstractDeltas.Average();
+            if (average >= 1.5)
+            {
+                return State.UP;
+            } 
+            else if (average <= -1.5)
+            {
+                return State.DOWN;
+            }
+            else
+            {
+                return State.NOTHING;
+            }
+        }
+
+        public List<decimal> calcDeltas(List<decimal> values)
+        {
+            var list = new List<decimal>();
+            for (int i = 0; i < values.Count-1; i++)
+            {
+                list.Add(values[i+1] - values[i]);
+            }
+           
+            return list;
+        }
+        
+        public List<int> calcAbstractDeltas(List<decimal> diffs)
+        {
+            //Пример: {0,0,0,1,1,1} -- начался набор
+            // {1,1,1,0,0,0} набор закончился
+            var list = new List<int>();
+            foreach (var diff in diffs)
+            {
+                var absDiff = Math.Abs(diff);
+                if (absDiff > 0 && absDiff < criticalLiquidLeveldelta)
+                {
+                    list.Add(0);
+                }
+                else if (diff > 0 && absDiff >= criticalLiquidLeveldelta)
+                {
+                    list.Add(1);
+                } 
+                else if (diff < 0 && absDiff >= criticalLiquidLeveldelta )
+                {
+                    list.Add(-1);
+                }
+            }
+            return list;
+        }
+
+        #endregion
+      
+
+        //очень грубое приближение, расчитываем на плоскости, только для положительных исходя из 1 градус = 111.1 км
+        private bool IsCoordinatesChangedSignificantly(decimal lon1, decimal lat1, decimal lon2, decimal lat2)
+        {
+            var lonD = (double)(lon1 - lon2);
+            var latD = (double)(lat1 - lat2);
+
+            return Math.Sqrt(lonD * lonD + latD * latD) * 111.1 * 1000 > movementDelta;
+        }
+
+        private string PrepareMessageMovementTemplate(string template, string pointName, DateTime date)
+        {
+            return template
+                .Replace("{point}", pointName)
+                .Replace("{date}", date.ToString("dd.MM.yyyy"))
+                .Replace("{time}", date.ToString("HH:mm"));
+        }
+        
+        [Route("coordinates/push")]
+        [HttpGet]
+        [HttpPost]
+        public async Task<IActionResult> PushCoordinates(string d, string lon, string lat)
+        {
+            if (string.IsNullOrEmpty(d))
+            {
+                return Json(new { success = false, error = "missing device guid" });
+            }
+            if (!lon.TryParseDecimal(out var _lon))
+            {
+                return Json(new { success = false, error = "wrong longitude" });
+            }
+            if (!lat.TryParseDecimal(out var _lat))
+            {
+                return Json(new { success = false, error = "wrong latitude" });
+            }
+
+            try
+            {
+                var pointInfoList = await _apiRepository.UploadPointCoordinatesAsync(d, _lon, _lat);
+                foreach (var point in pointInfoList)
+                {
+                    var isPointMoving = point.IsMoving as bool?;
+                    var pointLastMovingDateUTC = point.LastMovingDateUTC as DateTime?;
+                    var newLongitude = point.Longitude as decimal?;
+                    var newLatitude = point.Latitude as decimal?;
+
+                    var coordinatesChanged = newLongitude != _lon || newLatitude != _lat ?
+                            true as bool? : null;
+                    var coordinatesChangedSignificantly = newLongitude.HasValue && newLatitude.HasValue && 
+                        IsCoordinatesChangedSignificantly(_lon, _lat, newLongitude.Value, newLatitude.Value);
+
+                    bool? isMoving = null;
+                    DateTime? lastMovingDateUTC = null;
+
+                    var currentDateUTC = DateTime.Now.ToUniversalTime();
+
+                    if (isPointMoving == true)
+                    {
+                        if (coordinatesChangedSignificantly)
+                        {
+                            lastMovingDateUTC = currentDateUTC;
+                        }
+                        else
+                        {
+                            if ((currentDateUTC - pointLastMovingDateUTC.Value).TotalSeconds > holdTimeout)
+                            {
+                                _emailService.Send(
+                                    "Остановка",
+                                    PrepareMessageMovementTemplate(
+                                        smsTemplateMovementEnd,
+                                        point.PointName,
+                                        pointLastMovingDateUTC.Value.ToLocalTime()
+                                    )
+                                );
+                                
+                                isMoving = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (coordinatesChangedSignificantly)
+                        {
+                            _emailService.Send(
+                                "Начало движения",
+                                PrepareMessageMovementTemplate(
+                                    smsTemplateMovementStart,
+                                    point.PointName,
+                                    DateTime.Now
+                                )
+                            );
+                            
+                            isMoving = true;
+                            lastMovingDateUTC = currentDateUTC;
+                        }
+                    }
+
+                    await _apiRepository.UpdatePointCoordinate(point.PointGuid, _lon, _lat,
+                        coordinatesChanged, isMoving, lastMovingDateUTC);
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                _logService.Write(LogCategory.Exception, ex.Message);
+
+                return Json(new { success = false, error = ex.Message });
+            }
+        }
+
+        
+        #region Archive
 
         [Route("sensorvalue/archive/push")]
         [HttpPost]
@@ -166,8 +444,8 @@ namespace TSensor.Web.Controllers
                 return Error(ex.ToString(), value, null, deviceGuid);
             }
         }
-
-        private async Task<dynamic> ParseArchiveAsync(string content, string deviceGuid = null, bool legacySupport = false)
+        
+         private async Task<dynamic> ParseArchiveAsync(string content, string deviceGuid = null, bool legacySupport = false)
         {
             var error = 0;
 
@@ -290,115 +568,8 @@ namespace TSensor.Web.Controllers
 
             return RedirectToAction("UploadArchive", "Api");
         }
-
-        //очень грубое приближение, расчитываем на плоскости, только для положительных исходя из 1 градус = 111.1 км
-        private bool IsCoordinatesChangedSignificantly(decimal lon1, decimal lat1, decimal lon2, decimal lat2)
-        {
-            var lonD = (double)(lon1 - lon2);
-            var latD = (double)(lat1 - lat2);
-
-            return Math.Sqrt(lonD * lonD + latD * latD) * 111.1 * 1000 > movementDelta;
-        }
-
-        private string PrepareMessageMovementTemplate(string template, string pointName, DateTime date)
-        {
-            return template
-                .Replace("{point}", pointName)
-                .Replace("{date}", date.ToString("dd.MM.yyyy"))
-                .Replace("{time}", date.ToString("HH:mm"));
-        }
+    
+        #endregion
         
-        [Route("coordinates/push")]
-        [HttpGet]
-        [HttpPost]
-        public async Task<IActionResult> PushCoordinates(string d, string lon, string lat)
-        {
-            if (string.IsNullOrEmpty(d))
-            {
-                return Json(new { success = false, error = "missing device guid" });
-            }
-            if (!lon.TryParseDecimal(out var _lon))
-            {
-                return Json(new { success = false, error = "wrong longitude" });
-            }
-            if (!lat.TryParseDecimal(out var _lat))
-            {
-                return Json(new { success = false, error = "wrong latitude" });
-            }
-
-            try
-            {
-                var pointInfoList = await _apiRepository.UploadPointCoordinatesAsync(d, _lon, _lat);
-                foreach (var point in pointInfoList)
-                {
-                    var isPointMoving = point.IsMoving as bool?;
-                    var pointLastMovingDateUTC = point.LastMovingDateUTC as DateTime?;
-                    var newLongitude = point.Longitude as decimal?;
-                    var newLatitude = point.Latitude as decimal?;
-
-                    var coordinatesChanged = newLongitude != _lon || newLatitude != _lat ?
-                            true as bool? : null;
-                    var coordinatesChangedSignificantly = newLongitude.HasValue && newLatitude.HasValue && 
-                        IsCoordinatesChangedSignificantly(_lon, _lat, newLongitude.Value, newLatitude.Value);
-
-                    bool? isMoving = null;
-                    DateTime? lastMovingDateUTC = null;
-
-                    var currentDateUTC = DateTime.Now.ToUniversalTime();
-
-                    if (isPointMoving == true)
-                    {
-                        if (coordinatesChangedSignificantly)
-                        {
-                            lastMovingDateUTC = currentDateUTC;
-                        }
-                        else
-                        {
-                            if ((currentDateUTC - pointLastMovingDateUTC.Value).TotalSeconds > holdTimeout)
-                            {
-                                _emailService.Send(
-                                    "Остановка",
-                                    PrepareMessageMovementTemplate(
-                                        smsTemplateMovementEnd,
-                                        point.PointName,
-                                        pointLastMovingDateUTC.Value.ToLocalTime()
-                                    )
-                                );
-                                
-                                isMoving = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (coordinatesChangedSignificantly)
-                        {
-                            _emailService.Send(
-                                "Начало движения",
-                                PrepareMessageMovementTemplate(
-                                    smsTemplateMovementStart,
-                                    point.PointName,
-                                    DateTime.Now
-                                )
-                            );
-                            
-                            isMoving = true;
-                            lastMovingDateUTC = currentDateUTC;
-                        }
-                    }
-
-                    await _apiRepository.UpdatePointCoordinate(point.PointGuid, _lon, _lat,
-                        coordinatesChanged, isMoving, lastMovingDateUTC);
-                }
-
-                return Json(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                _logService.Write(LogCategory.Exception, ex.Message);
-
-                return Json(new { success = false, error = ex.Message });
-            }
-        }
     }
 }
