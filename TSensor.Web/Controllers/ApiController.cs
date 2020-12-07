@@ -99,48 +99,48 @@ namespace TSensor.Web.Controllers
                 
                 #region ErrorChecks
                 
-                // if (string.IsNullOrWhiteSpace(value))
-                // {
-                //     return Error("missing sensor value", value, date, guid);
-                // }
-                //
-                // var dateParseResult = DateTime.TryParseExact(date,
-                //     new[]
-                //     {
-                //         "yyyy-MM-dd HH:mm:ss.fff",
-                //         "yyyy-MM-dd HH:mm:ss.ff",
-                //         "yyyy-MM-dd HH:mm:ss.f",
-                //         "yyyy-MM-dd HH:mm:ss.",
-                //         "yyyy-MM-dd HH:mm:ss"
-                //     },
-                //     CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
-                // if (!dateParseResult)
-                // {
-                //     return Error("wrong event utc date", value, date, guid);
-                // }
-                //
-                // if (string.IsNullOrWhiteSpace(guid))
-                // {
-                //     return Error("missing device guid", value, date, guid);
-                // }
-                //
-                // var sensorValue = ActualSensorValue.TryParse(value);
-                // if (sensorValue == null)
-                // {
-                //     return Error("wrong value format", value, date, guid);
-                // }
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return Error("missing sensor value", value, date, guid);
+                }
+                
+                var dateParseResult = DateTime.TryParseExact(date,
+                    new[]
+                    {
+                        "yyyy-MM-dd HH:mm:ss.fff",
+                        "yyyy-MM-dd HH:mm:ss.ff",
+                        "yyyy-MM-dd HH:mm:ss.f",
+                        "yyyy-MM-dd HH:mm:ss.",
+                        "yyyy-MM-dd HH:mm:ss"
+                    },
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
+                if (!dateParseResult)
+                {
+                    return Error("wrong event utc date", value, date, guid);
+                }
+                
+                if (string.IsNullOrWhiteSpace(guid))
+                {
+                    return Error("missing device guid", value, date, guid);
+                }
+                
+                var sensorValue = ActualSensorValue.TryParse(value);
+                if (sensorValue == null)
+                {
+                    return Error("wrong value format", value, date, guid);
+                }
                 
                 #endregion
                 
-                var sensorValue = new ActualSensorValue(){liquidEnvironmentLevel = decimal.Parse(v), TankGuid = Guid.Parse(guid)};
+                // var sensorValue = new ActualSensorValue(){liquidEnvironmentLevel = decimal.Parse(v), TankGuid = Guid.Parse(guid)};
                 //var oldSensorValue = await _apiRepository.TakeLastValueAsync(sensorValue);
 
                 sensorValue.DeviceGuid = guid;
-                // sensorValue.EventUTCDate = eventUTCDate;
+                sensorValue.EventUTCDate = eventUTCDate;
                 #region CheckStartEndFilling
 
-                //if (sensorValue.TankGuid is Guid tankGuid){
-                var tankGuid = sensorValue.TankGuid ?? Guid.Empty;
+                if (sensorValue.TankGuid is Guid tankGuid)
+                {
                     if (!_lastValuesPerTank.ContainsKey(tankGuid))
                     {
                         _lastValuesPerTank[tankGuid] = new List<decimal>();
@@ -171,7 +171,8 @@ namespace TSensor.Web.Controllers
                                         "Налив закончился",
                                         await PrepareMessageLiquidLevelChangedTemplate(
                                             templateLiquidLevelChangedUpEnd,
-                                            DateTime.Now
+                                            DateTime.Now,
+                                            sensorValue.TankGuid.ToString()
                                         )
                                     );
                                     _statePerTank[tankGuid] = state;
@@ -186,7 +187,8 @@ namespace TSensor.Web.Controllers
                                         "Слив закончился",
                                         await PrepareMessageLiquidLevelChangedTemplate(
                                             templateLiquidLevelChangedDownEnd,
-                                            DateTime.Now
+                                            DateTime.Now,
+                                            sensorValue.TankGuid.ToString()
                                         )
                                     );
                                     _statePerTank[tankGuid] = state;
@@ -201,7 +203,8 @@ namespace TSensor.Web.Controllers
                                         "Начался налив",
                                         await PrepareMessageLiquidLevelChangedTemplate(
                                             templateLiquidLevelChangedUpStart,
-                                            DateTime.Now
+                                            DateTime.Now,
+                                            sensorValue.TankGuid.ToString()
                                         )
                                     );
                                     _statePerTank[tankGuid] = state;
@@ -212,7 +215,8 @@ namespace TSensor.Web.Controllers
                                         "Начался слив",
                                         await PrepareMessageLiquidLevelChangedTemplate(
                                             templateLiquidLevelChangedDownStart,
-                                            DateTime.Now
+                                            DateTime.Now,
+                                            sensorValue.TankGuid.ToString()
                                         )
                                     );
                                     _statePerTank[tankGuid] = state;
@@ -232,27 +236,27 @@ namespace TSensor.Web.Controllers
                             _lastValuesPerTank[tankGuid].RemoveAt(0);
                         }
                     }
-                
-                
+                }
+
+
                 #endregion
                 
 
                 #region PushNewValueToDB
-                //
-                // if (await _apiRepository.PushValueAsync(
-                //     Request.HttpContext.Connection.RemoteIpAddress.ToString(),
-                //     sensorValue, value))
-                // {
-                //     return Json(new { success = true });
-                // }
-                // else
-                // {
-                //     return Error("no record inserted to db", value, date, guid);
-                // }
+                
+                if (await _apiRepository.PushValueAsync(
+                    Request.HttpContext.Connection.RemoteIpAddress.ToString(),
+                    sensorValue, value))
+                {
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Error("no record inserted to db", value, date, guid);
+                }
                 
                 #endregion
 
-                return Json(new { success = true });
             }
             catch (Exception exception)
             {
@@ -336,9 +340,9 @@ namespace TSensor.Web.Controllers
                 .Replace("{time}", date.ToString("HH:mm"));
         }
         
-        private async Task<string> PrepareMessageLiquidLevelChangedTemplate(string template, DateTime date)
+        private async Task<string> PrepareMessageLiquidLevelChangedTemplate(string template, DateTime date, string tankGuid)
         {
-            var pointTankNameFromGuid = "name";//await _apiRepository.TakePointTankNameFromGuidAsync(tankGuid);
+            var pointTankNameFromGuid = await _apiRepository.TakePointTankNameFromGuidAsync(tankGuid);
             return template
                 .Replace("{name}", pointTankNameFromGuid)
                 .Replace("{date}", date.ToString("dd.MM.yyyy"))
