@@ -100,13 +100,25 @@ namespace TSensor.Web.Models.Repository
         {
 	        return await QueryFirstAsync<ActualSensorValue>(@"
 			SELECT TOP 1 * 
-				FROM ActualSensorValue
-				WHERE DeviceGuid = @DeviceGuid 
-					AND izkNumber = @izkNumber
-					AND sensorSerial = @sensorSerial
-					AND sensorChannel = @sensorChannel
+			FROM ActualSensorValue
+			WHERE DeviceGuid = @DeviceGuid 
+				AND izkNumber = @izkNumber
+				AND sensorSerial = @sensorSerial
+				AND sensorChannel = @sensorChannel
 ",
 		        new { value.DeviceGuid, value.izkNumber, value.sensorSerial, value.sensorChannel });
+        }
+        
+        public async Task<string> TakePointTankNameFromGuidAsync(string tankGuid)
+        {
+	        return await QueryFirstAsync<string>(@"
+				SELECT TOP (1) CONCAT_WS(' ', p.Name, t.Name)
+				FROM ActualSensorValue 
+				LEFT JOIN Tank t ON ActualSensorValue.TankGuid = t.TankGuid
+				LEFT JOIN Point p ON t.PointGuid = p.PointGuid
+				WHERE ActualSensorValue.TankGuid = @tankGuid
+",
+		        new { tankGuid });
         }
 
         public async Task PushArchivedValuesAsync(string ip, IEnumerable<ActualSensorValue> valueList)

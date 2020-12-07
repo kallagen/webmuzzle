@@ -30,14 +30,13 @@ namespace TSensor.Web.Controllers
         private readonly int movementDelta;
         private readonly int holdTimeout;
         private readonly decimal criticalLiquidLeveldelta;
-        private readonly string smsTemplateMovementStart;
-        private readonly string smsTemplateMovementEnd;
-        private readonly string TemplateLiquidLevelChangedUpStart;
-        private readonly string TemplateLiquidLevelChangedUpEnd;
-        private readonly string TemplateLiquidLevelChangedDownStart;
-        private readonly string TemplateLiquidLevelChangedDownEnd;
-        private const int countStoredValue = 6;
-        private bool lockFlag = false;
+        private readonly string templateMovementStart;
+        private readonly string templateMovementEnd;
+        private readonly string templateLiquidLevelChangedUpStart;
+        private readonly string templateLiquidLevelChangedUpEnd;
+        private readonly string templateLiquidLevelChangedDownStart;
+        private readonly string templateLiquidLevelChangedDownEnd;
+        private static int countStoredValue = 6;
         
         enum State
         {
@@ -45,9 +44,10 @@ namespace TSensor.Web.Controllers
             DOWN,
             NOTHING
         }
-        private static List<decimal> lastValues = new List<decimal>(countStoredValue);
-        private static State _state = State.NOTHING;
-
+        //private static List<decimal> lastValues = new List<decimal>(countStoredValue);
+        //private static State _state = State.NOTHING;
+        private static Dictionary<Guid?, State> _statePerTank = new Dictionary<Guid?, State>();
+        private static Dictionary<Guid?, List<decimal>> _lastValuesPerTank = new Dictionary<Guid?, List<decimal>>();
         public ApiController(IConfiguration configuration, IApiRepository apiRepository, 
             FileLogService logService, SmsService smsService, EmailService emailService)
         {
@@ -59,15 +59,17 @@ namespace TSensor.Web.Controllers
             movementDelta = configuration.GetValue<int>("movementDelta");
             criticalLiquidLeveldelta = configuration.GetValue<decimal>("criticalLiquidLeveldelta");
             holdTimeout = configuration.GetValue<int>("holdTimeout");
+            countStoredValue = configuration.GetValue<int>("countStoredValue");
+
+
+            templateMovementStart = configuration.GetValue<string>("smsTemplateMovementStart");
+            templateMovementEnd = configuration.GetValue<string>("smsTemplateMovementEnd");
             
+            templateLiquidLevelChangedUpStart = configuration.GetValue<string>("TemplateLiquidLevelChangedUpStart");
+            templateLiquidLevelChangedUpEnd = configuration.GetValue<string>("TemplateLiquidLevelChangedUpEnd");
+            templateLiquidLevelChangedDownStart = configuration.GetValue<string>("TemplateLiquidLevelChangedDownStart");
+            templateLiquidLevelChangedDownEnd = configuration.GetValue<string>("TemplateLiquidLevelChangedDownEnd");
             
-            smsTemplateMovementStart = configuration.GetValue<string>("smsTemplateMovementStart");
-            smsTemplateMovementEnd = configuration.GetValue<string>("smsTemplateMovementEnd");
-            
-            TemplateLiquidLevelChangedUpStart = configuration.GetValue<string>("TemplateLiquidLevelChangedUpStart");
-            TemplateLiquidLevelChangedUpEnd = configuration.GetValue<string>("TemplateLiquidLevelChangedUpEnd");
-            TemplateLiquidLevelChangedDownStart = configuration.GetValue<string>("TemplateLiquidLevelChangedDownStart");
-            TemplateLiquidLevelChangedDownEnd = configuration.GetValue<string>("TemplateLiquidLevelChangedDownEnd");
         }
 
         [NonAction]
@@ -97,149 +99,160 @@ namespace TSensor.Web.Controllers
                 
                 #region ErrorChecks
                 
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    return Error("missing sensor value", value, date, guid);
-                }
-                
-                var dateParseResult = DateTime.TryParseExact(date,
-                    new[]
-                    {
-                        "yyyy-MM-dd HH:mm:ss.fff",
-                        "yyyy-MM-dd HH:mm:ss.ff",
-                        "yyyy-MM-dd HH:mm:ss.f",
-                        "yyyy-MM-dd HH:mm:ss.",
-                        "yyyy-MM-dd HH:mm:ss"
-                    },
-                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
-                if (!dateParseResult)
-                {
-                    return Error("wrong event utc date", value, date, guid);
-                }
-                
-                if (string.IsNullOrWhiteSpace(guid))
-                {
-                    return Error("missing device guid", value, date, guid);
-                }
-                
-                var sensorValue = ActualSensorValue.TryParse(value);
-                if (sensorValue == null)
-                {
-                    return Error("wrong value format", value, date, guid);
-                }
+                // if (string.IsNullOrWhiteSpace(value))
+                // {
+                //     return Error("missing sensor value", value, date, guid);
+                // }
+                //
+                // var dateParseResult = DateTime.TryParseExact(date,
+                //     new[]
+                //     {
+                //         "yyyy-MM-dd HH:mm:ss.fff",
+                //         "yyyy-MM-dd HH:mm:ss.ff",
+                //         "yyyy-MM-dd HH:mm:ss.f",
+                //         "yyyy-MM-dd HH:mm:ss.",
+                //         "yyyy-MM-dd HH:mm:ss"
+                //     },
+                //     CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
+                // if (!dateParseResult)
+                // {
+                //     return Error("wrong event utc date", value, date, guid);
+                // }
+                //
+                // if (string.IsNullOrWhiteSpace(guid))
+                // {
+                //     return Error("missing device guid", value, date, guid);
+                // }
+                //
+                // var sensorValue = ActualSensorValue.TryParse(value);
+                // if (sensorValue == null)
+                // {
+                //     return Error("wrong value format", value, date, guid);
+                // }
                 
                 #endregion
                 
-                // var sensorValue = new ActualSensorValue(){liquidEnvironmentLevel = decimal.Parse(v)};
+                var sensorValue = new ActualSensorValue(){liquidEnvironmentLevel = decimal.Parse(v), TankGuid = Guid.Parse(guid)};
                 //var oldSensorValue = await _apiRepository.TakeLastValueAsync(sensorValue);
 
                 sensorValue.DeviceGuid = guid;
-                sensorValue.EventUTCDate = eventUTCDate;
-
+                // sensorValue.EventUTCDate = eventUTCDate;
                 #region CheckStartEndFilling
-                
-                //
-                if (lastValues.Count < countStoredValue - 1)
-                {
-                    lastValues.Add(sensorValue.liquidEnvironmentLevel);
-                }
-                else if (lastValues.Count == countStoredValue - 1)
-                {
-                    lastValues.Add(sensorValue.liquidEnvironmentLevel);
-                    var state = recognizeState();
-                    
-                    switch (_state)
-                    {
-                        case State.UP:
-                        {
-                            if (state == State.NOTHING)
-                            {
-                                _emailService.Send(
-                                    "Налив закончился",
-                                    PrepareMessageLiquidLevelChangedTemplate(
-                                        TemplateLiquidLevelChangedUpEnd,
-                                        DateTime.Now
-                                    )
-                                );
-                                _state = state;
-                            }
-                        }
-                            break;
-                        case State.DOWN:
-                        {
-                            if (state == State.NOTHING)
-                            {
-                                _emailService.Send(
-                                    "Слив закончился",
-                                    PrepareMessageLiquidLevelChangedTemplate(
-                                        TemplateLiquidLevelChangedDownEnd,
-                                        DateTime.Now
-                                    )
-                                );
-                                _state = state;
-                            }
-                        }
-                            break;
-                        case State.NOTHING:
-                        {
-                            if (state == State.UP)
-                            {
-                                _emailService.Send(
-                                    "Начался налив",
-                                    PrepareMessageLiquidLevelChangedTemplate(
-                                        TemplateLiquidLevelChangedUpStart,
-                                        DateTime.Now
-                                    )
-                                );
-                                _state = state;
 
-                            }
-                            else if (state == State.DOWN)
-                            {
-                                _emailService.Send(
-                                    "Начался слив",
-                                    PrepareMessageLiquidLevelChangedTemplate(
-                                        TemplateLiquidLevelChangedDownStart,
-                                        DateTime.Now
-                                    )
-                                );
-                                _state = state;
-                            }
-                        }
-                            break;
-                        // default:
-                        //     throw new ArgumentOutOfRangeException();
-                    }
-                    
-                    
-                    lastValues.RemoveAt(0);    
-                } 
-                else if (lastValues.Count > countStoredValue - 1)
-                {
-                    while (lastValues.Count != countStoredValue - 1)
+                //if (sensorValue.TankGuid is Guid tankGuid){
+                var tankGuid = sensorValue.TankGuid ?? Guid.Empty;
+                    if (!_lastValuesPerTank.ContainsKey(tankGuid))
                     {
-                        lastValues.RemoveAt(0);
+                        _lastValuesPerTank[tankGuid] = new List<decimal>();
                     }
-                }
+
+                    if (!_statePerTank.ContainsKey(tankGuid))
+                    {
+                        _statePerTank[tankGuid] = State.NOTHING;
+                    }
+
+                    //
+                    if (_lastValuesPerTank[tankGuid].Count < countStoredValue - 1)
+                    {
+                        _lastValuesPerTank[tankGuid].Add(sensorValue.liquidEnvironmentLevel);
+                    }
+                    else if (_lastValuesPerTank[tankGuid].Count == countStoredValue - 1)
+                    {
+                        _lastValuesPerTank[tankGuid].Add(sensorValue.liquidEnvironmentLevel);
+                        var state = recognizeState(tankGuid);
+
+                        switch (_statePerTank[tankGuid])
+                        {
+                            case State.UP:
+                            {
+                                if (state == State.NOTHING)
+                                {
+                                    _emailService.Send(
+                                        "Налив закончился",
+                                        await PrepareMessageLiquidLevelChangedTemplate(
+                                            templateLiquidLevelChangedUpEnd,
+                                            DateTime.Now
+                                        )
+                                    );
+                                    _statePerTank[tankGuid] = state;
+                                }
+                            }
+                                break;
+                            case State.DOWN:
+                            {
+                                if (state == State.NOTHING)
+                                {
+                                    _emailService.Send(
+                                        "Слив закончился",
+                                        await PrepareMessageLiquidLevelChangedTemplate(
+                                            templateLiquidLevelChangedDownEnd,
+                                            DateTime.Now
+                                        )
+                                    );
+                                    _statePerTank[tankGuid] = state;
+                                }
+                            }
+                                break;
+                            case State.NOTHING:
+                            {
+                                if (state == State.UP)
+                                {
+                                    _emailService.Send(
+                                        "Начался налив",
+                                        await PrepareMessageLiquidLevelChangedTemplate(
+                                            templateLiquidLevelChangedUpStart,
+                                            DateTime.Now
+                                        )
+                                    );
+                                    _statePerTank[tankGuid] = state;
+                                }
+                                else if (state == State.DOWN)
+                                {
+                                    _emailService.Send(
+                                        "Начался слив",
+                                        await PrepareMessageLiquidLevelChangedTemplate(
+                                            templateLiquidLevelChangedDownStart,
+                                            DateTime.Now
+                                        )
+                                    );
+                                    _statePerTank[tankGuid] = state;
+                                }
+                            }
+                                break;
+                            // default:
+                            //     throw new ArgumentOutOfRangeException();
+                        }
+
+                        _lastValuesPerTank[tankGuid].RemoveAt(0);
+                    }
+                    else if (_lastValuesPerTank[tankGuid].Count > countStoredValue - 1)
+                    {
+                        while (_lastValuesPerTank[tankGuid].Count != countStoredValue - 1)
+                        {
+                            _lastValuesPerTank[tankGuid].RemoveAt(0);
+                        }
+                    }
+                
                 
                 #endregion
                 
 
                 #region PushNewValueToDB
                 //
-                if (await _apiRepository.PushValueAsync(
-                    Request.HttpContext.Connection.RemoteIpAddress.ToString(),
-                    sensorValue, value))
-                {
-                    return Json(new { success = true });
-                }
-                else
-                {
-                    return Error("no record inserted to db", value, date, guid);
-                }
-
+                // if (await _apiRepository.PushValueAsync(
+                //     Request.HttpContext.Connection.RemoteIpAddress.ToString(),
+                //     sensorValue, value))
+                // {
+                //     return Json(new { success = true });
+                // }
+                // else
+                // {
+                //     return Error("no record inserted to db", value, date, guid);
+                // }
+                
                 #endregion
-               
+
+                return Json(new { success = true });
             }
             catch (Exception exception)
             {
@@ -250,9 +263,9 @@ namespace TSensor.Web.Controllers
         #region StateRecognize
 
         
-        private State recognizeState()
+        private State recognizeState(Guid tankGuid)
         {
-            var abstractDeltas = calcAbstractDeltas(calcDeltas(lastValues));
+            var abstractDeltas = calcAbstractDeltas(calcDeltas(_lastValuesPerTank[tankGuid]));
             var average = abstractDeltas.Average();
             if (average >= 0.5)
             {
@@ -323,9 +336,11 @@ namespace TSensor.Web.Controllers
                 .Replace("{time}", date.ToString("HH:mm"));
         }
         
-        private string PrepareMessageLiquidLevelChangedTemplate(string template, DateTime date)
+        private async Task<string> PrepareMessageLiquidLevelChangedTemplate(string template, DateTime date)
         {
+            var pointTankNameFromGuid = "name";//await _apiRepository.TakePointTankNameFromGuidAsync(tankGuid);
             return template
+                .Replace("{name}", pointTankNameFromGuid)
                 .Replace("{date}", date.ToString("dd.MM.yyyy"))
                 .Replace("{time}", date.ToString("HH:mm"));
         }
@@ -381,7 +396,7 @@ namespace TSensor.Web.Controllers
                                 _emailService.Send(
                                     "Остановка",
                                     PrepareMessageMovementTemplate(
-                                        smsTemplateMovementEnd,
+                                        templateMovementEnd,
                                         point.PointName,
                                         pointLastMovingDateUTC.Value.ToLocalTime()
                                     )
@@ -398,7 +413,7 @@ namespace TSensor.Web.Controllers
                             _emailService.Send(
                                 "Начало движения",
                                 PrepareMessageMovementTemplate(
-                                    smsTemplateMovementStart,
+                                    templateMovementStart,
                                     point.PointName,
                                     DateTime.Now
                                 )
