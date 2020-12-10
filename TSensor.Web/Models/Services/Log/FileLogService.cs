@@ -17,7 +17,10 @@ namespace TSensor.Web.Models.Services.Log
                 { LogCategory.Exception, new ReaderWriterLock() },
                 { LogCategory.SystemException, new ReaderWriterLock() },
                 { LogCategory.SmsLog, new ReaderWriterLock() },
-                { LogCategory.SmsException, new ReaderWriterLock() }
+                { LogCategory.SmsException, new ReaderWriterLock() },
+                { LogCategory.EmailLog, new ReaderWriterLock() },
+                { LogCategory.EmailException, new ReaderWriterLock() },
+                { LogCategory.LiquidLevel, new ReaderWriterLock() },
             };
 
         private readonly string LogFilePath;

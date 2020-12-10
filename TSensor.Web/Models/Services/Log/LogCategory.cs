@@ -33,5 +33,9 @@ namespace TSensor.Web.Models.Services.Log
         public static readonly LogCategory SystemException = new LogCategory("systemexception");
         public static readonly LogCategory SmsLog = new LogCategory("smslog");
         public static readonly LogCategory SmsException = new LogCategory("smsexception");
+        public static readonly LogCategory LiquidLevel = new LogCategory("LiquidLevel");
+        public static readonly LogCategory EmailLog = new LogCategory("EmailLog");
+        public static readonly LogCategory EmailException = new LogCategory("EmailException");
+
     }
 }

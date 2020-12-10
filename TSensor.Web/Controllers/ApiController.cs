@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
 using TSensor.Web.Models.Entity;
@@ -44,8 +45,7 @@ namespace TSensor.Web.Controllers
             DOWN,
             NOTHING
         }
-        //private static List<decimal> lastValues = new List<decimal>(countStoredValue);
-        //private static State _state = State.NOTHING;
+        
         private static Dictionary<Guid?, State> _statePerTank = new Dictionary<Guid?, State>();
         private static Dictionary<Guid?, List<decimal>> _lastValuesPerTank = new Dictionary<Guid?, List<decimal>>();
         public ApiController(IConfiguration configuration, IApiRepository apiRepository, 
@@ -167,6 +167,8 @@ namespace TSensor.Web.Controllers
                             {
                                 if (state == State.NOTHING)
                                 {
+                                    _logService.Write(LogCategory.LiquidLevel, "Changed from UP to NOTHING\n\n\n");
+
                                     _emailService.Send(
                                         "Налив закончился",
                                         await PrepareMessageLiquidLevelChangedTemplate(
@@ -183,6 +185,8 @@ namespace TSensor.Web.Controllers
                             {
                                 if (state == State.NOTHING)
                                 {
+                                    _logService.Write(LogCategory.LiquidLevel, "Changed from DOWN to NOTHING\n\n\n");
+
                                     _emailService.Send(
                                         "Слив закончился",
                                         await PrepareMessageLiquidLevelChangedTemplate(
@@ -199,6 +203,7 @@ namespace TSensor.Web.Controllers
                             {
                                 if (state == State.UP)
                                 {
+                                    _logService.Write(LogCategory.LiquidLevel, "Changed from NOTHING to UP\n\n\n");
                                     _emailService.Send(
                                         "Начался налив",
                                         await PrepareMessageLiquidLevelChangedTemplate(
@@ -211,6 +216,7 @@ namespace TSensor.Web.Controllers
                                 }
                                 else if (state == State.DOWN)
                                 {
+                                    _logService.Write(LogCategory.LiquidLevel, "Changed from NOTHING to DOWN\n\n\n");
                                     _emailService.Send(
                                         "Начался слив",
                                         await PrepareMessageLiquidLevelChangedTemplate(
@@ -270,6 +276,14 @@ namespace TSensor.Web.Controllers
         private State recognizeState(Guid tankGuid)
         {
             var abstractDeltas = calcAbstractDeltas(calcDeltas(_lastValuesPerTank[tankGuid]));
+
+            var builder = new StringBuilder();
+            builder.Append($"lastValues of tank: {tankGuid}\n");
+            builder.Append(string.Join(", ", _lastValuesPerTank[tankGuid]) + "\n");
+            builder.Append("abstractDeltas:\n");
+            builder.Append(string.Join(", ", abstractDeltas) + "\n");
+            _logService.Write(LogCategory.LiquidLevel, builder.ToString());
+            
             var average = abstractDeltas.Average();
             if (average >= 0.5)
             {

@@ -20,11 +20,11 @@ namespace TSensor.Web.Models.Services.Email
             try
             {
                 _provider.Send(subject, body);
-                _logService.Write(LogCategory.SmsLog, $@"Email message sended");
+                _logService.Write(LogCategory.EmailLog, $"Email message sended, body: {body}\nsubject: {subject}");
             }
             catch (Exception ex)
             {
-                _logService.Write(LogCategory.SmsException, ex.ToString());
+                _logService.Write(LogCategory.EmailException, ex.ToString());
             }
            
         }
