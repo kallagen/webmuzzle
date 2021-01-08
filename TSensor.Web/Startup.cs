@@ -8,6 +8,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using System.IO;
 using TSensor.Web.Models.Broadcast;
+using TSensor.Web.Models.Entity;
 using TSensor.Web.Models.Middleware;
 using TSensor.Web.Models.Repository;
 using TSensor.Web.Models.Security;
@@ -72,6 +73,8 @@ namespace TSensor.Web
             services.AddScoped<IProductRepository, ProductRepository>(p => new ProductRepository(connectionString));
             services.AddScoped<IFavoriteRepository, FavoriteRepository>(p => new FavoriteRepository(connectionString));
             services.AddScoped<IMapSettingsRepository, MapSettingsRepository>(p => new MapSettingsRepository(connectionString));
+            services.AddScoped<IControllerCommandRepository, ControllerCommandRepository>(p => new ControllerCommandRepository(connectionString));
+            services.AddScoped<IControllerSettingsRepository, ControllerSettingsRepository>(p => new ControllerSettingsRepository(connectionString));
             services.AddScoped<IPointTypeRepository, PointTypeRepository>(p => new PointTypeRepository(connectionString));
 
             services.AddSingleton<ILicenseRepository, LicenseRepository>(p => new LicenseRepository(connectionString));

@@ -1,0 +1,45 @@
+﻿@model TSensor.Web.ViewModels.ControllerSettings.ControllerSettingsEditViewModel
+
+@{
+    ViewBag.Title = "Управление контроллером";
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            @using (Html.BeginForm("Edit", "Controller", FormMethod.Post, new {@class = "form-horizontal", autocomplete = "off"}))
+            {
+                <div class="box-body">
+                    <div class="form-group @Html.ValidState("CommandForController")">
+                        <label for="CommandForController" class="col-sm-3 control-label">Команда для контроллера: </label>
+                        <div class="col-sm-6">
+                            @Html.TextBoxFor(m => m.CommandForController, new {@class = "form-control"})
+                            @Html.ValidationMessageFor(m => m.CommandForController, null, new {@class = "help-block"})
+                        </div>
+                        <button type="submit" class="btn bg-blue col-sm-3">Отправить команду</button>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        @* <div class="box"> *@
+        @*        @using (Html.BeginForm("Reset", "Controller", FormMethod.Post, new {@class = "form-horizontal", autocomplete = "off", id = "reset-form"})) *@
+        @*        { *@
+        @*            <button id="reset-button" type="button" class="btn bg-red-gradient">Перезапустить контроллер</button> *@
+        @*        } *@
+        @* </div> *@
+        
+    </div>
+    
+</div>
+
+
+<script>
+    // document.querySelector('#reset-button').addEventListener('click', function () {
+    //         document.querySelector('#reset-form').submit();
+    // });
+</script>
+
+
+@Html.ViewModelWindow()
