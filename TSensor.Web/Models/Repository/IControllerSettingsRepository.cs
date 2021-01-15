@@ -1,4 +1,5 @@
-﻿using TSensor.Web.Models.Entity;
+﻿using System.Collections.Generic;
+using TSensor.Web.Models.Entity;
 
 namespace TSensor.Web.Models.Repository
 {
@@ -6,9 +7,8 @@ namespace TSensor.Web.Models.Repository
     {
         public ControllerSettings GetSettings();
         public bool SaveSettings(decimal testValue);
-        public bool ResetController();
-        
+        public bool ControllerExist(string deviceGuid);
 
-
+        public IList<string> GetAllDeviceGuid();
     }
 }

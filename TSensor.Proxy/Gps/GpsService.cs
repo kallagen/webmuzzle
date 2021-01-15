@@ -30,24 +30,25 @@ namespace TSensor.Proxy.Gps
         private async void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             string line;
-
+//TODO раскоментить
             try
             {
-                using var stream = new FileStream(_config.GpsDevice, FileMode.Open);
-                using var reader = new StreamReader(stream);
+                // using var stream = new FileStream(_config.GpsDevice, FileMode.Open);
+                // using var reader = new StreamReader(stream);
                 while (true)
                 {
-                    line = await reader.ReadLineAsync();
+                    // line = await reader.ReadLineAsync();
 
-                    if (line.StartsWith(LINE_FORMAT))
-                    {
-                        var lonlat = Coordinates.Parse(line);
+                    // if (line.StartsWith(LINE_FORMAT))
+                    // {
+                    //     var lonlat = Coordinates.Parse(line);
+                    var lonlat = new Coordinates() {Latitude = 2.2, Longitude = 2.6};
                         _logger.Log($"coordinates: {lonlat}");
 
                         await SendCoordinatesAsync(lonlat);
 
                         break;
-                    }
+                    // }
                 }
             }
             catch (Exception ex)

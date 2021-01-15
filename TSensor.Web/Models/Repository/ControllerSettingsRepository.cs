@@ -1,4 +1,5 @@
-﻿using TSensor.Web.Models.Entity;
+﻿using System.Collections.Generic;
+using TSensor.Web.Models.Entity;
 
 namespace TSensor.Web.Models.Repository
 {
@@ -10,7 +11,7 @@ namespace TSensor.Web.Models.Repository
         {
             return QueryFirst<ControllerSettings>(@"
                 SELECT TOP 1 
-                   ResetState
+                   State
                 FROM ControllerSettings");
         }
 
@@ -19,9 +20,22 @@ namespace TSensor.Web.Models.Repository
             throw new System.NotImplementedException();
         }
 
-        public bool ResetController()
+        public bool ControllerExist(string deviceGuid)
         {
-            throw new System.NotImplementedException();
+            var query = QueryFirst<string>(@"
+                SELECT TOP 1 
+                   DeviceGuid
+                FROM ActualSensorValue
+                WHERE DeviceGuid = @deviceGuid",
+                new {deviceGuid});
+            return query != null;
+        }
+
+        public IList<string> GetAllDeviceGuid()
+        {
+            return QueryFirst<IList<string>>(@"
+                SELECT DeviceGuid
+                FROM ActualSensorValue");
         }
     }
 }

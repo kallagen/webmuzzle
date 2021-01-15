@@ -35,10 +35,17 @@ namespace TSensor.Proxy
         
         public string GpsDevice { get; private set; }
         public int? GpsSendInterval { get; private set; }
+        
+        public int? CommandGetInterval { get; private set; }
 
         public string ApiUrlSendCoordinates { get; private set; }
-
+        
+        public string ApiUrlGetCommand { get; private set; }
+        public string ApiUrlSendCommandComplete { get; private set; }
+        public string ApiUrlSendCommandFailed { get; private set; }
+        
         public bool UseGps => !string.IsNullOrWhiteSpace(GpsDevice) && GpsSendInterval.HasValue;
+        public bool UseCommandSendingApi => !string.IsNullOrWhiteSpace(DeviceGuid) && CommandGetInterval.HasValue;
 
         public bool IsLinux =>
             RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -105,6 +112,8 @@ namespace TSensor.Proxy
             ApiUrlSendValue = $"http://{apiHost}/api/sensorvalue/push";
             ApiUrlSendArchive = $"http://{apiHost}/api/sensorvalue/archive/push";
 
+            ApiUrlSendCoordinates = $"http://{apiHost}/api/coordinates/push";
+
             ArchiveFolder = config["archiveFolder"];
 
             MaxArchiveFileSize = int.Parse(config["maxArchiveFileSize"]) * 1024;
@@ -113,7 +122,13 @@ namespace TSensor.Proxy
             GpsDevice = config["gpsDevice"];
             GpsSendInterval = int.TryParse(config["gpsSendInterval"], out var _gpsSendInterval) ? _gpsSendInterval * 1000 as int? : null;
 
-            ApiUrlSendCoordinates = $"http://{apiHost}/api/coordinates/push";
+            CommandGetInterval = int.TryParse(config["commandGetInterval"], out var _commandGetInterval)
+                ? _commandGetInterval * 1000 as int?
+                : null;
+            
+            ApiUrlGetCommand = $"http://{apiHost}/controller/lastcommand/get";
+            ApiUrlSendCommandComplete = $"http://{apiHost}/controller/command/setcomplete";
+            ApiUrlSendCommandFailed = $"http://{apiHost}/controller/command/setfail";
         }
     }
 }

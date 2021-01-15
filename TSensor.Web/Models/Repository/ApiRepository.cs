@@ -94,7 +94,7 @@ namespace TSensor.Web.Models.Repository
 				END
 
 				SELECT @@ROWCOUNT", value) == 1;
-        }
+        } 
 
         public async Task<ActualSensorValue> TakeLastValueAsync(ActualSensorValue value)
         {

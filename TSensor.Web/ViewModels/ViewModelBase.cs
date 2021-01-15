@@ -1,4 +1,6 @@
-﻿namespace TSensor.Web.ViewModels
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace TSensor.Web.ViewModels
 {
     public class ViewModelBase
     {

@@ -49,6 +49,9 @@ namespace TSensor.Proxy.Com
             {
                 await outputService.Process(strData);
             }
+            // если флаг стоит то получили данные и закрываем порт и после этого процесс который отпрвляет команду
+            // открывает порт, отправляет команду, получает подтверждение и потом както возобновляет слушанье порта с процесса 2
+            // например он раз в 5 секунд чекает флаг если флаг стал снова фолс то 
         }
 
         private void Port_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)

@@ -26,6 +26,11 @@ namespace TSensor.Proxy
             _port = port;
         }
 
+        /// <summary>
+        /// Отправляет данные полученные с контроллера в бэкенд
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
         public async Task Process(string strData)
         {
             using var elapsed = Elapsed.Create;
