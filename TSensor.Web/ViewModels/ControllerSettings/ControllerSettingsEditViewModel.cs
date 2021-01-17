@@ -17,8 +17,6 @@ namespace TSensor.Web.ViewModels.ControllerSettings
         public string DeviceGuid { get; set; }
         
         public int IzkNumber { get; set; }
-        
-        public IList<string> DeviceGuides { get; set; } 
-        
+
     }
 }

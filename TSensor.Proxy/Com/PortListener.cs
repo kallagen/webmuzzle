@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.IO.Ports;
+using System.Threading.Tasks;
+using TSensor.Proxy.Commands;
 using TSensor.Proxy.Logger;
 
 namespace TSensor.Proxy.Com
@@ -7,61 +10,111 @@ namespace TSensor.Proxy.Com
     public class PortListener
     {
         private readonly ILogger _logger;
-
-        private readonly SerialPort port;
-
-        private readonly OutputService outputService;
+        private readonly SerialPort _serialPort;
+        private readonly OutputService _outputService;
+        private readonly string _portName;
+        
+        public static bool Flag2 = false;
+        public static bool FlagPortTableReady = false;
 
         private void Log(string message, Elapsed elapsed = null, bool isError = false)
         {
-            _logger.Log(message, prefix: port.PortName, elapsed, isError);
+            _logger.Log(message, prefix: _serialPort.PortName, elapsed, isError);
         }
 
-        public PortListener(string portName, Config config, ILogger logger, ArchiveService archiveService)
+        public PortListener(string portName, Config config, ILogger logger, ArchiveService archiveService, SerialPort serialSerialPort)
         {
             _logger = logger;
-
-            outputService = new OutputService(portName, config, logger, archiveService);
-
-            port = new SerialPort(portName)
-            {
-                BaudRate = 19200,
-                Parity = Parity.None,
-                StopBits = StopBits.One,
-                DataBits = 8,
-                Handshake = Handshake.None,
-                RtsEnable = true
-            };
-
-            port.DataReceived += Port_DataReceived;
-            port.ErrorReceived += Port_ErrorReceived;
+            _outputService = new OutputService(portName, config, logger, archiveService);
+            _serialPort = serialSerialPort;
+            _portName = portName;
+            
+            _serialPort.DataReceived += SerialPortDataReceived;
+            _serialPort.ErrorReceived += SerialPortErrorReceived;
+            SerialPortDataReceived(_serialPort, null); //TODO gavr убрать
         }
 
         private const int MESSAGE_SIZE = 128;
-        private async void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private const int MESSAGE_SIZE2 = 6;
+        
+        private async void SerialPortDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             var port = sender as SerialPort;
-
-            var strData = port.ReadLine();
-            Log($"{strData.Length} bytes received");
-
-            if (strData.Length == MESSAGE_SIZE)
+            if (port == null) return;
+            
+            if (!port.IsOpen)
             {
-                await outputService.Process(strData);
+                port.Open();
             }
-            // если флаг стоит то получили данные и закрываем порт и после этого процесс который отпрвляет команду
-            // открывает порт, отправляет команду, получает подтверждение и потом както возобновляет слушанье порта с процесса 2
-            // например он раз в 5 секунд чекает флаг если флаг стал снова фолс то 
+            
+            if (CommandsService.Flag1 == false)
+            {
+                Flag2 = false;
+                
+                var strData = port.ReadLine();
+                Log($"{strData.Length} bytes received");
+                
+                if (strData.Length == MESSAGE_SIZE)
+                {
+                    var byteIzkNum = byte.Parse(strData.Substring(1, 2), NumberStyles.HexNumber);
+                    ComPortsRepository.IzkNumbersToPortNames[byteIzkNum] = _portName;
+                    _logger.Log($"Добавлено соотношение izkNum: {byteIzkNum} к {_portName}");
+                    FlagPortTableReady = true;
+                    await _outputService.Process(strData);
+                }
+            }
+            else
+            {
+                Flag2 = true;
+                _logger.Log("Flag1 is true, Flag2 setted to true");
+            }
+               
+            
+        }
+        
+        private async void SerialPortDataReceived2(object sender, SerialDataReceivedEventArgs e)
+        {
+            var port = sender as SerialPort;
+            if (port == null) return;
+            
+            if (!port.IsOpen)
+            {
+                port.Open();
+            }
+            
+            if (CommandsService.Flag1 == false)
+            {
+                Flag2 = false;
+                
+                // var strData = port.ReadLine();
+                var strData = ":50asd";
+                Log($"{strData.Length} bytes received");
+                
+                if (strData.Length <= MESSAGE_SIZE2)
+                {
+                    var byteIzkNum = byte.Parse(strData.Substring(1, 2), NumberStyles.HexNumber);
+                    ComPortsRepository.IzkNumbersToPortNames[byteIzkNum] = _portName;
+                    FlagPortTableReady = true;
+                    await _outputService.Process(strData);
+                }
+            }
+            else
+            {
+                Flag2 = true;
+                _logger.Log("Flag1 is true, Flag2 setted to true");
+            }
+               
+            Task.Delay(10000).ContinueWith(t=> SerialPortDataReceived2(port, null) );
         }
 
-        private void Port_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        private void SerialPortErrorReceived(object sender, SerialErrorReceivedEventArgs e)
         {
             try
             {
                 var port = sender as SerialPort;
 
-                port.DataReceived -= Port_DataReceived;
-                port.ErrorReceived -= Port_ErrorReceived;
+                port.DataReceived -= SerialPortDataReceived;
+                port.ErrorReceived -= SerialPortErrorReceived;
             }
             catch { }
 
@@ -72,7 +125,7 @@ namespace TSensor.Proxy.Com
         {
             try
             {
-                port.Open();
+                _serialPort.Open();
                 Log("is open");
             }
             catch (Exception ex)

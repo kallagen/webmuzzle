@@ -1,4 +1,5 @@
-﻿using TSensor.Proxy.Com;
+﻿using System.IO.Ports;
+using TSensor.Proxy.Com;
 using TSensor.Proxy.Commands;
 using TSensor.Proxy.Gps;
 using TSensor.Proxy.Logger;
@@ -25,14 +26,20 @@ namespace TSensor.Proxy
                 logger.Log("gps disabled");
             }
             
-            if (config.UseCommandSendingApi)
+            
+            
+            if (config.UseCommandSendingApi && config.IsComInputMode)
+            {
+                ComPortsRepository.FillAndOpenAll(config);
                 new CommandsService(config, logger, commandsRepository).Run();
+            }
             else
-                logger.Log("Command Sending API disabled because of DeviceGuid or CommandGetInterval is empty in config");
+                logger.Log("Command Sending API disabled because of DeviceGuid or CommandGetInterval is empty in config or its not COM input mode");
             
 
             if (config.IsComInputMode)
             {
+                ComPortsRepository.FillAndOpenAll(config);
                 new SerialService(config, logger).Run();
             }
             else if (config.IsTcpInputMode)

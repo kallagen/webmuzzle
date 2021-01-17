@@ -36,7 +36,7 @@ namespace TSensor.Proxy
         public string GpsDevice { get; private set; }
         public int? GpsSendInterval { get; private set; }
         
-        public int? CommandGetInterval { get; private set; }
+        public int CommandGetInterval { get; private set; }
 
         public string ApiUrlSendCoordinates { get; private set; }
         
@@ -45,7 +45,7 @@ namespace TSensor.Proxy
         public string ApiUrlSendCommandFailed { get; private set; }
         
         public bool UseGps => !string.IsNullOrWhiteSpace(GpsDevice) && GpsSendInterval.HasValue;
-        public bool UseCommandSendingApi => !string.IsNullOrWhiteSpace(DeviceGuid) && CommandGetInterval.HasValue;
+        public bool UseCommandSendingApi => !string.IsNullOrWhiteSpace(DeviceGuid);
 
         public bool IsLinux =>
             RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -123,8 +123,8 @@ namespace TSensor.Proxy
             GpsSendInterval = int.TryParse(config["gpsSendInterval"], out var _gpsSendInterval) ? _gpsSendInterval * 1000 as int? : null;
 
             CommandGetInterval = int.TryParse(config["commandGetInterval"], out var _commandGetInterval)
-                ? _commandGetInterval * 1000 as int?
-                : null;
+                ? _commandGetInterval * 1000
+                : 1000;
             
             ApiUrlGetCommand = $"http://{apiHost}/controller/lastcommand/get";
             ApiUrlSendCommandComplete = $"http://{apiHost}/controller/command/setcomplete";

@@ -18,7 +18,6 @@ namespace TSensor.Proxy.Commands
         {
             _logger = logger;
             _config = config;
-
         }
 
         public async Task<ControllerCommand> GetLastCommand()

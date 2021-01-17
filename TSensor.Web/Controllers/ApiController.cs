@@ -98,7 +98,7 @@ namespace TSensor.Web.Controllers
                 _logService.Write(LogCategory.RawInput, $"{guid} {date} {value}");
                 
                 #region ErrorChecks
-                
+                //TODO gavr !!!
                 // if (string.IsNullOrWhiteSpace(value))
                 // {
                 //     return Error("missing sensor value", value, date, guid);

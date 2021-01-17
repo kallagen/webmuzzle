@@ -10,6 +10,7 @@ namespace TSensor.Proxy.Com
         private readonly Config _config;
         private readonly ILogger _logger;
 
+
         private readonly ArchiveService archiveService;
 
         public SerialService(Config config, ILogger logger)
@@ -22,11 +23,14 @@ namespace TSensor.Proxy.Com
 
         public void Run()
         {
-            foreach (var portName in SerialPort.GetPortNames()
-                .Where(p => !_config.IsLinux || p.Contains("USB"))
-                .Where(p => !_config.COMPortList.Any() || _config.COMPortList.Contains(p.ToUpper())))
+            if (!ComPortsRepository.NamesPortListFilled)
             {
-                var portListener = new PortListener(portName, _config, _logger, archiveService);
+                ComPortsRepository.FillComPortsNamesList(_config);
+            }
+            
+            foreach (var portKeyValuePair in ComPortsRepository.PortNamesToSerialPorts)
+            {
+                var portListener = new PortListener(portKeyValuePair.Key, _config, _logger, archiveService, portKeyValuePair.Value);
                 portListener.Run();
             }
 

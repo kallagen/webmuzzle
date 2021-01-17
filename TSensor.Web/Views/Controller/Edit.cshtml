@@ -13,7 +13,7 @@
                 <div class="box box-solid">
                     <div class="box-body">
                         <div class="form-group @Html.ValidState("CommandForController")">
-                            <label for="CommandForController">Команда: </label>
+                            <label for="CommandForController">Команда в HEX формате: </label>
                             <div >
                                 @Html.TextBoxFor(m => m.CommandForController, new {@class = "form-control"})
                                 @Html.ValidationMessageFor(m => m.CommandForController, null, new {@class = "help-block"})
