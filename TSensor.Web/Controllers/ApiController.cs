@@ -98,43 +98,43 @@ namespace TSensor.Web.Controllers
                 _logService.Write(LogCategory.RawInput, $"{guid} {date} {value}");
                 
                 #region ErrorChecks
-                //TODO gavr !!!
-                // if (string.IsNullOrWhiteSpace(value))
-                // {
-                //     return Error("missing sensor value", value, date, guid);
-                // }
-                //
-                // var dateParseResult = DateTime.TryParseExact(date,
-                //     new[]
-                //     {
-                //         "yyyy-MM-dd HH:mm:ss.fff",
-                //         "yyyy-MM-dd HH:mm:ss.ff",
-                //         "yyyy-MM-dd HH:mm:ss.f",
-                //         "yyyy-MM-dd HH:mm:ss.",
-                //         "yyyy-MM-dd HH:mm:ss"
-                //     },
-                //     CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
-                // if (!dateParseResult)
-                // {
-                //     return Error("wrong event utc date", value, date, guid);
-                // }
-                //
-                // if (string.IsNullOrWhiteSpace(guid))
-                // {
-                //     return Error("missing device guid", value, date, guid);
-                // }
-                //
-                // var sensorValue = ActualSensorValue.TryParse(value);
-                // if (sensorValue == null)
-                // {
-                //     return Error("wrong value format", value, date, guid);
-                // }
+                //TODO раскоменти gavr !!!
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return Error("missing sensor value", value, date, guid);
+                }
+                
+                var dateParseResult = DateTime.TryParseExact(date,
+                    new[]
+                    {
+                        "yyyy-MM-dd HH:mm:ss.fff",
+                        "yyyy-MM-dd HH:mm:ss.ff",
+                        "yyyy-MM-dd HH:mm:ss.f",
+                        "yyyy-MM-dd HH:mm:ss.",
+                        "yyyy-MM-dd HH:mm:ss"
+                    },
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var eventUTCDate);
+                if (!dateParseResult)
+                {
+                    return Error("wrong event utc date", value, date, guid);
+                }
+                
+                if (string.IsNullOrWhiteSpace(guid))
+                {
+                    return Error("missing device guid", value, date, guid);
+                }
+                
+                var sensorValue = ActualSensorValue.TryParse(value);
+                if (sensorValue == null)
+                {
+                    return Error("wrong value format", value, date, guid);
+                }
                 
                 #endregion
                 
-                var sensorValue = new ActualSensorValue(){liquidEnvironmentLevel = decimal.Parse(v), TankGuid = Guid.Parse(guid)};
-                //var oldSensorValue = await _apiRepository.TakeLastValueAsync(sensorValue);
-                var eventUTCDate = DateTime.Today;
+                // var sensorValue = new ActualSensorValue(){liquidEnvironmentLevel = decimal.Parse(v), TankGuid = Guid.Parse(guid)};
+                // var oldSensorValue = await _apiRepository.TakeLastValueAsync(sensorValue);
+                // var eventUTCDate = DateTime.Today;
                 sensorValue.DeviceGuid = guid;
                 sensorValue.EventUTCDate = eventUTCDate;
                 #region CheckStartEndFilling
@@ -250,16 +250,16 @@ namespace TSensor.Web.Controllers
 
                 #region PushNewValueToDB
                 
-                // if (await _apiRepository.PushValueAsync(
-                //     Request.HttpContext.Connection.RemoteIpAddress.ToString(),
-                //     sensorValue, value))
-                // {
-                    return Json(new { success = true, command = "делай sas" });
-                // }
-                // else
-                // {
-                //     return Error("no record inserted to db", value, date, guid);
-                // }
+                if (await _apiRepository.PushValueAsync(
+                    Request.HttpContext.Connection.RemoteIpAddress.ToString(),
+                    sensorValue, value))
+                {
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Error("no record inserted to db", value, date, guid);
+                }
                 
                 #endregion
 

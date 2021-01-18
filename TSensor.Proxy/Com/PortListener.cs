@@ -30,8 +30,11 @@ namespace TSensor.Proxy.Com
             _portName = portName;
             
             _serialPort.DataReceived += SerialPortDataReceived;
+            Console.Out.WriteLine("ПОДПИСАЛИСЬ на ПОРТ");
+
             _serialPort.ErrorReceived += SerialPortErrorReceived;
-            SerialPortDataReceived(_serialPort, null); //TODO gavr убрать
+            
+            //SerialPortDataReceived(_serialPort, null); //TODO gavr убрать
         }
 
         private const int MESSAGE_SIZE = 128;
@@ -40,72 +43,98 @@ namespace TSensor.Proxy.Com
         private async void SerialPortDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             var port = sender as SerialPort;
+            Console.Out.WriteLine($"1: {CommandsService.Flag1} 2: {Flag2}");
+            Console.Out.WriteLine($"port == null: {port == null} ");
+
             if (port == null) return;
-            
-            if (!port.IsOpen)
-            {
-                port.Open();
-            }
-            
+
             if (CommandsService.Flag1 == false)
             {
                 Flag2 = false;
+                Console.Out.WriteLine("qwe 2 + Port isOpen:" + port.IsOpen);
+
                 
-                var strData = port.ReadLine();
-                Log($"{strData.Length} bytes received");
-                
-                if (strData.Length == MESSAGE_SIZE)
+                if (!port.IsOpen)
                 {
-                    var byteIzkNum = byte.Parse(strData.Substring(1, 2), NumberStyles.HexNumber);
-                    ComPortsRepository.IzkNumbersToPortNames[byteIzkNum] = _portName;
-                    _logger.Log($"Добавлено соотношение izkNum: {byteIzkNum} к {_portName}");
-                    FlagPortTableReady = true;
-                    await _outputService.Process(strData);
+                    port.Open();
+                    Console.Out.WriteLine("ВО ВРЕМЯ 1" + port.IsOpen);
+                }
+
+                Console.Out.WriteLine("ДО ReadLine");
+                try
+                {
+                    var strData = port.ReadLine();
+                  
+                    Console.Out.WriteLine("ПОСЛЕ ReadLine");
+
+                    Log($"{strData.Length} bytes received");
+                    
+                    if (strData.Length == MESSAGE_SIZE)
+                    {
+                        var byteIzkNum = byte.Parse(strData.Substring(1, 2), NumberStyles.HexNumber);
+                        ComPortsRepository.IzkNumbersToPortNames[byteIzkNum] = _portName;
+                        _logger.Log($"Добавлено соотношение izkNum: {byteIzkNum} к {_portName}");
+                        FlagPortTableReady = true;
+                        await _outputService.Process(strData);
+                    } else if (strData == "stop")
+                    {
+                        port.Close();
+                        Console.Out.WriteLine("ПОРТ ЗАКРЫТ");
+                    }
+                }
+                
+                catch (Exception exception)
+                {
+                    Console.WriteLine("EXEPTION: " + exception);
+                    port.Close();
                 }
             }
             else
             {
+                port.Close();
                 Flag2 = true;
-                _logger.Log("Flag1 is true, Flag2 setted to true");
+                _logger.Log("Flag1 is true, Flag2 setted to true, port closed, isOpen:" + port.IsOpen);
             }
-               
             
         }
         
-        private async void SerialPortDataReceived2(object sender, SerialDataReceivedEventArgs e)
-        {
-            var port = sender as SerialPort;
-            if (port == null) return;
-            
-            if (!port.IsOpen)
-            {
-                port.Open();
-            }
-            
-            if (CommandsService.Flag1 == false)
-            {
-                Flag2 = false;
-                
-                // var strData = port.ReadLine();
-                var strData = ":50asd";
-                Log($"{strData.Length} bytes received");
-                
-                if (strData.Length <= MESSAGE_SIZE2)
-                {
-                    var byteIzkNum = byte.Parse(strData.Substring(1, 2), NumberStyles.HexNumber);
-                    ComPortsRepository.IzkNumbersToPortNames[byteIzkNum] = _portName;
-                    FlagPortTableReady = true;
-                    await _outputService.Process(strData);
-                }
-            }
-            else
-            {
-                Flag2 = true;
-                _logger.Log("Flag1 is true, Flag2 setted to true");
-            }
-               
-            Task.Delay(10000).ContinueWith(t=> SerialPortDataReceived2(port, null) );
-        }
+        // private async void SerialPortDataReceived2(object sender, SerialDataReceivedEventArgs e)
+        // {
+        //     var port = sender as SerialPort;
+        //     if (port == null) return;
+        //
+        //     Console.Out.WriteLine("ДО ОТКРЫТИЯ ПОРТА");
+        //     if (!port.IsOpen)
+        //     {
+        //         port.Open();
+        //         Console.Out.WriteLine("ОТКРЫТИЕ");
+        //     }
+        //     Console.Out.WriteLine("ПОСЛЕ ОТКРЫТИЯ");
+        //
+        //     if (CommandsService.Flag1 == false)
+        //     {
+        //         Flag2 = false;
+        //         
+        //         // var strData = port.ReadLine();
+        //         var strData = ":50asd";
+        //         Log($"{strData.Length} bytes received");
+        //         
+        //         if (strData.Length <= MESSAGE_SIZE2)
+        //         {
+        //             var byteIzkNum = byte.Parse(strData.Substring(1, 2), NumberStyles.HexNumber);
+        //             ComPortsRepository.IzkNumbersToPortNames[byteIzkNum] = _portName;
+        //             FlagPortTableReady = true;
+        //             await _outputService.Process(strData);
+        //         }
+        //     }
+        //     else
+        //     {
+        //         Flag2 = true;
+        //         _logger.Log("Flag1 is true, Flag2 setted to true");
+        //     }
+        //        
+        //     Task.Delay(10000).ContinueWith(t=> SerialPortDataReceived2(port, null) );
+        // }
 
         private void SerialPortErrorReceived(object sender, SerialErrorReceivedEventArgs e)
         {
@@ -115,6 +144,7 @@ namespace TSensor.Proxy.Com
 
                 port.DataReceived -= SerialPortDataReceived;
                 port.ErrorReceived -= SerialPortErrorReceived;
+                Console.Out.WriteLine("ОТПИСАЛИСЬ ОТ ПОРТА");
             }
             catch { }
 
@@ -125,7 +155,14 @@ namespace TSensor.Proxy.Com
         {
             try
             {
-                _serialPort.Open();
+                Console.Out.WriteLine("ДО 2");
+                if (!_serialPort.IsOpen)
+                {
+                    _serialPort.Open();
+                    Console.Out.WriteLine("ВО ВРЕМЯ 2");
+                }
+                Console.Out.WriteLine("ПОСЛЕ 2");
+
                 Log("is open");
             }
             catch (Exception ex)

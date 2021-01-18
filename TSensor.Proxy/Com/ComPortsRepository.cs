@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using System.IO.Ports;
@@ -55,8 +56,17 @@ namespace TSensor.Proxy.Com
          public static void OpenAllPorts()
          {
              foreach (var serialPort in SerialPorts)
+             {
+                 Console.Out.WriteLine("ДО 4");
+                 Console.Out.WriteLine(serialPort);
+                 
                  if (!serialPort.IsOpen)
+                 {
+                     Console.Out.WriteLine("ВО ВРЕМЯ 4");
                      serialPort.Open();
+                 }
+                 Console.Out.WriteLine("ПОСЛЕ 4");
+             }
          }
          
          public static void CloseAllPorts()

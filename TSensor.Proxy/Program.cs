@@ -1,4 +1,5 @@
-﻿using System.IO.Ports;
+﻿using System;
+using System.IO.Ports;
 using TSensor.Proxy.Com;
 using TSensor.Proxy.Commands;
 using TSensor.Proxy.Gps;
@@ -25,9 +26,9 @@ namespace TSensor.Proxy
             {
                 logger.Log("gps disabled");
             }
-            
-            
-            
+
+
+            Console.Out.WriteLine($"UseCommandSendingApi: {config.UseCommandSendingApi}, IsComInputMode:{config.IsComInputMode}");
             if (config.UseCommandSendingApi && config.IsComInputMode)
             {
                 ComPortsRepository.FillAndOpenAll(config);

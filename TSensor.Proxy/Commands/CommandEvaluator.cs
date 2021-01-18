@@ -21,49 +21,35 @@ namespace TSensor.Proxy.Commands
                 serialPort.Handshake = Handshake.None;
                 serialPort.RtsEnable = true;
 
+                Console.Out.WriteLine("ДО 3");
                 if (!serialPort.IsOpen)
                 {
+                    Console.Out.WriteLine("ВО ВРЕМЯ 3");
                     serialPort.Open();
                 }
+                Console.Out.WriteLine("ПОСЛЕ 3");
+
                 
                 ModbusSerialMaster master = ModbusSerialMaster.CreateAscii(serialPort);
                 using (master)
                 {
+                    Console.Out.WriteLine("До записи в порт: " + command.izkNumber + " " + command.startAddress + " " + command.value);
+
                     master.WriteSingleRegister(command.izkNumber, command.startAddress, command.value);
+                    Console.Out.WriteLine("После Записи в порт");
+
                 }
 
                 return new CommandsService.CommandEvalResult(false);
             }
             catch (Exception e)
             {
+                Console.Out.WriteLine("ОШИБКА при записи: " + e.Message);
                 return new CommandsService.CommandEvalResult(true, e.Message);
             }
             
         }
         
-        // public void RestartController(string portName, CommandsService.ParsedCommand parsedCommand , byte izkNumber, ushort startAddress, ushort numOfPoints)
-        // {
-        //     SerialPort serialPort = new SerialPort(portName); //Create a new SerialPort object.
-        //     serialPort.BaudRate = 19200;
-        //     serialPort.DataBits = 8;
-        //     serialPort.Parity = Parity.None;
-        //     serialPort.StopBits = StopBits.One;
-        //     serialPort.Handshake = Handshake.None;
-        //     serialPort.RtsEnable = true;
-        //   
-        //     serialPort.Open();
-        //     
-        //     ModbusSerialMaster master = ModbusSerialMaster.CreateAscii(serialPort);
-        //     
-        //     byte slaveID = izkNumber;
-        //     // ushort startAddress = 0;
-        //     // ushort numOfPoints = 1;
-        //     master.WriteSingleRegister(slaveID, startAddress, 65535);
-        //
-        //     // ushort[] holding_register = master.ReadHoldingRegisters(slaveID, startAddress,
-        //     //     numOfPoints);
-        // }
-
 
     }
 }

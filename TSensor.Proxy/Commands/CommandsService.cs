@@ -37,6 +37,7 @@ namespace TSensor.Proxy.Commands
         private async void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             //Если таблица портов уже заполнена, и сейчас не ранится никаких других коммад
+            Console.Out.WriteLine($"PortListener.FlagPortTableReady: {PortListener.FlagPortTableReady} !IsThereCommandRunning: {!IsThereCommandRunning}");
             if (PortListener.FlagPortTableReady && !IsThereCommandRunning)
             {
                 try
@@ -92,6 +93,7 @@ namespace TSensor.Proxy.Commands
                     if (ex.Message.Contains("404"))
                     {
                         Flag1 = false;
+                        
                         CommandEvalResult.sended = true; // поддельный сенд чтобы Worker_RunWorkerCompleted не ругался
                     }
                     else
@@ -99,6 +101,7 @@ namespace TSensor.Proxy.Commands
                 }
                 finally
                 {
+                    ComPortsRepository.OpenAllPorts();
                     IsThereCommandRunning = false;
                     IsThereAnyCommandDone = true;
                 }
