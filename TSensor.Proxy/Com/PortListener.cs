@@ -61,39 +61,37 @@ namespace TSensor.Proxy.Com
                 }
 
                 Console.Out.WriteLine("ДО ReadLine");
-                
-                
-                    try
+                try
+                {
+                    string strData = null;
+                    lock (CommandEvaluator.portLock)
                     {
-                        string strData = null;
-                        lock (CommandEvaluator.portLock)
-                        {
-                            strData = port.ReadLine();
-                        }
-
-                        Console.Out.WriteLine("ПОСЛЕ ReadLine");
-
-                        Log($"{strData.Length} bytes received");
-
-                        if (strData.Length == MESSAGE_SIZE)
-                        {
-                            var byteIzkNum = byte.Parse(strData.Substring(1, 2), NumberStyles.HexNumber);
-                            ComPortsRepository.IzkNumbersToPortNames[byteIzkNum] = _portName;
-                            _logger.Log($"Добавлено соотношение izkNum: {byteIzkNum} к {_portName}");
-                            FlagPortTableReady = true;
-                            await _outputService.Process(strData);
-                        }
-                        else if (strData == "stop")
-                        {
-                            port.Close();
-                            Console.Out.WriteLine("ПОРТ ЗАКРЫТ");
-                        }
+                        strData = port.ReadLine();
                     }
-                    catch (Exception exception)
+
+                    Console.Out.WriteLine("ПОСЛЕ ReadLine");
+
+                    Log($"{strData.Length} bytes received");
+
+                    if (strData.Length == MESSAGE_SIZE)
                     {
-                        Console.WriteLine("EXEPTION: " + exception);
+                        var byteIzkNum = byte.Parse(strData.Substring(1, 2), NumberStyles.HexNumber);
+                        ComPortsRepository.IzkNumbersToPortNames[byteIzkNum] = _portName;
+                        _logger.Log($"Добавлено соотношение izkNum: {byteIzkNum} к {_portName}");
+                        FlagPortTableReady = true;
+                        await _outputService.Process(strData);
+                    }
+                    else if (strData == "stop")
+                    {
                         port.Close();
+                        Console.Out.WriteLine("ПОРТ ЗАКРЫТ");
                     }
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine("EXEPTION: " + exception);
+                    port.Close();
+                }
                 
             }
             else

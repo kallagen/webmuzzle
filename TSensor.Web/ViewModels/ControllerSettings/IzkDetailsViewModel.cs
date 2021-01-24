@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TSensor.Web.ViewModels.ControllerSettings
 {
-    public class ControllerSettingsEditViewModel : ViewModelBase
+    public class IzkDetailsViewModel : ViewModelBase
     {
         [Required(ErrorMessage = "Заполните команду")]
         [StringLength(100)]
@@ -15,8 +13,7 @@ namespace TSensor.Web.ViewModels.ControllerSettings
         [MinLength(5, ErrorMessage = "Минимальная длинна 5. Введите DeviceGuid (содержится в конфиге каждого контроллера)")]
         [Display(Name = "DeviceGuid контроллера")]
         public string DeviceGuid { get; set; }
-        
-        public int IzkNumber { get; set; }
+        public int? IzkNumber { get; set; }
 
     }
 }

@@ -2,6 +2,5 @@
 {
     public class ControllerModel
     {
-        public bool Reset { get; set; }
     }
 }

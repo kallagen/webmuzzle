@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TSensor.Web.Models.Entity;
 
 namespace TSensor.Web.Models.Repository
@@ -7,12 +8,23 @@ namespace TSensor.Web.Models.Repository
     {
         public ControllerSettingsRepository(string connectionString) : base(connectionString) { }
         
-        public ControllerSettings GetSettings()
+       
+
+
+        public IEnumerable<ControllerSettings> List()
         {
-            return QueryFirst<ControllerSettings>(@"
-                SELECT TOP 1 
-                   State
+            return QueryFirst<IList<ControllerSettings>>(@"
+                SELECT DeviceGuid, izkNumber
                 FROM ControllerSettings");
+        }
+
+        public Izk GetByDeviceGuidAndIzkNum(Guid deviceGuid, int izkNum)
+        {
+            return QueryFirst<Izk>(@"
+                SELECT DeviceGuid, izkNumber
+                FROM ControllerSettings
+                WHERE DeviceGuid = @deviceGuid AND izkNumber = @izkNum",
+                new {deviceGuid, izkNum});
         }
 
         public bool SaveSettings(decimal testValue)

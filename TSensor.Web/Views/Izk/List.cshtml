@@ -1,0 +1,45 @@
+﻿@using TSensor.Web.Models.Services
+@model TSensor.Web.ViewModels.SearchViewModel<TSensor.Web.Models.Entity.Tank>
+@{
+    ViewBag.Title = "Выбор контроллера";
+}
+
+@section AdditionalHeader
+{
+    @Html.ActionLink("Добавить объект", "Create", "Point", null, new { @class = "btn bg-blue btn-block pull-right" })
+}
+<div class="row">
+    <div class="col-md-12">
+        @if (!Model.HasData)
+        {
+            <h4>ничего не найдено</h4>
+        }
+        else
+        {
+            <div class="box box-solid">
+                <div class="box-body table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Код устройства</th>
+                                <th>Код ИЗК</th>
+                                <th>Примечание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Data.OrderBy(p => p.Name, new AlphanumComparer()))
+                            {
+                                <tr>
+                                    <td>@Html.ActionLink(item.MainDeviceGuid, "Edit", "Izk", new { mainDeviceGuid = item.MainDeviceGuid, mainIZKId = item.MainIZKId }, null)</td>
+                                    <td>@item.MainIZKId</td>
+                                    <td>@item.Description</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@Html.ViewModelWindow()

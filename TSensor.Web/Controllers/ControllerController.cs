@@ -30,7 +30,7 @@ namespace TSensor.Web.Controllers
         public IActionResult Edit()
         {
 
-            var viewModel = new ControllerSettingsEditViewModel()
+            var viewModel = new IzkDetailsViewModel()
             { CommandForController = "" };
             
             var successMessage = TempData["ControllerSettings.Edit.SuccessMessage"] as string;
@@ -45,15 +45,15 @@ namespace TSensor.Web.Controllers
                 viewModel.ErrorMessage = errorMessage;
             }
 
-            // viewModel.DeviceGuides = _settingsRepository.GetAllDeviceGuid();
+            return View("Details", viewModel);
 
-            return View(viewModel);
+            // return View(viewModel);
         }
         
         [Authorize(Policy = "Admin")]
         [Route("controller/send")]
         [HttpPost]
-        public IActionResult Edit(ControllerSettingsEditViewModel viewModel)
+        public IActionResult Edit(IzkDetailsViewModel viewModel)
         {
             if (viewModel == null)
                 return RedirectToAction("Edit", "Controller");
@@ -69,7 +69,7 @@ namespace TSensor.Web.Controllers
                 if (!string.IsNullOrEmpty(viewModel.DeviceGuid) && _settingsRepository.ControllerExist(viewModel.DeviceGuid))
                 {
 
-                    var guid = _commandRepository.UploadCommand(viewModel.CommandForController, viewModel.DeviceGuid, viewModel.IzkNumber);
+                    var guid = _commandRepository.UploadCommand(viewModel.CommandForController, viewModel.DeviceGuid, viewModel.IzkNumber ?? -1); //TODO gavr возможно не -1
                     if (guid != null)
                     {
                         TempData["ControllerSettings.Edit.SuccessMessage"] =
@@ -91,31 +91,22 @@ namespace TSensor.Web.Controllers
                 }
             }
 
-            return View(viewModel);
+            return View("Details", viewModel);
         }
 
         [Authorize(Policy = "Admin")]
         [Route("settings/reset")]
         [HttpPost]
-        public IActionResult Reset(ControllerSettingsEditViewModel viewModel)
+        public IActionResult Reset(IzkDetailsViewModel viewModel)
         {
             if (viewModel == null)
             {
                 return RedirectToAction("Edit", "Controller");
             }
-            
-            //TODO
-            // if (КОНТРОЛЛЕР ВЫКЛЮЧЕН)
-            // {
-            //     ModelState.AddModelError("Controller", "Контроллер выключен или перезагружается");
-            // }
 
-            
-            
-        
             if (!string.IsNullOrEmpty(viewModel.DeviceGuid) && _settingsRepository.ControllerExist(viewModel.DeviceGuid))
             {
-                var guid = _commandRepository.UploadCommand(RESET_COMMAND, viewModel.DeviceGuid, viewModel.IzkNumber);
+                var guid = _commandRepository.UploadCommand(RESET_COMMAND, viewModel.DeviceGuid, viewModel.IzkNumber ?? -1); //TODO gavr возможно не -1
                 if (guid != null)
                 {
                     TempData["ControllerSettings.Edit.SuccessMessage"] =
@@ -140,6 +131,7 @@ namespace TSensor.Web.Controllers
             return RedirectToAction("Edit", "Controller");
         }
 
+        
         [Route("lastcommand/get")]
         [HttpGet]
         public async Task<ActionResult<LatestControllerCommand>> GetLastCommand(string deviceGuid)
@@ -149,8 +141,67 @@ namespace TSensor.Web.Controllers
                 return NotFound();
             
             return latestCC;
-        } 
+        }
         
+        //Сюда приходим когда уже выбрали конкретный контроллер со страницы SelectController
+        [Route("controller/{guid}/details")]
+        public IActionResult Details(string deviceGuid, string mainIzkId)
+        {
+            if (Guid.TryParse(deviceGuid, out var _deviceGuid) && int.TryParse(mainIzkId, out var _izkNumber))
+            {
+                var viewModel = new IzkDetailsViewModel()
+                {
+                    DeviceGuid = _deviceGuid.ToString(),
+                    IzkNumber = _izkNumber,
+                };
+                return View(viewModel);
+                // if (tankInfo != null)
+                // {
+                //     var viewModel = new TankDetailsViewModel
+                //     {
+                //         TankGuid = _tankGuid,
+                //         TankName = tankInfo.TankName,
+                //         DualMode = tankInfo.DualMode,
+                //         PointName = tankInfo.PointName,
+                //         ProductName = tankInfo.ProductName,
+                //         HasCalibrationRights = HttpContext.User.IsInRole("ADMIN"),
+                //         HasCalibrationData = _tankRepository.HasTankCalibrationData(_tankGuid),
+                //         IsMassmeter = tankInfo.PointGuid == PointRepository.MASSMETER_POINT_GUID
+                //     };
+                //
+                //     if (viewModel.HasCalibrationRights && !isMassmeter)
+                //     {
+                //         viewModel.MassmeterList = _tankRepository.GetListByPoint(PointRepository.MASSMETER_POINT_GUID)
+                //             .ToDictionary(p => p.TankGuid, p => p.Name);
+                //     }
+                //
+                //     if (tankInfo.InsertDate != null)
+                //     {
+                //         viewModel.Value = ActualSensorValue.Parse(tankInfo);
+                //     }
+                //
+                //     var successMessage = TempData["Tank.Details.SuccessMessage"] as string;
+                //     if (!string.IsNullOrEmpty(successMessage))
+                //     {
+                //         viewModel.SuccessMessage = successMessage;
+                //     }
+                //     var errorMessage = TempData["Tank.Details.ErrorMessage"] as string;
+                //     if (!string.IsNullOrEmpty(errorMessage))
+                //     {
+                //         viewModel.ErrorMessage = errorMessage;
+                //     }
+                //
+                //     return View("Details", viewModel);
+                // }
+            }
+
+            ViewBag.Title = "ИЗК не найден";
+            return View("NotFound");
+        }
+
+
+        #region setStatus
+
         [Route("command/setfail")]
         [HttpPost]
         public async Task<ActionResult<ControllerCommand>> SetWhyCommandFailed(
@@ -200,10 +251,7 @@ namespace TSensor.Web.Controllers
             return commandGuid;
         }
 
-        // public async Task<IActionResult> SearchIzkNumber(string term)
-        // {
-        //     var names = _settingsRepository.GetAllDeviceGuid();
-        //     return new JsonResult(names);
-        // }
+        #endregion setStatus
+        
     }
 }

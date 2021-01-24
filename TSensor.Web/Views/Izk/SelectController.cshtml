@@ -1,0 +1,49 @@
+﻿@using System.Text.Json
+@model TSensor.Web.ViewModels.Dashboard.ActualSensorValuesViewModel
+
+@{
+    ViewBag.Title = "Выбор контроллера";
+    var hasItems = Model?.ActualSensorValueList?.Any() == true;
+}
+
+@if (hasItems)
+{
+
+    var hasError = Model.ActualSensorValueList.Any(t => t.IsError);
+    var hasWarning = Model.ActualSensorValueList.Any(t => t.IsWarning);
+
+    // var listenSensors = Model.ActualSensorValueList.Select(t =>
+    //     new
+    //     {
+    //         guid = t.MainSensorGuid,
+    //         updateDate = t.MainSensorInsertDate,
+    //         warningDate = t.MainSensorWarningDateTicks,
+    //         weightDelta = t.WeightChangeDelta ?? 0,
+    //         weightTimeout = t.WeightChangeTimeout ?? 0,
+    //         weight = t.LiquidEnvironmentLevel,
+    //         isGas = t.IsGas
+    //     });
+    
+    <div class="t-error-message callout callout-danger @if(!hasError){<text>hidden</text>}">
+        <h4>Внимание!</h4>
+        <p>Данные с некоторых датчиков никогда не поступали. Проверьте правильность настроек.</p>
+    </div>
+    <div class="t-warning-message callout callout-warning @if(!hasWarning){<text>hidden</text>}">
+        <h4>Внимание!</h4>
+        <p>Данные с некоторых датчиков не поступают больше десяти минут. Проверьте правильность настроек и исправность системы.</p>
+    </div>
+   
+    @foreach (var tank in Model.ActualSensorValueList)
+    {
+        @await Html.PartialAsync("IzkDeviceCard", tank)
+    }
+   
+    <div class="clearfix"></div>
+
+    @Html.ViewModelWindow()
+   
+}   
+else    
+{   
+    <p>Нет данных для отображения</p>
+}   

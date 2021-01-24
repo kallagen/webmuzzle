@@ -1,7 +1,7 @@
-﻿@model TSensor.Web.ViewModels.ControllerSettings.ControllerSettingsEditViewModel
+﻿@model TSensor.Web.ViewModels.ControllerSettings.IzkDetailsViewModel
 
 @{
-    ViewBag.Title = "Управление контроллером";
+    ViewBag.Title = $"Управление контроллером с Guid: {ViewBag.DeviceGuid} номером {ViewBag.IzkNumber}";
 }
 
 <div class="row">
@@ -44,9 +44,7 @@
                 </div>
                 
             }
-                
-        
-        
+            
         
             <div class="box">
                  @using (Html.BeginForm("Reset", "Controller", FormMethod.Post, new {@class = "user-search-form", autocomplete = "on", id = "reset-form"}))
@@ -76,29 +74,11 @@
                             </div>
                            
                         </div>
-                        
                     }
-                
-                @* @using (Html.BeginForm("Reset", "Controller", FormMethod.Post, new {@class = "form-horizontal", autocomplete = "off", id = "reset-form"})) *@
-                @* { *@
-                @* *@
-                @*     <div class="form-group"> *@
-                @*         <label for="DeviceGuid">Контроллер</label> *@
-                @*         <div > *@
-                @*             @Html.TextBoxFor(m => m.DeviceGuid, new {@class = "form-control", @id = "DeviceGuid", @autocomplete = "DeviceGuides"}) *@
-                @*             @Html.ValidationMessageFor(m => m.DeviceGuid, null, new {@class = "help-block"}) *@
-                @*         </div> *@
-                @*     </div> *@
-                @*     <button id="reset-button" type="button" class="btn bg-red-gradient">Перезапустить контроллер</button> *@
-                @* } *@
             </div>
-        
+        </div>
     </div>
     
-</div>
-
-
-
 
 <script>
     document.querySelector('#reset-button').addEventListener('click', function () {
@@ -107,11 +87,7 @@
   
 // https://demos.componentone.com/aspnet/5/mvcexplorer/InputMask  
 
-
 </script>
-    
-
-
 
 @Html.ViewModelWindow()
 </div>

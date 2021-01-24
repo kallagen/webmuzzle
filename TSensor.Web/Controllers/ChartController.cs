@@ -51,9 +51,9 @@ namespace TSensor.Web.Controllers
                 dateStart.ToUniversalTime(), dateEnd.ToUniversalTime(),
                 mainParam, additionalParam);
 
-            //период меньше 3 часов - показываем сырые значения
-            //период меньше суток - показываем минуты
-            //все остальное - показываем часы
+            //РїРµСЂРёРѕРґ РјРµРЅСЊС€Рµ 3 С‡Р°СЃРѕРІ - РїРѕРєР°Р·С‹РІР°РµРј СЃС‹СЂС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
+            //РїРµСЂРёРѕРґ РјРµРЅСЊС€Рµ СЃСѓС‚РѕРє - РїРѕРєР°Р·С‹РІР°РµРј РјРёРЅСѓС‚С‹
+            //РІСЃРµ РѕСЃС‚Р°Р»СЊРЅРѕРµ - РїРѕРєР°Р·С‹РІР°РµРј С‡Р°СЃС‹
 
             var totalHours = (dateEnd - dateStart).TotalHours;
             return data.Select(dataset =>
@@ -117,7 +117,7 @@ namespace TSensor.Web.Controllers
                 viewModel.DateEnd = viewModel.DateStart.Value.AddDays(15);
                 ModelState.Remove("DateEnd");
 
-                viewModel.ErrorMessage = "Нельзя указать период больше 15 суток. Конец периода был автоматически изменен";
+                viewModel.ErrorMessage = "РќРµР»СЊР·СЏ СѓРєР°Р·Р°С‚СЊ РїРµСЂРёРѕРґ Р±РѕР»СЊС€Рµ 15 СЃСѓС‚РѕРє. РљРѕРЅРµС† РїРµСЂРёРѕРґР° Р±С‹Р» Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РёР·РјРµРЅРµРЅ";
             }
 
             viewModel.Values = GetData(viewModel.TankGuidList,

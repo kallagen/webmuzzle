@@ -32,6 +32,10 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\DashboardSelect\SelectController.cshtml" />
+  </ItemGroup>
+
 
 
 </Project>
