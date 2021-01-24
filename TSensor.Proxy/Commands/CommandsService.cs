@@ -190,7 +190,7 @@ namespace TSensor.Proxy.Commands
             try
             {
                 //ПАРСИНГ
-                ParsedCommand parcedCommand = null;
+                ParsedCommand? parcedCommand = null;
                 try
                 {
                     parcedCommand = ParceSingleRegisterWriteCommand(command.Command);
@@ -202,29 +202,20 @@ namespace TSensor.Proxy.Commands
                 }
                 
                 var comPortForCmdEval = ComPortsRepository.IzkNumbersToPortNames[parcedCommand.izkNumber]; 
-
                 
-                if (parcedCommand != null)
+                if (command.Command == "RESET")
                 {
-                    if (command.Command == "RESET")
-                    {
-                        _logger.Log($"Reset command detected, evaluating");
-                        var evalResult = CommandEvaluator.Eval(comPortForCmdEval,
-                            new ParsedCommand() { izkNumber = parcedCommand.izkNumber, value = 65535, startAddress = 0});
-                        return evalResult;
-                    }
-                    else
-                    {
-                        var evalResult = CommandEvaluator.Eval(comPortForCmdEval, parcedCommand);
-                        await SendStatusAsync(evalResult.failed, evalResult.failedReason);
-                        return evalResult;
-                    }
+                    _logger.Log($"Reset command detected, evaluating");
+                    var evalResult = CommandEvaluator.Eval(comPortForCmdEval,
+                        new ParsedCommand() { izkNumber = parcedCommand.izkNumber, value = 65535, startAddress = 0}, _logger);
+                    return evalResult;
                 }
                 else
                 {
-                    _logger.Log($"ParceSingleRegisterWriteCommand error", isError: true);
-                    return new CommandEvalResult(true, "ParceSingleRegisterWriteCommand error");
-                } //TODO gavr тут експрешон ис олвейс тру на 190
+                    var evalResult = CommandEvaluator.Eval(comPortForCmdEval, parcedCommand, _logger);
+                    await SendStatusAsync(evalResult.failed, command.Guid, evalResult.failedReason);
+                    return evalResult;
+                }
                 
             }
             catch (Exception e)

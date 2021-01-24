@@ -38,46 +38,6 @@ namespace TSensor.Proxy.Http
 
                 response = await request.GetResponseAsync() as HttpWebResponse;
                 using var reader = new StreamReader(response.GetResponseStream());
-                var sas = reader.ReadToEnd(); //TODO убрать
-                return new HttpResult
-                {
-                    Content = reader.ReadToEnd()
-                };
-            }
-            catch (Exception ex)
-            {
-                return new HttpResult
-                {
-                    Exception = ex
-                };
-            }
-            finally
-            {
-                request = null;
-                response = null;
-            }
-        }
-        
-        public static async Task<HttpResult> GetAsync(string url, Dictionary<string, string> param)
-        {
-            HttpWebRequest request;
-            HttpWebResponse response;
-
-            try
-            {
-                var args = string.Join("&", param.Select(p => $"{p.Key}={WebUtility.UrlEncode(p.Value)}"));
-
-                request = WebRequest.Create(url + "?" +  args) as HttpWebRequest;
-                request.Method = "GET";
-                request.ContentType = "application/x-www-form-urlencoded";
-                request.Timeout = 10000;
-                request.MaximumAutomaticRedirections = 5;
-                request.AllowAutoRedirect = true;
-                request.Headers.Add("Upgrade-Insecure-Requests", "1");
-
-                response = await request.GetResponseAsync() as HttpWebResponse;
-                using var reader = new StreamReader(response.GetResponseStream());
-                var sas = reader.ReadToEnd(); //TODO убрать
                 return new HttpResult
                 {
                     Content = reader.ReadToEnd()

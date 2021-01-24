@@ -2,14 +2,14 @@
 using System.IO.Ports;
 using System.Threading;
 using Modbus.Device;
-
+using TSensor.Proxy.Logger;
 
 
 namespace TSensor.Proxy.Commands
 {
     public class CommandEvaluator
     {
-        public static CommandsService.CommandEvalResult Eval(string portName, ParsedCommand command)
+        public static CommandsService.CommandEvalResult Eval(string portName, ParsedCommand command, ILogger _logger)
         {
             try
             {
@@ -21,30 +21,26 @@ namespace TSensor.Proxy.Commands
                 serialPort.Handshake = Handshake.None;
                 serialPort.RtsEnable = true;
 
-                Console.Out.WriteLine("ДО 3");
                 if (!serialPort.IsOpen)
                 {
-                    Console.Out.WriteLine("ВО ВРЕМЯ 3");
                     serialPort.Open();
                 }
-                Console.Out.WriteLine("ПОСЛЕ 3");
 
-                
                 ModbusSerialMaster master = ModbusSerialMaster.CreateAscii(serialPort);
                 using (master)
                 {
-                    Console.Out.WriteLine("До записи в порт: " + command.izkNumber + " " + command.startAddress + " " + command.value);
-
+                    _logger.Log($"В порт {command.izkNumber} с начальным адресом: {command.startAddress} будет записано {command.value}");
+                    serialPort.WriteTimeout = 5000;
+                    serialPort.ReadTimeout = 5000;
                     master.WriteSingleRegister(command.izkNumber, command.startAddress, command.value);
-                    Console.Out.WriteLine("После Записи в порт");
-
+                    _logger.Log("Команда записана");
                 }
 
                 return new CommandsService.CommandEvalResult(false);
             }
             catch (Exception e)
             {
-                Console.Out.WriteLine("ОШИБКА при записи: " + e.Message);
+                _logger.Log("ОШИБКА при записи: " + e.Message, isError: true);
                 return new CommandsService.CommandEvalResult(true, e.Message);
             }
             
