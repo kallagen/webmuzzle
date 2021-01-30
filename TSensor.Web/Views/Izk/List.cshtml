@@ -20,21 +20,30 @@
                 <div class="box-body table-responsive">
                     <table class="table table-hover">
                         <thead>
-                            <tr>
-                                <th>Код устройства</th>
-                                <th>Код ИЗК</th>
-                                <th>Примечание</th>
-                            </tr>
+                        <tr>
+                            <th>Код устройства</th>
+                            <th>Код ИЗК</th>
+                            <th>Примечание</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.Data.OrderBy(p => p.Name, new AlphanumComparer()))
+                        @foreach (var item in Model.Data.OrderBy(p => p.Name, new AlphanumComparer()))
+                        {
+                            @if (item.MainDeviceGuid != null)
                             {
                                 <tr>
-                                    <td>@Html.ActionLink(item.MainDeviceGuid, "Edit", "Izk", new { mainDeviceGuid = item.MainDeviceGuid, mainIZKId = item.MainIZKId }, null)</td>
+                                    <td>@Html.ActionLink(item.MainDeviceGuid, "Edit", "Izk", new { mainDeviceGuid = item.MainDeviceGuid, mainIZKId = item.MainIZKId })</td>
                                     <td>@item.MainIZKId</td>
                                     <td>@item.Description</td>
-                                </tr>
+                                </tr>     
                             }
+                            else
+                            {
+                                Console.Out.WriteLine("item without MainDeviceGuid " + item.Name);    
+                            }
+                                
+                               
+                        }
                         </tbody>
                     </table>
                 </div>
