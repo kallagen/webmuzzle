@@ -64,22 +64,63 @@ namespace TSensor.Web.Controllers
         
         //Создается по вью модели на каждый Izk из списка и вызывается ендпоинт с соответствующей вью моделью
         [Authorize(Policy = "Admin")]
-        [Route("izk/{mainDeviceGuid}/{mainIZKId}")]
-        public IActionResult Edit(string mainDeviceGuid, int? mainIZKId)
+        [Route("{tankGuid}/{deviceGuid}")]
+        public IActionResult Edit(string tankGuid, int izkChannel, string deviceGuid )
         {
-           
-            var viewModel = new IzkDetailsViewModel(){DeviceGuid = mainDeviceGuid, IzkNumber = mainIZKId};
-            ViewBag.DeviceGuid = mainDeviceGuid;
-            ViewBag.IzkNumber = mainIZKId ?? -1;
-            return View(viewModel);
-             
-            
+            if (Guid.TryParse(tankGuid, out var _tankGuid))
+            {
+                dynamic tankInfo = null;
+                if (izkChannel != -1)
+                {
+                    tankInfo = _tankRepository.GetTankActualSensorValuesBySensorChannel(deviceGuid, izkChannel);
+                }
+                else
+                {
+                    tankInfo = _tankRepository.GetTankActualSensorValues(_tankGuid);
+                }
 
-            ViewBag.Title = "Объект не найден";
-            ViewBag.BackTitle = "назад к списку объектов";
-            ViewBag.BackUrl = Url.ActionLink("List", "Point");
+                if (tankInfo != null) {
+                    var viewModel = new IzkDetailsViewModel()
+                    {
+                        DeviceGuid = tankInfo.MainDeviceGuid,
+                        IzkNumber = tankInfo.MainIZKId,
+                        IsMassmeter = tankInfo.PointGuid == PointRepository.MASSMETER_POINT_GUID
+                    };
 
-            return View("NotFound");
+                    viewModel.Value = ActualSensorValue.Parse(tankInfo);
+
+
+
+                    ViewBag.DeviceGuid = tankInfo.DeviceGuid;
+
+                    if (tankInfo.izkNumber != null)
+                    {
+                        viewModel.SensorChannelList =
+                            _tankRepository.GetSensorChannels(tankInfo.DeviceGuid, tankInfo.izkNumber ?? -1);
+                        ViewBag.IzkNumber = tankInfo.izkNumber;
+                    }
+
+                    return View(viewModel);
+                }
+                else
+                {
+                    ViewBag.Title = "Объект не найден";
+                    ViewBag.BackTitle = "назад к списку объектов";
+                    ViewBag.BackUrl = Url.ActionLink("List", "Point");
+
+                    return View("NotFound");
+                }
+            }
+            else
+            {
+                
+                ViewBag.Title = "Объект не найден";
+                ViewBag.BackTitle = "назад к списку объектов";
+                ViewBag.BackUrl = Url.ActionLink("List", "Point");
+
+                return View("NotFound");
+            }
+
         }
 
         // public IActionResult SelectController(IEnumerable<Guid> guidList, Favorite favorite = null,

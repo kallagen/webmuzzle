@@ -32,7 +32,7 @@
                             @if (item.MainDeviceGuid != null)
                             {
                                 <tr>
-                                    <td>@Html.ActionLink(item.MainDeviceGuid, "Edit", "Izk", new { mainDeviceGuid = item.MainDeviceGuid, mainIZKId = item.MainIZKId })</td>
+                                    <td>@Html.ActionLink(item.MainDeviceGuid, "Edit", "Izk", new {tankGuid = item.TankGuid, izkChannel = -1, deviceGuid = item.MainDeviceGuid})</td>
                                     <td>@item.MainIZKId</td>
                                     <td>@item.Description</td>
                                 </tr>     
@@ -41,8 +41,7 @@
                             {
                                 Console.Out.WriteLine("item without MainDeviceGuid " + item.Name);    
                             }
-                                
-                               
+                            
                         }
                         </tbody>
                     </table>

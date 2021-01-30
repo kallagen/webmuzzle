@@ -19,6 +19,8 @@ namespace TSensor.Web.Models.Repository
         public bool Remove(Guid tankGuid, Guid pointGuid);
 
         public dynamic GetTankActualSensorValues(Guid tankGuid);
+        public dynamic GetTankActualSensorValuesBySensorChannel(string mainDeviceGuid, int sensorChannel);
+        IEnumerable<int> GetSensorChannels(string deviceGuid, int izkNumber);
         public IEnumerable<ActualSensorValue> GetTankSensorValuesHistory(Guid tankGuid, DateTime dateStart, DateTime dateEnd);
 
         public IEnumerable<dynamic> GetTankWithoutSensorList();

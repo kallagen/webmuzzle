@@ -2,6 +2,15 @@
 
 @{
     ViewBag.Title = $"Управление контроллером с Guid: {ViewBag.DeviceGuid} номером {ViewBag.IzkNumber}";
+    
+    var sensorGuid = Model.Value?.SensorGuid;
+    void ValueRow(string sysname, string label, object value)
+    {
+        <tr>
+        <td>@label</td>
+        <td class="@sysname" data-sensorGuid="@sensorGuid">@value?.ToString()?.Replace(",", ".")</td>
+        </tr>
+    }
 }
 
 <div class="row">
@@ -12,6 +21,7 @@
             {
                 <div class="box box-solid">
                     <div class="box-body">
+                        
                         <div class="form-group @Html.ValidState("CommandForController")">
                             <label for="CommandForController">Команда в HEX формате: </label>
                             <div >
@@ -19,63 +29,97 @@
                                 @Html.ValidationMessageFor(m => m.CommandForController, null, new {@class = "help-block"})
                             </div>
                         </div>
-                           
+
                         <div class="form-group">
-                            <label for="DeviceGuid">Контроллер</label>
-                            <div >
-                                @Html.TextBoxFor(m => m.DeviceGuid, new {@class = "form-control", @id = "DeviceGuid", @autocomplete = "DeviceGuides"})
-                                @Html.ValidationMessageFor(m => m.DeviceGuid, null, new {@class = "help-block"})
-                            </div>
+                            <label for="massmeterGuid">Активные Каналы</label>
+                            @Html.DropDownList("SensorChannel", new SelectList(Model.SensorChannelList), new {@class = "form-control", @onchange="callChangefunc(this.value)"})
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="IzkNumber">Номер ИЗК</label>
-                            <div>
-                                @Html.TextBoxFor(m => m.IzkNumber, new {@class = "form-control", @id = "IzkNumber"})
-                                @Html.ValidationMessageFor(m => m.IzkNumber, null, new {@class = "help-block"})
-                            </div>
-                        </div>
+
                     </div>
+                 
                     
                     <div class="box-footer">
                         <button type="submit" class="btn btn-default">Отправить команду</button>
                     </div>
                    
+                    
                 </div>
                 
             }
             
         
             <div class="box">
-                 @using (Html.BeginForm("Reset", "Controller", FormMethod.Post, new {@class = "user-search-form", autocomplete = "on", id = "reset-form"}))
-                    {
-                        <div class="box box-solid">
-                            <div class="box-body">
-                               
-                                <div class="form-group">
-                                    <label for="DeviceGuid">Контроллер</label>
-                                    <div >
-                                        @Html.TextBoxFor(m => m.DeviceGuid, new {@class = "form-control", @id = "DeviceGuid"})
-                                        @Html.ValidationMessageFor(m => m.DeviceGuid, null, new {@class = "help-block"})
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="IzkNumber">Номер ИЗК</label>
-                                    <div>
-                                        @Html.TextBoxFor(m => m.IzkNumber, new {@class = "form-control", @id = "IzkNumber"})
-                                        @Html.ValidationMessageFor(m => m.IzkNumber, null, new {@class = "help-block"})
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="box-footer">
-                                <button id="reset-button" type="button" class="btn bg-red-gradient">Перезапустить контроллер</button>
-                            </div>
-                           
-                        </div>
-                    }
+                @using (Html.BeginForm("Reset", "Controller", FormMethod.Post, new {@class = "user-search-form", autocomplete = "on", id = "reset-form"}))
+                {
+                    <div class="box-footer">
+                        <button id="reset-button" type="button" class="btn bg-red-gradient">Перезапустить контроллер</button>
+                    </div>
+                }
             </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="box box-solid">
+                        <div class="box-body table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Название параметра</th>
+                                        <th>Значение датчика</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.IsMassmeter)
+                                    {
+                                        ValueRow("izkNumber", "Адрес ИЗК", Model.Value?.izkNumber);
+                                        ValueRow("sensorSerial", "Адрес датчика", Model.Value?.sensorSerial);
+                                        ValueRow("environmentVolume", "Объем, л", Model.Value?.environmentVolume);
+                                        ValueRow("liquidEnvironmentLevel", "Общий счетчик массы, кг", Model.Value?.liquidEnvironmentLevel);
+                                        ValueRow("steamMass", "Текущий счетчик массы, кг", Model.Value?.steamMass);
+                                        ValueRow("liquidDensity", "Текущая плотность, кг/м³", Model.Value?.liquidDensity);
+                                        ValueRow("t1", "Температура массомера, °C", Model.Value?.t1);
+                                        ValueRow("environmentComposition", "Положение задвижки, %", Model.Value?.environmentComposition);
+                                    }
+                                    else
+                                    {
+                                        ValueRow("izkNumber", "Адрес ИЗК", Model.Value?.izkNumber);
+                                        ValueRow("banderolType", "Тип посылки", Model.Value?.banderolType);
+                                        ValueRow("sensorSerial", "Адрес датчика", Model.Value?.sensorSerial);
+                                        ValueRow("sensorChannel", "Номер канала", Model.Value?.sensorChannel);
+                                        ValueRow("sensorFirmwareVersionAndReserv", "версия ПО датчика", Model.Value?.sensorFirmwareVersionAndReserv);
+                                        ValueRow("alarma", "Бит сигнализации", Model.Value?.alarma);
+                                        ValueRow("environmentLevel", "Уровень, мм", Model.Value?.environmentLevel);
+                                        // if (Model.DualMode)
+                                        // {
+                                        //     ValueRow("pressureFilter", "Сигнальный уровень, атм", Model.Value?.pressureFilter);
+                                        // }
+                                        ValueRow("pressureMeasuring", "Давление измер, атм", Model.Value?.pressureMeasuring);
+                                        ValueRow("levelInPercent", "Объем, %", Model.Value?.levelInPercent);
+                                        ValueRow("environmentVolume", "Объем, м³", Model.Value?.environmentVolume);
+                                        ValueRow("liquidEnvironmentLevel", "Масса жидкости, т", Model.Value?.liquidEnvironmentLevel);
+                                        ValueRow("steamMass", "Масса пара, т", Model.Value?.steamMass);
+                                        ValueRow("liquidDensity", "Плотность жидкости, кг/м³", Model.Value?.liquidDensity);
+                                        ValueRow("steamDensity", "Плотность пара, кг/м³", Model.Value?.steamDensity);
+                                        ValueRow("dielectricPermeability", "Диэлектрическая проницаемость жидкости", Model.Value?.dielectricPermeability);
+                                        ValueRow("dielectricPermeability2", "Диэлектрическая проницаемость пара", Model.Value?.dielectricPermeability2);
+                                        ValueRow("t1", "Температура нижнего датчика?, °C", Model.Value?.t1);
+                                        ValueRow("t2", "Температура, °C", Model.Value?.t2);
+                                        ValueRow("t3", "Температура, °C", Model.Value?.t3);
+                                        ValueRow("t4", "Температура, °C", Model.Value?.t4);
+                                        ValueRow("t5", "Температура, °C", Model.Value?.t5);
+                                        ValueRow("t6", "Температура верхнего датчика?, °C", Model.Value?.t6);
+                                        ValueRow("plateTemp", "Температура платы, °C", Model.Value?.plateTemp);
+                                        ValueRow("period", "Период платы", Model.Value?.period);
+                                        ValueRow("environmentComposition", "Состав среды, %", Model.Value?.environmentComposition);
+                                        ValueRow("plateServiceParam2", "Угол крена, °", Model.Value?.plateServiceParam2);
+                                        ValueRow("plateServiceParam3", "Угол дифферента, °", Model.Value?.plateServiceParam3);
+                                        ValueRow("cs1", "Измеренная емкость платы, Пф", Model.Value?.cs1);
+                                        ValueRow("crc", "Контрольная сумма", Model.Value?.crc);
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
         </div>
     </div>
     
@@ -84,6 +128,11 @@
     document.querySelector('#reset-button').addEventListener('click', function () {
             document.querySelector('#reset-form').submit();
     });
+    
+    function callChangefunc(val){
+        //Izk/izk/c0cc3057-ce71-424d-814d-7877aca62416
+        window.location.href = "/Controller/ActionMethod?value=" + val;
+    }
   
 // https://demos.componentone.com/aspnet/5/mvcexplorer/InputMask  
 

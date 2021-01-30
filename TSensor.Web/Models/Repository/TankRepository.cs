@@ -33,6 +33,15 @@ namespace TSensor.Web.Models.Repository
                 FROM Tank 
                 WHERE TankGuid = @tankGuid", new { tankGuid });
         }
+        
+        public IEnumerable<int> GetSensorChannels(string deviceGuid, int izkNumber)
+        {
+            return Query<int>(@"
+                SELECT sensorChannel
+                FROM ActualSensorValue
+                WHERE DeviceGuid = @deviceGuid AND izkNumber = @izkNumber",
+                new { deviceGuid, izkNumber });
+        }
 
         public Guid? Create(Guid pointGuid, string name, Guid? productGuid, bool dualMode,
             string mainDeviceGuid, int? mainIZKId, int? mainSensorId,
@@ -141,6 +150,27 @@ namespace TSensor.Web.Models.Repository
                         t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial
                 WHERE
 					t.TankGuid = @tankGuid", new { tankGuid });
+        }
+        
+        public dynamic GetTankActualSensorValuesBySensorChannel(string mainDeviceGuid, int sensorChannel)
+        {
+            return QueryFirst<dynamic>(@"
+				SELECT
+                    t.TankGuid, t.Name AS TankName, t.DualMode, p.PointGuid, p.Name AS PointName, pr.Name AS ProductName, InsertDate, DeviceGuid,
+                    izkNumber, banderolType, sensorSerial, sensorChannel, pressureAndTempSensorState,
+                    sensorFirmwareVersionAndReserv, alarma, environmentLevel, pressureFilter, pressureMeasuring,
+                    levelInPercent, environmentVolume, liquidEnvironmentLevel, steamMass, liquidDensity, steamDensity,
+                    dielectricPermeability, dielectricPermeability2, t1, t2, t3, t4, t5, t6,  plateTemp,
+                    period, plateServiceParam, environmentComposition, cs1, plateServiceParam2, plateServiceParam3,
+                    sensorWorkMode, plateServiceParam4, plateServiceParam5, crc
+                FROM Tank t
+                    LEFT JOIN Point p ON p.PointGuid = t.PointGuid
+                    LEFT JOIN Product pr ON t.ProductGuid = pr.ProductGuid
+	                LEFT JOIN ActualSensorValue asv ON
+                        t.MainDeviceGuid = asv.DeviceGuid AND t.MainIZKId = asv.izkNumber AND t.MainSensorId = asv.sensorSerial
+                WHERE
+	                t.MainDeviceGuid = @mainDeviceGuid AND sensorChannel = @sensorChannel",
+                new { mainDeviceGuid, sensorChannel });
         }
 
         public IEnumerable<ActualSensorValue> GetTankSensorValuesHistory(Guid tankGuid, DateTime dateStart, DateTime dateEnd)

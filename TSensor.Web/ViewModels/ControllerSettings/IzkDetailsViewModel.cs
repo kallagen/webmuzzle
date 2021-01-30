@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using TSensor.Web.Models.Entity;
 
 namespace TSensor.Web.ViewModels.ControllerSettings
 {
@@ -14,6 +17,13 @@ namespace TSensor.Web.ViewModels.ControllerSettings
         [Display(Name = "DeviceGuid контроллера")]
         public string DeviceGuid { get; set; }
         public int? IzkNumber { get; set; }
+        
+        
+        public bool IsMassmeter { get; set; }
+        
+        public ActualSensorValue Value { get; set; }
+        
+        public IEnumerable<int> SensorChannelList { get; set; }
 
     }
 }
